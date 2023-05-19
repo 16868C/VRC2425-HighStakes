@@ -13,7 +13,7 @@ double MedianFilter::filter(double input) {
 		samples.pop();
 	}
 
-	std::vector<double> v = queueToVector(samples);
+	std::vector<double> v = Util::queueToVector(samples);
 
 	size_t medianIndex = v.size() / 2;
 	std::nth_element(v.begin(), v.begin() + medianIndex, v.end());

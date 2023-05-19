@@ -1,5 +1,4 @@
 #pragma once
-#include <cstddef>
 #include <queue>
 
 namespace lib16868X {

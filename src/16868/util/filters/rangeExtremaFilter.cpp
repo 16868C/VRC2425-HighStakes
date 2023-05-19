@@ -11,6 +11,6 @@ double RangeExtremaFilter::filter(double input) {
 	samples.push(input);
 	if (samples.size() > sampleSize) samples.pop();
 
-	std::vector<double> v = queueToVector(samples);
+	std::vector<double> v = Util::queueToVector(samples);
 	return output = *std::max_element(v.begin(), v.end());
 }

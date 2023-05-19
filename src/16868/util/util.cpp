@@ -20,9 +20,9 @@ template<typename T> std::queue<T> vectorToQueue(const std::vector<T> v) {
 	return q;
 }
 
-void runAsBlocking(std::function<void()> fn, std::function<bool()> endCond, int timeout, int pollRate) {
+void runAsBlocking(std::function<void()> fn, std::function<bool()> endCond, int timeout, int pollRate, int paddingDelay) {
 	fn();
-	blocking(endCond, timeout, pollRate);
+	Util::blocking(endCond, timeout, pollRate, paddingDelay);
 }
 void blocking(std::function<bool()> endCond, int timeout, int pollRate, int paddingDelay) {
 	pros::delay(paddingDelay);
