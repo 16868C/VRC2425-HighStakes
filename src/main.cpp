@@ -141,8 +141,19 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-
+	okapi::Motor mtr(12, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::degrees);
+	mtr.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
+	okapi::ControllerButton scooper(okapi::ControllerDigital::A);
 	while (true) {
+		if (scooper.changedToPressed()) {
+			pros::Task scoop([&] {
+				mtr.moveVoltage(12000);
+				while (mtr.getPosition() < 500) {
+					pros::delay(20);
+				}
+				mtr.moveVoltage(0);
+			});
+		}
 
 		pros::delay(20);
 	}
