@@ -13,6 +13,7 @@ enum class EncoderValsType {
 	SCALES_WHEEL_TRACK
 };
 
+typedef struct EncoderVals EncoderScales, EncoderTicks;
 struct EncoderVals {
 	double left { 0 };
 	double right { 0 };
@@ -50,9 +51,20 @@ struct EncoderVals {
 	inline EncoderVals operator/(const double& divisor) {
 		return {left / divisor, right / divisor, rear / divisor, theta, type};
 	}
+
+	inline EncoderVals toDistance(EncoderVals wheelDiamScales, int tpr) {
+		if (type != EncoderValsType::TICKS) return *this;
+		if (wheelDiamScales.type != EncoderValsType::SCALES_WHEEL_DIAM) return *this;
+
+		return {left / static_cast<double>(tpr) * wheelDiamScales.left * M_PI,
+				right / static_cast<double>(tpr) * wheelDiamScales.right * M_PI,
+				rear / static_cast<double>(tpr) * wheelDiamScales.rear * M_PI,
+				EncoderValsType::DISTANCE};
+	}
 };
-typedef EncoderVals EncoderTicks;
-typedef EncoderVals EncoderScales;
+inline EncoderVals operator/(const double& divident, const EncoderVals& divisor) {
+	return {divident / divisor.left, divident / divisor.right, divident / divisor.rear, divisor.theta, divisor.type};
+}
 
 struct Encoders {
 	std::shared_ptr<AbstractEncoder> left { nullptr };
@@ -90,6 +102,9 @@ class Odometry {
 		EncoderScales getWheelTrackScales();
 
 		bool isUsingInertial();
+
+		EncoderScales calibWheelDiam(double actualDist);
+		EncoderScales calibWheelTrack(double actualAng);
 
 	private:
 		static std::shared_ptr<Odometry> odomSingleton;

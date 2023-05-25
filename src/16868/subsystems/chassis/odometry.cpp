@@ -99,6 +99,34 @@ bool Odometry::isUsingInertial() {
 	return useInertial;
 }
 
+EncoderScales Odometry::calibWheelDiam(double actualDist) {
+	EncoderTicks ticksTravelled = encs.getTicks();
+	EncoderVals distTravelled = ticksTravelled.toDistance(wheelDiamScales, encs.tpr);
+	EncoderVals ratios = distTravelled / actualDist;
+	EncoderVals newScales = wheelDiamScales * ratios;
+
+	std::cout << "Ticks travelled: " << ticksTravelled.left << ", " << ticksTravelled.right << ", " << ticksTravelled.rear << "\n";
+	std::cout << "Distance travelled: " << distTravelled.left << ", " << distTravelled.right << ", " << distTravelled.rear << "\n";
+	std::cout << "Ratios: " << ratios.left << ", " << ratios.right << ", " << ratios.rear << "\n";
+	std::cout << "Calibrated wheel diameters: " << newScales.left << ", " << newScales.right << ", " << newScales.rear << "\n";
+	return newScales;
+}
+
+EncoderScales Odometry::calibWheelTrack(double actualAng) {
+	EncoderTicks ticksTravelled = encs.getTicks();
+	EncoderVals distTravelled = ticksTravelled.toDistance(wheelDiamScales, encs.tpr);
+	EncoderVals angTurned =  distTravelled / wheelTrackScales;
+	EncoderVals ratios = angTurned / actualAng;
+	EncoderVals newScales = wheelTrackScales * ratios;
+
+	std::cout << "Ticks travelled: " << ticksTravelled.left << ", " << ticksTravelled.right << ", " << ticksTravelled.rear << "\n";
+	std::cout << "Distance travelled: " << distTravelled.left << ", " << distTravelled.right << ", " << distTravelled.rear << "\n";
+	std::cout << "Angle turned: " << angTurned.left << ", " << angTurned.right << ", " << angTurned.rear << "\n";
+	std::cout << "Ratios: " << ratios.left << ", " << ratios.right << ", " << ratios.rear << "\n";
+	std::cout << "Calibrated wheel tracks: " << newScales.left << ", " << newScales.right << ", " << newScales.rear << "\n";
+	return newScales;
+}
+
 void Odometry::step(EncoderVals deltaTicks) {
 	if (deltaTicks.type != EncoderValsType::TICKS) return;
 	if (std::abs(deltaTicks.left) > MAX_TICKS || std::abs(deltaTicks.right) > MAX_TICKS || std::abs(deltaTicks.rear) > MAX_TICKS) {
@@ -112,14 +140,10 @@ void Odometry::step(EncoderVals deltaTicks) {
 	const double rearCircumference = wheelDiamScales.rear * M_PI;
 	const double wheelTrack = wheelTrackScales.left + wheelTrackScales.right;
 
-	// Delta vertical distance
-	EncoderVals delta(EncoderValsType::DISTANCE);
-	delta.left = deltaTicks.left / static_cast<double>(encs.tpr) * leftCircumference;
-	delta.right = deltaTicks.right / static_cast<double>(encs.tpr) * rightCircumference;
-	// Delta theta
-	delta.theta = (delta.left - delta.right) / wheelTrack;
-	// Delta horizontal distance
-	delta.rear = (deltaTicks.rear / static_cast<double>(encs.tpr) * rearCircumference) - (delta.theta * wheelTrackScales.rear);
+	// Delta distance and theta
+	EncoderVals delta = deltaTicks.toDistance(wheelDiamScales, encs.tpr);
+	delta.theta = (delta.right - delta.left) / wheelTrack;
+	delta.rear -= delta.theta * wheelTrackScales.rear;
 
 	// Local coordinates
 	double localOffsetX = delta.rear;
