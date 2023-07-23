@@ -43,6 +43,31 @@ template<typename T> inline std::queue<T> vectorToQueue(const std::vector<T>& v)
 	return q;
 }
 
+template<typename T> inline T reduceAngle(T ang, T max, T min) {
+	T range = max - min;
+	while (ang > max) ang -= range;
+	while (ang < min) ang += range;
+	return ang;
+}
+template<typename T> inline T reduceAngle360(T deg) {
+	return reduceAngle(deg, static_cast<T>(360), static_cast<T>(0));
+}
+template<typename T> inline T reduceAngle180(T deg) {
+	return reduceAngle(deg, static_cast<T>(180), static_cast<T>(-180));
+}
+template<typename T> inline T reduceAngle90(T deg) {
+	return reduceAngle(deg, static_cast<T>(90), static_cast<T>(-90));
+}
+template<typename T> inline T reduceAngle2PI(T rad) {
+	return reduceAngle(rad, static_cast<T>(2 * M_PI), static_cast<T>(0));
+}
+template<typename T> inline T reduceAnglePI(T rad) {
+	return reduceAngle(rad, static_cast<T>(M_PI), static_cast<T>(-M_PI));
+}
+template<typename T> inline T reduceAnglePI2(T rad) {
+	return reduceAngle(rad, static_cast<T>(M_PI_2), static_cast<T>(-M_PI_2));
+}
+
 void runAsBlocking(std::function<void()> fn, std::function<bool()> endCond, int timeout = -1, int pollRate = 10, int paddingDelay = 5);
 void blocking(std::function<bool()> endCond, int timeout = -1, int pollRate = 10, int paddingDelay = 5);
 pros::Task runAsync(std::function<void()> fn);

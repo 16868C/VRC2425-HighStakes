@@ -35,7 +35,7 @@ MotionProfile MotionProfiling::generateTrapezoidal(double dist, MotionLimit moti
 	if (maxDist < 0) {
 		accelTime = sqrt(fabs(dist) / motionLimit.maxAccel);
 		accelDist = 0.5 * motionLimit.maxAccel * accelTime * accelTime;
-		trapezoidalDist = 2 * accelTime * motionLimit.maxVel;
+		trapezoidalDist = 2 * accelDist;
 		maxDist = 0;
 	}
 	profile.accelTime = accelTime;
