@@ -28,8 +28,6 @@ PIDController::PIDController(PIDGains gains, double outputMax, double outputMin,
 }
 
 double PIDController::calculate(double error) {
-	// if (settleCond()) return output = std::clamp(0.0, outputMin, outputMax);
-
 	uint32_t currTime = pros::millis();
 	double dT = currTime - prevTime;
 	prevTime = currTime;
@@ -42,7 +40,9 @@ double PIDController::calculate(double error) {
 	if (resetIntegralOnCross && Util::sgn(error) != Util::sgn(prevError)) integral = 0;
 	integral = std::clamp(integral, -maxIntegral, maxIntegral);
 
-	return output = std::clamp(error * gains.kP + integral * gains.kI + derivative * gains.kD + gains.kF, outputMin, outputMax);
+	output = error * gains.kP + integral * gains.kI + derivative * gains.kD + gains.kF;
+	if (outputMin != outputMax) output = std::clamp(output, outputMin, outputMax);
+	return output;
 }
 double PIDController::calculate(double target, double current) {
 	return calculate(target - current);

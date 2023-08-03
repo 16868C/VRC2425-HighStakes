@@ -2,11 +2,8 @@
 #include "robotconfig.hpp"
 #include "16868Z/controllers/PIDController.hpp"
 #include "16868Z/subsystems/chassis/motionProfiling.hpp"
-#include "16868Z/util/filters/emaFilter.hpp"
-#include "16868Z/util/filters/medianFilter.hpp"
-#include "16868Z/util/filters/rangeExtremaFilter.hpp"
-#include "16868Z/util/filters/smaFilter.hpp"
 #include "16868Z/util/util.hpp"
+#include "routes.hpp"
 #include <fstream>
 
 using namespace lib16868Z;
@@ -19,6 +16,31 @@ using namespace lib16868Z;
  */
 void initialize() {
 	pros::lcd::initialize();
+	
+	bool inertialResetFailed = true, inertialDrift = false;
+	do {
+		if (!inertialResetFailed) {
+			std::cerr << "Inertial Reset Failed" << std::endl;
+			master.setText(0, 0, "Inertial Reset Failed");
+			pros::lcd::print(0, "Inertial Reset Failed");
+			master.rumble("-");
+		}
+		inertialResetFailed = inertial.reset(true) - 1;
+	} while (inertialResetFailed);
+	double h1 = inertial.get_rotation();
+	pros::delay(300);
+	double h2 = inertial.get_rotation();
+	if (std::abs(h1 - h2) > 0.5) {
+		inertialDrift = true;
+		std::cerr << "Inertial Drift Detected: " << std::abs(h1 - h2) << " deg difference in 300ms" << std::endl;
+		master.setText(0, 0, "Inertial Drift Detected: " + std::to_string(std::abs(h1 - h2)) + " deg difference in 300ms");
+		pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 300ms", std::abs(h1 - h2));
+		master.rumble("-");
+	}
+
+	leftDrive.tarePosition();
+	rightDrive.tarePosition();
+	turretMotor.tarePosition();
 }
 
 /**
@@ -45,16 +67,16 @@ void moveDistanceStraight(double dist, double maxRPM) {
 		okapi::VelMath encVelCalc = okapi::VelMathFactory().create(360);
 		while (true) {
 			double motorVel = mtrVelCalc.step((leftDrive.getPosition() + rightDrive.getPosition()) / 2.0).convert(okapi::rpm);
-			double encVel = encVelCalc.step((leftEncoder.get() + rightEncoder.get()) / 2.0).convert(okapi::rpm);
-			std::cout << motorVel << " " << encVel * (2/6.0) << " " << inertial.get_rotation() << "\n";
+			// double encVel = encVelCalc.step((leftEncoder.get() + rightEncoder.get()) / 2.0).convert(okapi::rpm);
+			// std::cout << motorVel << " " << encVel * (2/6.0) << " " << inertial.get_rotation() << "\n";
 			pros::delay(50);
 		}
 	});
 
 	double currDist = 0;
 	while (dist - currDist > 0) {
-		double avgTicks = std::abs(leftEncoder.get() + rightEncoder.get()) / 2.0;
-		currDist = avgTicks / 360.0 * WHEEL_DIAMETER * M_PI;
+		// double avgTicks = std::abs(leftEncoder.get() + rightEncoder.get()) / 2.0;
+		// currDist = avgTicks / 360.0 * WHEEL_DIAMETER * M_PI;
 		leftDrive.moveVoltage(maxRPM / 200 * 12000);
 		rightDrive.moveVoltage(maxRPM / 200 * 12000);
 		pros::delay(20);
@@ -80,8 +102,9 @@ void moveDistanceABS(double dist, double maxRPM, double decelDist, PIDGains left
 	PIDController headingPID(headingPid, 1.0, -1.0, 25, 10, true);
 
 	double leftVel = minPower, prevLeftVel = minPower, rightVel = minPower, prevRightVel = minPower;
-	double leftDist = leftEncoder.get() / 360.0 * 2.75 * M_PI;
-	double rightDist = rightEncoder.get() / 360.0 * 2.75 * M_PI;
+	// double leftDist = leftEncoder.get() / 360.0 * 2.75 * M_PI;
+	// double rightDist = rightEncoder.get() / 360.0 * 2.75 * M_PI;
+	double leftDist = 0, rightDist = 0;
 	double leftSgnl = 0, rightSgnl = 0;
 	double headingSgnl = 0;
 
@@ -99,11 +122,11 @@ void moveDistanceABS(double dist, double maxRPM, double decelDist, PIDGains left
 		while (true) {
 			leftMtrVel = leftMtrVelCalc.step(leftDrive.getPosition()).convert(okapi::rpm);
 			rightMtrVel = rightMtrVelCalc.step(rightDrive.getPosition()).convert(okapi::rpm);
-			double encVel = encVelCalc.step((leftEncoder.get() + rightEncoder.get()) / 2.0).convert(okapi::rpm);
-			double encInps = encVel / 60.0 * (M_PI * 2.75);
-			double encRPM = encInps * 60 / (M_PI * 4.0) / (4/6.0);
-			std::cout << leftMtrVel << " " << rightMtrVel << " " << encRPM << " " << leftVel << " " << rightVel << " " << leftDist << " " << rightDist << " " << leftSgnl << " " << rightSgnl << " " << inertial.get_rotation() << "\n";
-			data << leftMtrVel << "," << rightMtrVel << "," << encRPM << "," << leftVel << "," << rightVel << "," << leftDist << "," << rightDist << "," << leftSgnl << "," << rightSgnl << "," << inertial.get_rotation() << "\n";
+			// double encVel = encVelCalc.step((leftEncoder.get() + rightEncoder.get()) / 2.0).convert(okapi::rpm);
+			// double encInps = encVel / 60.0 * (M_PI * 2.75);
+			// double encRPM = encInps * 60 / (M_PI * 4.0) / (4/6.0);
+			// std::cout << leftMtrVel << " " << rightMtrVel << " " << encRPM << " " << leftVel << " " << rightVel << " " << leftDist << " " << rightDist << " " << leftSgnl << " " << rightSgnl << " " << inertial.get_rotation() << "\n";
+			// data << leftMtrVel << "," << rightMtrVel << "," << encRPM << "," << leftVel << "," << rightVel << "," << leftDist << "," << rightDist << "," << leftSgnl << "," << rightSgnl << "," << inertial.get_rotation() << "\n";
 			lastSaved++;
 			if (lastSaved >= 20) { data.close(); data.open("/usd/data.csv", std::ios::trunc); }
 
@@ -153,8 +176,8 @@ void moveDistanceABS(double dist, double maxRPM, double decelDist, PIDGains left
 		}
 	});
 	while (std::abs(dist - leftDist) >= 0.5 || std::abs(dist - rightDist) >= 0.5 || std::abs(targetHeading - inertial.get_rotation()) >= 1) {
-		leftDist = leftEncoder.get() / 360.0 * 2.75 * M_PI;
-		rightDist = rightEncoder.get() / 360.0 * 2.75 * M_PI;
+		// leftDist = leftEncoder.get() / 360.0 * 2.75 * M_PI;
+		// rightDist = rightEncoder.get() / 360.0 * 2.75 * M_PI;
 		// leftDist = leftDrive.getPosition() / 300.0 * 4 * M_PI * (4/6.0);
 		// rightDist = rightDrive.getPosition() / 360.0 * 4 * M_PI * (4/6.0);
 
@@ -232,6 +255,8 @@ void moveDistanceABS(double dist, double maxRPM, double decelDist, PIDGains left
 void moveDistanceABS2(double dist, double maxRPM, double decelDist, PIDGains absPID, double turnRPM, PIDGains headingPID, double minPower) {
 	// leftDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	// rightDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+	leftDrive.tarePosition();
+	rightDrive.tarePosition();
 	
 	double targetHeading = inertial.get_rotation();
 	
@@ -249,7 +274,7 @@ void moveDistanceABS2(double dist, double maxRPM, double decelDist, PIDGains abs
 		leftMtrVel = leftMtrVelCalc.step(leftDrive.getPosition()).convert(okapi::rpm);
 		rightMtrVel = rightMtrVelCalc.step(rightDrive.getPosition()).convert(okapi::rpm);
 
-		currDist = (leftEncoder.get() + rightEncoder.get()) / 2.0 / 360.0 * 2.75 * M_PI;
+		currDist = (leftDrive.getPosition() + rightDrive.getPosition()) / 2.0 / 300.0 * 4.0 * M_PI * (3 / 6.0);
 		std::cout << currDist << "\n";
 		double absSgnl = absController.calculate(dist, currDist);
 		double headingSgnl = headingController.calculate(targetHeading, inertial.get_rotation());
@@ -390,8 +415,8 @@ void moveDistanceProfiledPID(double dist, MotionLimit motionLimit, double kV, do
 		okapi::VelMath encVelCalc = okapi::VelMathFactory().create(360);
 		while (true) {
 			mtrVel = mtrVelCalc.step((leftDrive.getPosition() + rightDrive.getPosition()) / 2.0).convert(okapi::rpm);
-			encVel = encVelCalc.step((leftEncoder.get() + rightEncoder.get()) / 2.0).convert(okapi::rpm) * (2/6.0);
-			encDist = (leftEncoder.get() + rightEncoder.get()) / 2.0 / 360.0 * 2.75 * M_PI;
+			// encVel = encVelCalc.step((leftEncoder.get() + rightEncoder.get()) / 2.0).convert(okapi::rpm) * (2/6.0);
+			// encDist = (leftEncoder.get() + rightEncoder.get()) / 2.0 / 360.0 * 2.75 * M_PI;
 			if (isnan(mtrVel)) mtrVel = 0;
 			if (isnan(encVel)) encVel = 0;
 			if (isnan(encDist)) encDist = 0;
@@ -425,8 +450,8 @@ void moveDistanceHalfLife(double dist, double maxRPM, double decelZone) {
 	double currDist = 0;
 	double prevVel = maxRPM;
 	while (dist - currDist > 0) {
-		double avgTicks = abs(leftEncoder.get() + rightEncoder.get()) / 2.0;
-		currDist = avgTicks / 360.0 * WHEEL_DIAMETER * M_PI;
+		// double avgTicks = abs(leftEncoder.get() + rightEncoder.get()) / 2.0;
+		// currDist = avgTicks / 360.0 * WHEEL_DIAMETER * M_PI;
 		double vel = dist - currDist > decelZone ? maxRPM : maxRPM * std::pow(0.5, (currDist - (dist - decelZone)) / (decelZone / 5.0));
 		prevVel = vel;
 		leftDrive.moveVoltage(vel / 200 * 12000);
@@ -489,7 +514,7 @@ void turnAbsoluteABS(double targetHeading, double maxRPM, PIDGains pidGains, dou
 	while (numInSettleZone < 5) {
 		heading = inertial.get_rotation();
 		double error = targetHeading - heading;
-		if (reduceAngle) error = Util::reduceAngle180(error);
+		if (reduceAngle) error = Util::ReduceAngle::deg180(error);
 		absCtrl = absPID.calculate(std::abs(error));
 		// std::cout << error << " " << absCtrl << "\n";
 
@@ -507,12 +532,16 @@ void turnAbsoluteABS(double targetHeading, double maxRPM, PIDGains pidGains, dou
 			if (Util::sgn(targetHeading - heading) != Util::sgn(prevError)) break;
 			pros::delay(15);
 		} else if (absCtrl < 1) {
+			leftDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+			rightDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 			leftDrive.moveVelocity(0);
 			rightDrive.moveVelocity(0);
-			pros::delay(15 * (1 - absCtrl));
+			pros::delay(25 * (1 - absCtrl));
+			leftDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+			rightDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 			leftDrive.moveVoltage(0);
 			rightDrive.moveVoltage(-0);
-			pros::delay(15 * absCtrl);
+			pros::delay(25 * absCtrl);
 			c++;
 			if (leftMtrVel == 0 && rightMtrVel == 0) {
 				absComplete = true;
@@ -562,84 +591,111 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-
-	// okapi::Motor frontLeft(-1);
-	// okapi::Motor frontRight(10);
-	// okapi::Motor rearLeft(-2);
-	// okapi::Motor rearRight(9);
-	// okapi::MotorGroup intake({-7, 8});
-	// okapi::MotorGroup flywheel({-15, 20});
-
-	// okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
-	// okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
-	// int intakeDir = 0;
-
-	// okapi::ControllerButton flywheelTgl(okapi::ControllerDigital::L1);
-	// bool flywheelOn = false;
-
-	// while (true) {
-	// 	double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
-	// 	double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
-	// 	double strafe = master.getAnalog(okapi::ControllerAnalog::leftX);
-
-	// 	frontLeft.moveVoltage((forward + turn + strafe) * 12000);
-	// 	frontRight.moveVoltage((forward - turn - strafe) * 12000);
-	// 	rearLeft.moveVoltage((forward + turn - strafe)  * 12000);
-	// 	rearRight.moveVoltage((forward - turn + strafe) * 12000);
-
-	// 	if (intakeTgl.changedToPressed()) intakeDir = intakeDir == 0 ? 1 : 0;
-	// 	else if (outtakeTgl.changedToPressed()) intakeDir = intakeDir == 0 ? 0 : -1;
-	// 	intake.moveVelocity(intakeDir * 200);
-
-	// 	if (flywheelTgl.changedToPressed()) flywheelOn = !flywheelOn;
-	// 	flywheel.moveVelocity(flywheelOn ? 200 : 0);
-
-	// 	pros::delay(20);
-	// }
-	
-	bool inertialResetFailed;
-	do {
-		inertialResetFailed = inertial.reset(true) - 1;
-		// std::cout << inertialResetFailed << " " << inertial.get_rotation() << "\n";
-	} while (inertialResetFailed);
-	leftEncoder.reset();
-	rightEncoder.reset();
-	leftDrive.getEncoder()->reset();
-	rightDrive.getEncoder()->reset();
+	// leftEncoder.reset();
+	// rightEncoder.reset();
+	// leftDrive.getEncoder()->reset();
+	// rightDrive.getEncoder()->reset();
 	// pros::Task heading = pros::Task([&] {
 	// 	while (true) {
 	// 		master.setText(1, 0, std::to_string(inertial.get_rotation()));
 	// 		pros::delay(50);
 	// 	}
 	// });
-	pros::delay(500);
 
-	leftDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-	rightDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-	pros::delay(500);
+	// chassis.moveDistance(24, 600, {0.045, 0, 0.6}, 600, 0, 300, {0.01, 0, 0});
+	// chassis.turnAbsolute(90, 600, {0.05, 0, 0}, 1.1, 2, 5);
 
 	uint st = pros::millis();
+	
+	// goalSide();
+	goalSideBar();
+	// matchloadAWP();
+
+	std::cout << "Auton took " << pros::millis() - st << " ms\n";
+	
+	// turret.setToRelativeTarget();
+
+	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
+	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
+	okapi::ControllerButton shootTgl(okapi::ControllerDigital::L1);
+	okapi::ControllerButton matchloadTgl(okapi::ControllerDigital::L2);
+
+	okapi::ControllerButton wingsTgl(okapi::ControllerDigital::B);
+	okapi::ControllerButton mouthTgl(okapi::ControllerDigital::X);
+	okapi::ControllerButton clotheslineTgl(okapi::ControllerDigital::up);
+
+	while (true) {
+		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
+		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
+		chassis.driveTank(left, right);
+
+		// double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
+		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
+		// chassis.driveArcade(forward, turn);
+
+		if (matchloadTgl.changedToPressed()) {
+			if (intake.getState() == IntakeState::MATCHLOAD) intake.stop();
+			else intake.matchload();
+		} else if (intakeTgl.changedToPressed()) {
+			if (intake.getState() == IntakeState::INTAKE) intake.stop();
+			else intake.intake(false);
+		} else if (outtakeTgl.changedToPressed()) {
+			if (intake.getState() == IntakeState::OUTTAKE) intake.stop();
+			else intake.outtake(true, 1000, false);
+		} else if (shootTgl.changedToPressed()) {
+			if (intake.getState() == IntakeState::SHOOT) intake.stop();
+			else intake.shoot();
+		}
+
+		if (wingsTgl.changedToPressed()) wings.toggle();
+		if (mouthTgl.changedToPressed()) mouth.toggle();
+		if (clotheslineTgl.changedToPressed()) clothesline.toggle();
+
+		// if (turretLeft.isPressed()) turret.spin(-150);
+		// else if (turretRight.isPressed()) turret.spin(150);
+		// else turret.spin(0);
+		// std::cout << frontIntake.getVoltage() << " " << frontIntake.getActualVelocity() << " " << rearIntake.getVoltage() << " " << rearIntake.getActualVelocity() << "\n";
+
+		pros::lcd::print(0, "Left Drive: %f", leftDrive.getTemperature());
+		pros::lcd::print(1, "Right Drive: %f", rightDrive.getTemperature());
+		pros::lcd::print(2, "Front Intake: %f", frontIntake.getTemperature());
+		pros::lcd::print(3, "Rear Intake: %f", rearIntake.getTemperature());
+		pros::lcd::print(4, "Turret: %f", turretMotor.getTemperature());
+
+		if (leftDrive.isOverTemp() || rightDrive.isOverTemp() || frontIntake.isOverTemp() || rearIntake.isOverTemp() || turretMotor.isOverTemp()) master.rumble("-");
+
+		pros::delay(20);
+	}
+
+	// pros::delay(500);
+
+	// leftDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+	// rightDrive.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+	// pros::delay(500);
+
+	// uint st = pros::millis();
 
 	// leftDrive.moveVoltage(0);
 	// rightDrive.moveVoltage(0);
 
-	// leftDrive.moveVoltage(4000);
-	// rightDrive.moveVoltage(4000);
 	// moveDistanceStraight(24, 200);
 	// moveDistanceHalfLife(48, 200, 40);
 	// moveDistancePID(72, 600, 0, 200, 300, {0.023, 0, 0.3}, {0.2, 0, 0});
 	// moveDistancePIDABS(72, 600, 0, 400, 200, {0.068, 0, 0.1}, {0.1, 0, 0.2});
 	// moveDistanceProfiledPID(48, {48, 36}, 3.3, 0.8, 0.8);
 	// moveDistanceABS(24, 600, 14.5, {0.001, 0, 0}, {0.001, 0, 0}, 400, {0.1, 0, 0.2}, 40);
-	moveDistanceABS2(48+15.5, 600, 15.5, {0.045, 0, 0}, 400, {0.1, 0, 0}, 1600);
-
-	// turnAbsoluteABS(90, 600, {0.021, 0, 0}, 1600);
+	// moveDistanceABS2(48, 600, 11, {0.09, 0, 0}, 400, {0.2, 0, 0}, 1600);
+	
+	// turnAbsoluteABS(90, 600, {0.016, 0, 0}, 0);
 	// turnAbsoluteABS(45, 300, {0.041, 0, 0}, 2500);
 	// turnAbsoluteABS(-180, 600, {0.01427, 0, 0}, 15);
-	std::cout << "time: " << pros::millis() - st << "\n";
 
-	pros::delay(2000);
-	std::cout << "a: " << (leftDrive.getPosition() / 300.0) * 4 * M_PI * (4/6.0) << " " << (rightDrive.getPosition() / 300.0) * 4 * M_PI * (4/6.0) << " b: " << (leftEncoder.get() / 360.0) * 2.75 * M_PI << " " << (rightEncoder.get() / 360.0) * 2.75 * M_PI << " c: " << inertial.get_rotation() << "\n";
+	// turnAbsoluteABS(90, 600, {0.0174, 0, 0}, 0);
+
+	// std::cout << "time: " << pros::millis() - st << "\n";
+
+	// pros::delay(2000);
+	// std::cout << "a: " << (leftDrive.getPosition() / 300.0) * 4 * M_PI * (3/6.0) << " " << (rightDrive.getPosition() / 300.0) * 4 * M_PI * (3/6.0) << " b: " << (leftEncoder.get() / 360.0) * 2.75 * M_PI << " " << (rightEncoder.get() / 360.0) * 2.75 * M_PI << " c: " << inertial.get_rotation() << "\n";
 	// leftDrive.moveAbsolute(1800, 200);
 	// rightDrive.moveAbsolute(1800, 200);
 

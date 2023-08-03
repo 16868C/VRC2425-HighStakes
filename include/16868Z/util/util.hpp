@@ -25,6 +25,9 @@ template<typename T> inline T avg(std::vector<T> v) {
 	for (T d : v) sum += d;
 	return sum / v.size();
 }
+template<typename T> inline T avg(std::initializer_list<T> l) {
+	avg(std::vector<T>(l));
+}
 
 template<typename T> inline std::vector<T> queueToVector(const std::queue<T>& q) {
 	std::vector<T> v;
@@ -43,29 +46,31 @@ template<typename T> inline std::queue<T> vectorToQueue(const std::vector<T>& v)
 	return q;
 }
 
-template<typename T> inline T reduceAngle(T ang, T max, T min) {
+namespace ReduceAngle {
+template<typename T> inline T reduce(T ang, T max, T min) {
 	T range = max - min;
 	while (ang > max) ang -= range;
 	while (ang < min) ang += range;
 	return ang;
 }
-template<typename T> inline T reduceAngle360(T deg) {
-	return reduceAngle(deg, static_cast<T>(360), static_cast<T>(0));
+template<typename T> inline T deg360(T deg) {
+	return reduce(deg, static_cast<T>(360), static_cast<T>(0));
 }
-template<typename T> inline T reduceAngle180(T deg) {
-	return reduceAngle(deg, static_cast<T>(180), static_cast<T>(-180));
+template<typename T> inline T deg180(T deg) {
+	return reduce(deg, static_cast<T>(180), static_cast<T>(-180));
 }
-template<typename T> inline T reduceAngle90(T deg) {
-	return reduceAngle(deg, static_cast<T>(90), static_cast<T>(-90));
+template<typename T> inline T deg90(T deg) {
+	return reduce(deg, static_cast<T>(90), static_cast<T>(-90));
 }
-template<typename T> inline T reduceAngle2PI(T rad) {
-	return reduceAngle(rad, static_cast<T>(2 * M_PI), static_cast<T>(0));
+template<typename T> inline T rad2Pi(T rad) {
+	return reduce(rad, static_cast<T>(2 * M_PI), static_cast<T>(0));
 }
-template<typename T> inline T reduceAnglePI(T rad) {
-	return reduceAngle(rad, static_cast<T>(M_PI), static_cast<T>(-M_PI));
+template<typename T> inline T radPi(T rad) {
+	return reduce(rad, static_cast<T>(M_PI), static_cast<T>(-M_PI));
 }
-template<typename T> inline T reduceAnglePI2(T rad) {
-	return reduceAngle(rad, static_cast<T>(M_PI_2), static_cast<T>(-M_PI_2));
+template<typename T> inline T radPi2(T rad) {
+	return reduce(rad, static_cast<T>(M_PI_2), static_cast<T>(-M_PI_2));
+}
 }
 
 void runAsBlocking(std::function<void()> fn, std::function<bool()> endCond, int timeout = -1, int pollRate = 10, int paddingDelay = 5);
