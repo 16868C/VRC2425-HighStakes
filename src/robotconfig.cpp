@@ -24,3 +24,4 @@ okapi::DistanceSensor distance(18);
 lib16868Z::Pneumatic wings('C');
 lib16868Z::Pneumatic mouth('B');
 lib16868Z::Pneumatic clothesline('A');
+lib16868Z::Pneumatic turretShifter('H');

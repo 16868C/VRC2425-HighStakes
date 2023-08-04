@@ -40,6 +40,7 @@ extern okapi::Motor turretMotor;
 extern lib16868Z::Pneumatic wings;
 extern lib16868Z::Pneumatic mouth;
 extern lib16868Z::Pneumatic clothesline;
+extern lib16868Z::Pneumatic turretShifter;
 
 // Subsystems
 extern lib16868Z::Inline chassis;
