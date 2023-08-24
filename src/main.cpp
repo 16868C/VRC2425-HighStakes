@@ -34,7 +34,7 @@ void initialize() {
 
 	leftDrive.tarePosition();
 	rightDrive.tarePosition();
-	turretMotor.tarePosition();
+	// turretMotor.tarePosition();
 }
 
 void disabled() {}
@@ -52,6 +52,33 @@ void autonomous() {
 }
 
 void opcontrol() {
+	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
+	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
+	int intakeDir = 0;
+
+	okapi::ControllerButton cataFire(okapi::ControllerDigital::L1);
+	okapi::ControllerButton cataIntake(okapi::ControllerDigital::L2);
+
+	okapi::ControllerButton tomTgl(okapi::ControllerDigital::B);
+
+	while (true) {
+		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
+		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
+		chassis.driveTank(left, right);
+
+		if (intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
+		else if (outtakeTgl.changedToPressed()) intakeDir = intakeDir == -1 ? 0 : -1;
+		intakeMtr.moveVelocity(intakeDir * 600);
+
+		if (cataFire.changedToPressed()) catapult.fire();
+		else if (cataIntake.changedToPressed()) catapult.intake();
+
+		if (tomTgl.changedToPressed()) tom.toggle();
+
+		pros::delay(20);
+	}
+
+	/*
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
 	okapi::ControllerButton shootTgl(okapi::ControllerDigital::L1);
@@ -104,4 +131,6 @@ void opcontrol() {
 		if (leftDrive.isOverTemp() || rightDrive.isOverTemp() || frontIntake.isOverTemp() || rearIntake.isOverTemp() || turretMotor.isOverTemp()) master.rumble("-");
 
 		pros::delay(20);
-	}}
+	}
+	*/
+}
