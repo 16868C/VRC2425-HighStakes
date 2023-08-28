@@ -16,7 +16,7 @@ public:
 	 * @param mtr The motors on the catapult
 	 * @param limit The limit switch used to determine where the reset position of the catapult is
 	 */
-	Catapult(okapi::Motor& mtr, pros::ADIDigitalIn& limit);
+	Catapult(okapi::MotorGroup& mtr, okapi::DistanceSensor& distance);
 	/**
 	 * @brief Destroy the Catapult Subsystem object
 	 * 
@@ -55,8 +55,9 @@ public:
 	void waitForSettled();
 
 private:
-	okapi::Motor& mtr;
-	pros::ADIDigitalIn& limitSwitch;
+	okapi::MotorGroup& mtr;
+	// pros::ADIDigitalIn& limitSwitch;
+	okapi::DistanceSensor& distance;
 
 	double settledTick = 0;
 

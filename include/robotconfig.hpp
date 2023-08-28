@@ -59,12 +59,16 @@ extern okapi::DistanceSensor distance;
 
 #ifdef ANSONBOT
 // Ports
-const int FRONT_LEFT_MOTOR = 11;
-const int REAR_LEFT_MOTOR = 2;
-const int FRONT_RIGHT_MOTOR = 14;
-const int REAR_RIGHT_MOTOR = 1;
-const int INTAKE_MOTOR = 19;
-const int CATA_MOTOR = 3;
+const int FRONT_LEFT_PORT = 1;
+const int REAR_LEFT_PORT = 3;
+const int FRONT_RIGHT_PORT = 11;
+const int REAR_RIGHT_PORT = 13;
+const int INTAKE_PORT = 20;
+const int CATA_PORT_1 = 16;
+const int CATA_PORT_2 = 18;
+
+const int INERTIAL_PORT = 5;
+const int CATA_DIST_PORT = 19;
 
 // Constants
 const double WHEEL_DIAMETER = 3.25;
@@ -85,7 +89,9 @@ extern okapi::MotorGroup rightDrive;
 
 extern okapi::Motor intakeMtr;
 
-extern okapi::Motor cataMtr;
+extern okapi::Motor cataMtr1;
+extern okapi::Motor cataMtr2;
+extern okapi::MotorGroup cataMtrs;
 
 // Pneumatics
 extern lib16868Z::Pneumatic tom;
@@ -96,5 +102,5 @@ extern lib16868Z::Catapult catapult;
 
 // Sensors
 extern pros::Imu inertial;
-extern pros::ADIDigitalIn cataLimit;
+extern okapi::DistanceSensor cataDist;
 #endif

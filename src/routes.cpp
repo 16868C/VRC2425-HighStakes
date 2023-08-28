@@ -4,6 +4,7 @@
 
 using namespace lib16868Z;
 
+/*
 void goalSide() {
 	inertial.set_rotation(0);
 	
@@ -124,3 +125,4 @@ void matchloadAWP() {
 	chassis.turnAbsolute(-180, 400, {0.026, 0, 0.7}, 100, 2, 5, TurnWheel::LEFT);
 	chassis.moveDistance(-32, 600, {0.0532, 0, 0.6}, 400, -180, 300, {0.015, 0, 0});
 }
+*/

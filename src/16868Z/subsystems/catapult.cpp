@@ -1,6 +1,6 @@
 #include "okapi/api.hpp"
 #include "catapult.hpp"
-#include "util/util.hpp"
+#include "16868Z/util/util.hpp"
 
 using namespace lib16868Z;
 
@@ -9,26 +9,20 @@ void lib16868Z::CataMain(void* param) {
 
 	uint32_t time = pros::millis();
 	while (true) {
-		if (cata->cataState == CataState::FIRING)
-			cata->mtr.moveVoltage(12000);
-		else
-			cata->stop();
+		if (cata->cataState != CataState::SETTLED) cata->mtr.moveVoltage(12000);
+		else cata->stop();
 
 		if (cata->cataState == CataState::FIRING) {
-			if (cata->limitSwitch.get_new_press()) {
-				cata->cataState = CataState::SETTLED;
-				cata->settledTick = cata->mtr.getPosition();
-			}
+			if (cata->distance.get() < 90) cata->cataState = CataState::SETTLED;
 		} else if (cata->cataState == CataState::INTAKE) {
-			if (cata->mtr.getPosition() > cata->settledTick + 100)
-				cata->cataState = CataState::SETTLED;
+			if (cata->distance.get() < 120) cata->cataState = CataState::SETTLED;
 		}
 
 		pros::Task::delay_until(&time, 10);
 	}
 }
 
-Catapult::Catapult(okapi::Motor& mtr, pros::ADIDigitalIn& limit) : mtr(mtr), limitSwitch(limit) {
+Catapult::Catapult(okapi::MotorGroup& mtr, okapi::DistanceSensor& distance) : mtr(mtr), distance(distance) {
 	mtr.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 	pros::c::task_create(CataMain, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Catapult Control");
 }

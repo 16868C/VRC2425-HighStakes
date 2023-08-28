@@ -29,22 +29,24 @@ lib16868Z::Pneumatic turretShifter('H');
 #endif
 
 #ifdef ANSONBOT
-okapi::Motor frontLeftMotor(FRONT_LEFT_MOTOR, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearLeftMotor(REAR_LEFT_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor frontRightMotor(FRONT_RIGHT_MOTOR, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearRightMotor(REAR_RIGHT_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor frontLeftMotor(FRONT_LEFT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor rearLeftMotor(REAR_LEFT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor frontRightMotor(FRONT_RIGHT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor rearRightMotor(REAR_RIGHT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
 okapi::MotorGroup leftDrive({frontLeftMotor, rearLeftMotor});
 okapi::MotorGroup rightDrive({frontRightMotor, rearRightMotor});
 
-okapi::Motor intakeMtr(INTAKE_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor intakeMtr(INTAKE_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
 
-okapi::Motor catapultMotor(CATA_MOTOR, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor cataMtr1(CATA_PORT_1, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor cataMtr2(CATA_PORT_2, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::MotorGroup cataMtrs({cataMtr1, cataMtr2});
 
 lib16868Z::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
-lib16868Z::Catapult catapult(catapultMotor, cataLimit);
+lib16868Z::Catapult catapult(cataMtrs, cataDist);
 
-pros::Imu inertial(15);
+pros::Imu inertial(INERTIAL_PORT);
 
 lib16868Z::Pneumatic tom('A');
-pros::ADIDigitalIn cataLimit('B');
+okapi::DistanceSensor cataDist(CATA_DIST_PORT);
 #endif
