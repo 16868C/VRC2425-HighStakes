@@ -2,7 +2,7 @@
 #include "okapi/api.hpp"
 #include "16868Z/devices/pneumatic.hpp"
 
-namespace lib16868Z {
+namespace lib16868C {
 enum class IntakeState {
 	INTAKE,
 	OUTTAKE,
@@ -50,4 +50,4 @@ class Intake {
 };
 
 void intakeSlewRate(void* param);
-} // namespace lib16868Z
+} // namespace lib16868C

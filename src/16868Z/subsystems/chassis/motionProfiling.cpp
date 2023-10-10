@@ -1,6 +1,6 @@
 #include "16868Z/subsystems/chassis/motionProfiling.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 MotionProfile MotionProfiling::generateAccel(double dist, MotionLimit motionLimit) {
 	MotionProfile profile;

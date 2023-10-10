@@ -1,6 +1,6 @@
 #include "16868Z/util/filters/emafilter.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 EMAFilter::EMAFilter(double alpha) : alpha(alpha) {}
 

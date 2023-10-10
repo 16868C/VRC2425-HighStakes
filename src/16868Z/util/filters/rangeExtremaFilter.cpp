@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 RangeExtremaFilter::RangeExtremaFilter(int sampleSize) : sampleSize(sampleSize) {}
 

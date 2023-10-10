@@ -15,17 +15,17 @@ okapi::Motor rearIntake(REAR_INTAKE_MOTOR, false, okapi::AbstractMotor::gearset:
 
 okapi::Motor turretMotor(TURRET_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
 
-lib16868Z::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
-lib16868Z::Intake intake(frontIntake, rearIntake, distance, mouth, 1000);
-lib16868Z::Turret turret(turretMotor, inertial, 36/234.0);
+lib16868C::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
+lib16868C::Intake intake(frontIntake, rearIntake, distance, mouth, 1000);
+lib16868C::Turret turret(turretMotor, inertial, 36/234.0);
 
 pros::Imu inertial(15);
 okapi::DistanceSensor distance(18);
 
-lib16868Z::Pneumatic wings('C');
-lib16868Z::Pneumatic mouth('B');
-lib16868Z::Pneumatic clothesline('A');
-lib16868Z::Pneumatic turretShifter('H');
+lib16868C::Pneumatic wings('C');
+lib16868C::Pneumatic mouth('B');
+lib16868C::Pneumatic clothesline('A');
+lib16868C::Pneumatic turretShifter('H');
 #endif
 
 #ifdef ANSONBOT
@@ -42,11 +42,11 @@ okapi::Motor cataMtr1(CATA_PORT_1, false, okapi::AbstractMotor::gearset::green, 
 okapi::Motor cataMtr2(CATA_PORT_2, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
 okapi::MotorGroup cataMtrs({cataMtr1, cataMtr2});
 
-lib16868Z::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
-lib16868Z::Catapult catapult(cataMtrs, cataDist);
+lib16868C::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
+lib16868C::Catapult catapult(cataMtrs, cataDist);
 
 pros::Imu inertial(INERTIAL_PORT);
 
-lib16868Z::Pneumatic tom('A');
+lib16868C::Pneumatic tom('A');
 okapi::DistanceSensor cataDist(CATA_DIST_PORT);
 #endif

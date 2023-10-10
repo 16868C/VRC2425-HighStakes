@@ -2,7 +2,7 @@
 #include "api.h"
 #include "16868Z/util/util.hpp"
 
-namespace lib16868Z {
+namespace lib16868C {
 class Pneumatic {
 	public:
 		Pneumatic(uint port, bool initState = false);
@@ -20,4 +20,4 @@ class Pneumatic {
 
 		void setState(bool state);
 };
-} // namespace lib16868Z
+} // namespace lib16868C

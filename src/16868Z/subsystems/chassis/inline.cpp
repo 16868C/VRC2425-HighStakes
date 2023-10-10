@@ -2,7 +2,7 @@
 #include "16868Z/subsystems/chassis/motionProfiling.hpp"
 #include "16868Z/util/util.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 Inline::Inline(okapi::MotorGroup& leftMtrs, okapi::MotorGroup& rightMtrs, pros::Imu& inertial, double wheelDiam, double gearRatio)
 	: leftMtrs(leftMtrs), rightMtrs(rightMtrs), inertial(inertial), wheelDiam(wheelDiam), gearRatio(gearRatio) {
@@ -37,7 +37,7 @@ void Inline::driveArcade(double forward, double turn, double deadzone) {
 	moveArcade(forward * 12000, turn * 12000);
 }
 
-void Inline::moveDistance(double dist, double maxRPM, lib16868Z::PIDGains distGains, double maxAccelRPM, double heading, double turnRPM, lib16868Z::PIDGains headingGains, int timeout) {
+void Inline::moveDistance(double dist, double maxRPM, lib16868C::PIDGains distGains, double maxAccelRPM, double heading, double turnRPM, lib16868C::PIDGains headingGains, int timeout) {
 	leftMtrs.tarePosition();
 	rightMtrs.tarePosition();
 
@@ -84,7 +84,7 @@ void Inline::moveDistance(double dist, double maxRPM, lib16868Z::PIDGains distGa
 	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation() << " deg" << std::endl;
 }
 
-void Inline::turnAbsolute(double angle, double maxRPM, lib16868Z::PIDGains gains, double accelRate, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
+void Inline::turnAbsolute(double angle, double maxRPM, lib16868C::PIDGains gains, double accelRate, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
 	PIDController turnPID(gains, 1, -1);
 
 	double currAngle = inertial.get_rotation();

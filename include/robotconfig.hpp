@@ -42,15 +42,15 @@ extern okapi::Motor rearIntake;
 extern okapi::Motor turretMotor;
 
 // Pneumatics
-extern lib16868Z::Pneumatic wings;
-extern lib16868Z::Pneumatic mouth;
-extern lib16868Z::Pneumatic clothesline;
-extern lib16868Z::Pneumatic turretShifter;
+extern lib16868C::Pneumatic wings;
+extern lib16868C::Pneumatic mouth;
+extern lib16868C::Pneumatic clothesline;
+extern lib16868C::Pneumatic turretShifter;
 
 // Subsystems
-extern lib16868Z::Inline chassis;
-extern lib16868Z::Intake intake;
-extern lib16868Z::Turret turret;
+extern lib16868C::Inline chassis;
+extern lib16868C::Intake intake;
+extern lib16868C::Turret turret;
 
 // Sensors
 extern pros::Imu inertial;
@@ -94,11 +94,11 @@ extern okapi::Motor cataMtr2;
 extern okapi::MotorGroup cataMtrs;
 
 // Pneumatics
-extern lib16868Z::Pneumatic tom;
+extern lib16868C::Pneumatic tom;
 
 // Subsystems
-extern lib16868Z::Inline chassis;
-extern lib16868Z::Catapult catapult;
+extern lib16868C::Inline chassis;
+extern lib16868C::Catapult catapult;
 
 // Sensors
 extern pros::Imu inertial;

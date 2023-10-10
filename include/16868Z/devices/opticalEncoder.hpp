@@ -3,7 +3,7 @@
 #include "16868Z/util/util.hpp"
 #include "okapi/api.hpp"
 
-namespace lib16868Z {
+namespace lib16868C {
 class OpticalEncoder : private okapi::ADIEncoder, public AbstractEncoder {
 	public:
 		OpticalEncoder(const OpticalEncoder& enc);
@@ -22,4 +22,4 @@ class OpticalEncoder : private okapi::ADIEncoder, public AbstractEncoder {
 		double prevTicks = 0;
 		uint prevTime = 0;
 };
-} // namespace lib16868Z
+} // namespace lib16868C

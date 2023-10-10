@@ -5,15 +5,23 @@
 #include "api.h"
 #include <memory>
 
-namespace lib16868Z {
+namespace lib16868C {
+enum class OdomType {
+	THREE_ENCODER,
+	TWO_ENCODER,
+	ACCEL
+};
+
 enum class EncoderValsType {
 	DISTANCE,
+	VELOCITY,
+	ACCELERATION,
 	TICKS,
 	SCALES_WHEEL_DIAM,
 	SCALES_WHEEL_TRACK
 };
 
-typedef struct EncoderVals EncoderScales, EncoderTicks;
+typedef struct EncoderVals EncoderScales, EncoderTicks, Deltas;
 struct EncoderVals {
 	double left { 0 };
 	double right { 0 };
@@ -66,66 +74,67 @@ inline EncoderVals operator/(const double& divident, const EncoderVals& divisor)
 	return {divident / divisor.left, divident / divisor.right, divident / divisor.rear, divisor.theta, divisor.type};
 }
 
-struct Encoders {
+struct OdomSensors {
 	std::shared_ptr<AbstractEncoder> left { nullptr };
 	std::shared_ptr<AbstractEncoder> right { nullptr };
 	std::shared_ptr<AbstractEncoder> rear { nullptr };
+	std::shared_ptr<pros::Imu> inertial { nullptr };
 
-	int tpr = left->getTPR();
-
-	inline EncoderTicks getTicks() {
-		return {left->get(), right->get(), rear->get(), EncoderValsType::TICKS};
+	inline Deltas getDeltas(OdomType type) {
+		switch(type) {
+			case OdomType::THREE_ENCODER:
+				return {left->get(), right->get(), rear->get(), EncoderValsType::TICKS};
+			case OdomType::TWO_ENCODER:
+				return {left->get(), 0, rear->get(), EncoderValsType::TICKS};
+			case OdomType::ACCEL: {
+				pros::c::imu_accel_s_t a = inertial->get_accel();
+				return {a.x, 0, a.z, EncoderValsType::ACCELERATION}; }
+			default:
+				return {0, 0, 0, EncoderValsType::TICKS};
+		}
 	}
 	inline void reset() {
-		left->resetZero();
-		right->resetZero();
-		rear->resetZero();
+		if (left) left->resetZero();
+		if (right) right->resetZero();
+		if (rear) rear->resetZero();
+		if (inertial) inertial->reset();
 	}
 };
 
 class Odometry {
 	public:
-		std::shared_ptr<Odometry> getOdometry();
-		std::shared_ptr<Odometry> getOdometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales);
-		std::shared_ptr<Odometry> getOdometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales, std::shared_ptr<pros::Imu> inertial);
+		Odometry(OdomType type, OdomSensors snrs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales);
 
 		void init();
 		void init(Pose pose);
 
 		Pose getPose();
 
-		Encoders getEncoders();
+		OdomType getOdomType();
+		OdomSensors getSensors();
 		void resetEncoders();
-		EncoderTicks getEncoderTicks();
+		Deltas getDeltas();
 
 		EncoderScales getWheelDiamScales();
 		EncoderScales getWheelTrackScales();
-
-		bool isUsingInertial();
 
 		EncoderScales calibWheelDiam(double actualDist);
 		EncoderScales calibWheelTrack(double actualAng);
 
 	private:
-		static std::shared_ptr<Odometry> odomSingleton;
-		Odometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales);
-		Odometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales, std::shared_ptr<pros::Imu> inertial);
-
 		Pose pose { 0, 0, 0, 0 };
 
-		Encoders encs;
+		OdomType odomType;
+		OdomSensors snrs;
+
 		EncoderScales wheelDiamScales;
 		EncoderScales wheelTrackScales;
 
-		const int MAX_TICKS = 1000;
-
-		bool useInertial { false };
-		std::shared_ptr<pros::Imu> inertial { nullptr };
-
 		pros::task_t odomTask;
-
 		static void odomManager(void* param);
+
+		const int MAX_DELTA = 1000;
 
 		void step(EncoderVals encDelta);
 };
-} // namespace lib16868Z
+} // namespace lib16868C

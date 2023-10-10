@@ -1,6 +1,6 @@
 #pragma once
 
-namespace lib16868Z {
+namespace lib16868C {
 class AbstractEncoder {
 	public:
 		virtual double get() = 0;
@@ -14,4 +14,4 @@ class AbstractEncoder {
 	protected:
 		int tpr;
 };
-} // namespace lib16868Z
+} // namespace lib16868C

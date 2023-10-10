@@ -2,9 +2,9 @@
 #include "16868Z/controllers/pidController.hpp"
 #include "16868Z/util/util.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
-void lib16868Z::turretManager(void* param) {
+void lib16868C::turretManager(void* param) {
 	Turret* turret = static_cast<Turret*>(param);
 	turret->motor.tarePosition();
 

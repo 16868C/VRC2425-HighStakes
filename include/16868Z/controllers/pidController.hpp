@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 
-namespace lib16868Z {
+namespace lib16868C {
 struct PIDGains {
 	double kP, kI, kD, kF = 0;
 };
@@ -48,4 +48,4 @@ class PIDController {
 
 		std::function<bool()> settleCond;
 };
-} // namespace lib16868Z
+} // namespace lib16868C

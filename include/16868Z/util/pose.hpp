@@ -1,7 +1,7 @@
 #pragma once
 #include "16868Z/util/util.hpp"
 
-namespace lib16868Z {
+namespace lib16868C {
 class Pose {
 	public:
 		double x, y, theta;
@@ -28,4 +28,4 @@ class Pose {
 			return {x / divisor, y / divisor, theta / divisor, time};
 		}
 };
-} // namespace lib16868Z
+} // namespace lib16868C

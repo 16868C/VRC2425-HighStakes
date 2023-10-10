@@ -1,6 +1,6 @@
 #include "16868Z/devices/opticalEncoder.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 OpticalEncoder::OpticalEncoder(const OpticalEncoder& enc) : okapi::ADIEncoder(enc) {
 	tpr = enc.tpr;

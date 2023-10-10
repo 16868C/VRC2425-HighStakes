@@ -1,7 +1,7 @@
 #include "16868Z/util/util.hpp"
 #include "api.h"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 void Util::runAsBlocking(std::function<void()> fn, std::function<bool()> endCond, int timeout, int pollRate, int paddingDelay) {
 	fn();

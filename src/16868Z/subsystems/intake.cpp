@@ -1,8 +1,8 @@
 #include "16868Z/subsystems/intake.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
-void lib16868Z::intakeSlewRate(void* param) {
+void lib16868C::intakeSlewRate(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
 	
 	uint32_t time = pros::millis();

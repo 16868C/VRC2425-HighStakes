@@ -1,6 +1,6 @@
 #include "16868Z/util/filters/smafilter.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 SMAFilter::SMAFilter(int sampleSize) : sampleSize(sampleSize) {}
 

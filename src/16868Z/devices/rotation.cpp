@@ -1,6 +1,6 @@
 #include "16868Z/devices/rotation.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 Rotation::Rotation(int port) : okapi::RotationSensor(port, Util::sgn(port) > 0 ? true : false) {
 	tpr = 360;

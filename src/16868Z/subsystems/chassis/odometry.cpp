@@ -1,60 +1,74 @@
 #include "16868Z/subsystems/chassis/odometry.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 void Odometry::odomManager(void* param) {
-	EncoderVals prev = {0, 0, 0, 0, EncoderValsType::TICKS};
+	EncoderVals prev = {EncoderValsType::TICKS};
 
-	uint32_t time = pros::millis();
+	// EncoderVals vel = {EncoderValsType::VELOCITY}; // Only for accel odom
+
+	Odometry* odom = static_cast<Odometry*>(param);
+
+	uint32_t time = pros::millis(), prevTime;
 	while (true) {
-		EncoderVals curr = odomSingleton->getEncoderTicks();
+		Deltas delta = odom->snrs.getDeltas(odom->odomType);
 
-		odomSingleton->step(curr - prev);
+		EncoderVals curr = { EncoderValsType::DISTANCE };
+		switch (odom->odomType) {
+			case OdomType::THREE_ENCODER: {
+				// Chassis scales
+				const double leftCircumference = odom->wheelDiamScales.left * M_PI;
+				const double rightCircumference = odom->wheelDiamScales.right * M_PI;
+				const double rearCircumference = odom->wheelDiamScales.rear * M_PI;
+				const double wheelTrack = odom->wheelTrackScales.left + odom->wheelTrackScales.right;
 
-		Pose pose = odomSingleton->getPose();
+				// Distance and theta
+				curr = delta.toDistance(odom->wheelDiamScales, odom->snrs.left->getTPR());
+				curr.theta = (curr.right - curr.left) / wheelTrack;
+				curr.rear -= (curr.theta - prev.theta) * odom->wheelTrackScales.rear; }
+			case OdomType::TWO_ENCODER: {
+				// Chassis scales
+				const double fowardCircumference = odom->wheelDiamScales.left * M_PI;
+				const double rearCircumference = odom->wheelDiamScales.rear * M_PI;
+
+				// Distance and theta
+				curr = delta.toDistance(odom->wheelDiamScales, odom->snrs.left->getTPR());
+				curr.theta = odom->snrs.inertial->get_rotation() - prev.theta;
+				curr.rear -= (curr.theta - prev.theta) * odom->wheelTrackScales.rear; }
+			case OdomType::ACCEL: { // Accel odom not complete
+				// // Velocity
+				// vel.left += delta.left;
+				// vel.rear += delta.rear;
+				
+				// // Distance
+				// curr.left += vel.left;
+				// curr.rear += vel.rear;
+				// curr.theta = odom->snrs.inertial->get_rotation() - prev.theta;
+				// curr.rear -= curr.theta - prev.theta;
+			}
+		}
+
+		odom->step(curr - prev);
+
+		Pose pose = odom->getPose();
 		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.x, pose.y);
 		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(pose.theta), pose.theta);
 
 		pros::lcd::print(2, "Left: %.2f, Right: %.2f", curr.left, curr.right);
 		pros::lcd::print(3, "Rear: %.2f", curr.rear);
 
+		prev = curr;
+
 		pros::Task::delay_until(&time, 10);
 	}
 }
 
-std::shared_ptr<Odometry> Odometry::odomSingleton = nullptr;
-
-std::shared_ptr<Odometry> Odometry::getOdometry() {
-	return odomSingleton;
-}
-std::shared_ptr<Odometry> Odometry::getOdometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales) {
-	if (odomSingleton) return odomSingleton;
-
-	if (wheelDiamScales.type != EncoderValsType::SCALES_WHEEL_DIAM) return nullptr;
-	if (wheelTrackScales.type != EncoderValsType::SCALES_WHEEL_TRACK) return nullptr;
-	Odometry odom(encs, wheelDiamScales, wheelTrackScales);
-	return odomSingleton = std::make_shared<Odometry>(odom);
-}
-std::shared_ptr<Odometry> Odometry::getOdometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales, std::shared_ptr<pros::Imu> inertial) {
-	if (odomSingleton) return odomSingleton;
-
-	if (wheelDiamScales.type != EncoderValsType::SCALES_WHEEL_DIAM) return nullptr;
-	if (wheelTrackScales.type != EncoderValsType::SCALES_WHEEL_TRACK) return nullptr;
-	Odometry odom(encs, wheelDiamScales, wheelTrackScales, inertial);
-	return odomSingleton = std::make_shared<Odometry>(odom);
-}
-
-Odometry::Odometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales) 
-				: encs(encs), wheelDiamScales(wheelDiamScales), wheelTrackScales(wheelTrackScales) {}
-Odometry::Odometry(Encoders encs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales, std::shared_ptr<pros::Imu> inertial) 
-				: encs(encs), wheelDiamScales(wheelDiamScales), wheelTrackScales(wheelTrackScales), inertial(inertial) {
-	useInertial = true;
-}
+Odometry::Odometry(OdomType odomType, OdomSensors snrs, EncoderScales wheelDiamScales, EncoderScales wheelTrackScales) 
+				: odomType(odomType), snrs(snrs), wheelDiamScales(wheelDiamScales), wheelTrackScales(wheelTrackScales) {}
 
 void Odometry::init() {
 	// Resetting sensors
-	encs.reset();
-	if (useInertial) inertial->reset();
+	snrs.reset();
 
 	// Resetting pose
 	pose = { 0, 0, 0, 0 };
@@ -64,8 +78,7 @@ void Odometry::init() {
 }
 void Odometry::init(Pose pose) {
 	// Resetting sensors
-	encs.reset();
-	if (useInertial) inertial->reset();
+	snrs.reset();
 
 	// Resetting pose
 	this->pose = pose;
@@ -78,14 +91,14 @@ Pose Odometry::getPose() {
 	return pose;
 }
 
-Encoders Odometry::getEncoders() {
-	return encs;
+OdomSensors Odometry::getSensors() {
+	return snrs;
 }
 void Odometry::resetEncoders() {
-	encs.reset();
+	snrs.reset();
 }
-EncoderTicks Odometry::getEncoderTicks() {
-	return encs.getTicks();
+Deltas Odometry::getDeltas() {
+	return snrs.getDeltas(odomType);
 }
 
 EncoderScales Odometry::getWheelDiamScales() {
@@ -95,13 +108,11 @@ EncoderScales Odometry::getWheelTrackScales() {
 	return wheelTrackScales;
 }
 
-bool Odometry::isUsingInertial() {
-	return useInertial;
-}
-
 EncoderScales Odometry::calibWheelDiam(double actualDist) {
-	EncoderTicks ticksTravelled = encs.getTicks();
-	EncoderVals distTravelled = ticksTravelled.toDistance(wheelDiamScales, encs.tpr);
+	if (odomType != OdomType::THREE_ENCODER || odomType != OdomType::TWO_ENCODER) return {0, 0, 0, EncoderValsType::SCALES_WHEEL_DIAM};
+
+	EncoderTicks ticksTravelled = snrs.getDeltas(odomType);
+	EncoderVals distTravelled = ticksTravelled.toDistance(wheelDiamScales, snrs.left->getTPR());
 	EncoderVals ratios = distTravelled / actualDist;
 	EncoderVals newScales = wheelDiamScales * ratios;
 
@@ -113,8 +124,10 @@ EncoderScales Odometry::calibWheelDiam(double actualDist) {
 }
 
 EncoderScales Odometry::calibWheelTrack(double actualAng) {
-	EncoderTicks ticksTravelled = encs.getTicks();
-	EncoderVals distTravelled = ticksTravelled.toDistance(wheelDiamScales, encs.tpr);
+	if (odomType != OdomType::THREE_ENCODER) return {0, 0, 0, EncoderValsType::SCALES_WHEEL_TRACK};
+
+	EncoderTicks ticksTravelled = snrs.getDeltas(odomType);
+	EncoderVals distTravelled = ticksTravelled.toDistance(wheelDiamScales, snrs.left->getTPR());
 	EncoderVals angTurned =  distTravelled / wheelTrackScales;
 	EncoderVals ratios = angTurned / actualAng;
 	EncoderVals newScales = wheelTrackScales * ratios;
@@ -127,25 +140,17 @@ EncoderScales Odometry::calibWheelTrack(double actualAng) {
 	return newScales;
 }
 
-void Odometry::step(EncoderVals deltaTicks) {
-	if (deltaTicks.type != EncoderValsType::TICKS) return;
-	if (std::abs(deltaTicks.left) > MAX_TICKS || std::abs(deltaTicks.right) > MAX_TICKS || std::abs(deltaTicks.rear) > MAX_TICKS) {
-		std::cerr << "Odometry: Encoder delta too large: " << deltaTicks.left << ", " << deltaTicks.right << ", " << deltaTicks.rear << "\n";
+void Odometry::step(Deltas delta) {
+	if (delta.type != EncoderValsType::DISTANCE) return;
+	if (std::abs(delta.left) > MAX_DELTA || std::abs(delta.right) > MAX_DELTA || std::abs(delta.rear) > MAX_DELTA) {
+		std::cerr << "[Odometry] Sensor deltas too large: ";
+		std::cerr << delta.left << ", ";
+		if (delta.right) std::cerr << delta.right << " ";
+		std::cerr << delta.rear << "\n";
 		return;
 	}
 
-	// Chassis scales
-	const double leftCircumference = wheelDiamScales.left * M_PI;
-	const double rightCircumference = wheelDiamScales.right * M_PI;
-	const double rearCircumference = wheelDiamScales.rear * M_PI;
-	const double wheelTrack = wheelTrackScales.left + wheelTrackScales.right;
-
-	// Delta distance and theta
-	EncoderVals delta = deltaTicks.toDistance(wheelDiamScales, encs.tpr);
-	delta.theta = (delta.right - delta.left) / wheelTrack;
-	delta.rear -= delta.theta * wheelTrackScales.rear;
-
-	// Local coordinates
+	// Local offsets
 	double localOffsetX = delta.rear;
 	double localOffsetY = (delta.left + delta.right) / 2.0;
 	if (delta.left != delta.right) {
@@ -153,11 +158,13 @@ void Odometry::step(EncoderVals deltaTicks) {
 		localOffsetY = 2 * sin(delta.theta / 2.0) * (delta.right / delta.theta + wheelTrackScales.right);
 	}
 
-	// Polar coordinates
-	double polarR = std::hypot(localOffsetX, localOffsetY);
-	double polarA = std::atan2(localOffsetY, localOffsetX);
+	// Polar offsets to shift to global frame
+	double avgA = pose.theta + (delta.theta / 2.0);
 
-	// Global coordinates
+	double polarR = std::hypot(localOffsetX, localOffsetY);
+	double polarA = std::atan2(localOffsetY, localOffsetX) - avgA;
+
+	// Global offsets
 	double globalDeltaX = polarR * cos(polarA);
 	double globalDeltaY = polarR * sin(polarA);
 

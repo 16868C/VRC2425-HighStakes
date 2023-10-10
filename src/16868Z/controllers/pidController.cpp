@@ -3,7 +3,7 @@
 #include "api.h"
 #include <algorithm>
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 PIDController::PIDController(const PIDController& pidController) {
 	this->gains = pidController.gains;

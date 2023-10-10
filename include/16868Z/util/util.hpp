@@ -5,7 +5,7 @@
 #include <queue>
 #include <vector>
 
-namespace lib16868Z {
+namespace lib16868C {
 typedef unsigned int uint;
 
 namespace Util {
@@ -76,5 +76,5 @@ template<typename T> inline T radPi2(T rad) {
 void runAsBlocking(std::function<void()> fn, std::function<bool()> endCond, int timeout = -1, int pollRate = 10, int paddingDelay = 5);
 void blocking(std::function<bool()> endCond, int timeout = -1, int pollRate = 10, int paddingDelay = 5);
 pros::Task runAsync(std::function<void()> fn);
-} // namespace lib16868Z::Util
+} // namespace lib16868C::Util
 } // namespace Util

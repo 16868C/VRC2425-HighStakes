@@ -1,6 +1,6 @@
 #pragma once
 
-namespace lib16868Z {
+namespace lib16868C {
 class EMAFilter {
 	public:
 		EMAFilter(double alpha = 0.5);
@@ -15,4 +15,4 @@ class EMAFilter {
 		double alpha;
 		double prev = 0;
 };
-} // namespace lib16868Z
+} // namespace lib16868C

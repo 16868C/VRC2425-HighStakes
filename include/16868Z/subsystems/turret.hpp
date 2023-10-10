@@ -1,7 +1,7 @@
 #pragma once
 #include "okapi/api.hpp"
 
-namespace lib16868Z {
+namespace lib16868C {
 enum class TargetMode {
 	ABSOLUTE,
 	RELATIVE
@@ -34,4 +34,4 @@ class Turret {
 };
 
 void turretManager(void* param);
-} // namespace lib16868Z
+} // namespace lib16868C

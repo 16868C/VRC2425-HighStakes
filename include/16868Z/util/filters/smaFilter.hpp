@@ -1,7 +1,7 @@
 #pragma once
 #include <queue>
 
-namespace lib16868Z {
+namespace lib16868C {
 class SMAFilter {
 	public:
 		SMAFilter(int sampleSize);
@@ -14,4 +14,4 @@ class SMAFilter {
 		int sampleSize;
 		std::queue<double> samples;
 };
-} // namespace lib16868Z
+} // namespace lib16868C

@@ -6,7 +6,7 @@
 #include "routes.hpp"
 #include <fstream>
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 void initialize() {
 	pros::lcd::initialize();
@@ -77,60 +77,4 @@ void opcontrol() {
 
 		pros::delay(20);
 	}
-
-	/*
-	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
-	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
-	okapi::ControllerButton shootTgl(okapi::ControllerDigital::L1);
-	okapi::ControllerButton matchloadTgl(okapi::ControllerDigital::L2);
-
-	okapi::ControllerButton wingsTgl(okapi::ControllerDigital::B);
-	okapi::ControllerButton mouthTgl(okapi::ControllerDigital::X);
-	okapi::ControllerButton clotheslineTgl(okapi::ControllerDigital::up);
-	okapi::ControllerButton turretShifterTgl(okapi::ControllerDigital::down);
-
-	while (true) {
-		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
-		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
-		chassis.driveTank(left, right);
-
-		// double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
-		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
-		// chassis.driveArcade(forward, turn);
-
-		if (matchloadTgl.changedToPressed()) {
-			if (intake.getState() == IntakeState::MATCHLOAD) intake.stop();
-			else intake.matchload();
-		} else if (intakeTgl.changedToPressed()) {
-			if (intake.getState() == IntakeState::INTAKE) intake.stop();
-			else intake.intake(false);
-		} else if (outtakeTgl.changedToPressed()) {
-			if (intake.getState() == IntakeState::OUTTAKE) intake.stop();
-			else intake.outtake(true, 1000, false);
-		} else if (shootTgl.changedToPressed()) {
-			if (intake.getState() == IntakeState::SHOOT) intake.stop();
-			else intake.shoot();
-		}
-
-		if (wingsTgl.changedToPressed()) wings.toggle();
-		if (mouthTgl.changedToPressed()) mouth.toggle();
-		if (clotheslineTgl.changedToPressed()) clothesline.toggle();
-		if (turretShifterTgl.changedToPressed()) turretShifter.toggle();
-
-		// if (turretLeft.isPressed()) turret.spin(-150);
-		// else if (turretRight.isPressed()) turret.spin(150);
-		// else turret.spin(0);
-		// std::cout << frontIntake.getVoltage() << " " << frontIntake.getActualVelocity() << " " << rearIntake.getVoltage() << " " << rearIntake.getActualVelocity() << "\n";
-
-		pros::lcd::print(0, "Left Drive: %f", leftDrive.getTemperature());
-		pros::lcd::print(1, "Right Drive: %f", rightDrive.getTemperature());
-		pros::lcd::print(2, "Front Intake: %f", frontIntake.getTemperature());
-		pros::lcd::print(3, "Rear Intake: %f", rearIntake.getTemperature());
-		pros::lcd::print(4, "Turret: %f", turretMotor.getTemperature());
-
-		if (leftDrive.isOverTemp() || rightDrive.isOverTemp() || frontIntake.isOverTemp() || rearIntake.isOverTemp() || turretMotor.isOverTemp()) master.rumble("-");
-
-		pros::delay(20);
-	}
-	*/
 }

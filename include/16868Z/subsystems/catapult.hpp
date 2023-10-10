@@ -3,7 +3,7 @@
 #include "okapi/api.hpp"
 #include "16868Z/controllers/pidController.hpp"
 
-namespace lib16868Z {
+namespace lib16868C {
 void CataMain(void*);
 
 enum class CataState { SETTLED, FIRING, INTAKE };

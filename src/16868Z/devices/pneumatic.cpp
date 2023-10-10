@@ -1,7 +1,7 @@
 #include "16868Z/devices/pneumatic.hpp"
 #include "16868Z/util/util.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 Pneumatic::Pneumatic(uint port, bool initState) : pneumatic(port, initState) {
 	state = initState;

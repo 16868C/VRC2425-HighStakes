@@ -2,7 +2,7 @@
 #include "16868Z/util/util.hpp"
 #include <vector>
 
-namespace lib16868Z {
+namespace lib16868C {
 struct MotionLimit {
 	double maxVel;
 	double maxAccel;
@@ -41,4 +41,4 @@ class MotionProfiling {
 		static MotionProfile generateAccel(double dist, MotionLimit motionLimit);
 		static MotionProfile generateTrapezoidal(double dist, MotionLimit motionLimit);
 };
-} // namespace lib16868Z
+} // namespace lib16868C

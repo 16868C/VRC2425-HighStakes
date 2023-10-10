@@ -1,7 +1,7 @@
 #pragma once
 #include <queue>
 
-namespace lib16868Z {
+namespace lib16868C {
 class MedianFilter {
 	public:
 		MedianFilter(int sampleSize);
@@ -13,4 +13,4 @@ class MedianFilter {
 		double output;
 		std::queue<double> samples;
 };
-} // namespace lib16868Z
+} // namespace lib16868C

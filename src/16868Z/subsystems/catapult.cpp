@@ -2,9 +2,9 @@
 #include "catapult.hpp"
 #include "16868Z/util/util.hpp"
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
-void lib16868Z::CataMain(void* param) {
+void lib16868C::CataMain(void* param) {
 	Catapult* cata = (Catapult*) param;
 
 	uint32_t time = pros::millis();

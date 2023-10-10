@@ -3,7 +3,7 @@
 #include "16868Z/util/util.hpp"
 #include "okapi/api.hpp"
 
-namespace lib16868Z {
+namespace lib16868C {
 class Rotation : private okapi::RotationSensor, public AbstractEncoder {
 	public:
 		Rotation(int port);
@@ -22,4 +22,4 @@ class Rotation : private okapi::RotationSensor, public AbstractEncoder {
 		double prevTicks = 0;
 		uint prevTime = 0;
 };
-} // namespace lib16868Z
+} // namespace lib16868C

@@ -5,7 +5,7 @@
 #include "16868Z/util/util.hpp"
 #include <fstream>
 
-using namespace lib16868Z;
+using namespace lib16868C;
 
 void moveDistanceStraight(double dist, double maxRPM) {
 	pros::Task vel = pros::Task([&] {
