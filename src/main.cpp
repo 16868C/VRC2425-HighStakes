@@ -1,8 +1,8 @@
 #include "main.h"
 #include "robotconfig.hpp"
-#include "16868Z/controllers/PIDController.hpp"
-#include "16868Z/subsystems/chassis/motionProfiling.hpp"
-#include "16868Z/util/util.hpp"
+#include "16868C/controllers/PIDController.hpp"
+#include "16868C/subsystems/chassis/motionProfiling.hpp"
+#include "16868C/util/util.hpp"
 #include "routes.hpp"
 #include <fstream>
 
@@ -10,6 +10,7 @@ using namespace lib16868C;
 
 void initialize() {
 	pros::lcd::initialize();
+	pros::lcd::set_text(0, "Initializing...");
 	
 	// bool inertialResetFailed = true, inertialDrift = false;
 	// do {
@@ -32,9 +33,13 @@ void initialize() {
 	// 	master.rumble("-");
 	// }
 
+	// inertial.reset(true);
 	leftDrive.tarePosition();
 	rightDrive.tarePosition();
-	// turretMotor.tarePosition();
+	
+	// odomThreeEnc.init();
+	// odomTwoEnc.init();
+	odomDriveEnc.init();
 }
 
 void disabled() {}
@@ -52,29 +57,74 @@ void autonomous() {
 }
 
 void opcontrol() {
+	#ifdef ODOMBOT
+
+	while (inertial.get_rotation() == INFINITY) pros::delay(20);
+
+	int initX = gps.get_status().x, initY = gps.get_status().y, initTheta = gps.get_status().yaw;
+
+	while (odomDriveEnc.getPose().y < 24_in) {
+		chassis.moveArcade(3000, 0);
+		pros::delay(20);
+	}
+	chassis.moveArcade(0, 0);
+
+	std::cout << "[Odom] ";
+	odomDriveEnc.getPose().print();
+
+	std::cout << "[GPS] x: " << Util::mToIn(gps.get_status().x - initX) << " y: " << Util::mToIn(gps.get_status().y - initY) << " theta: " << gps.get_status().yaw - initTheta << "\n";
+
+	while (true) {
+		double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
+		double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
+		chassis.driveArcade(forward, turn);
+
+		pros::delay(20);
+	}
+	#endif
+
+	#ifdef ANSONBOT
+	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
 	int intakeDir = 0;
 
 	okapi::ControllerButton cataFire(okapi::ControllerDigital::L1);
 	okapi::ControllerButton cataIntake(okapi::ControllerDigital::L2);
+	okapi::ControllerButton matchloadTgl(okapi::ControllerDigital::up);
+	bool matchloading = false;
 
-	okapi::ControllerButton tomTgl(okapi::ControllerDigital::B);
+	// okapi::ControllerButton tomTgl(okapi::ControllerDigital::B);
+	okapi::ControllerButton wingTgl(okapi::ControllerDigital::A);
 
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
+		pros::lcd::print(2, "Left: %f, Right: %f", left, right);
 		chassis.driveTank(left, right);
 
 		if (intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
 		else if (outtakeTgl.changedToPressed()) intakeDir = intakeDir == -1 ? 0 : -1;
 		intakeMtr.moveVelocity(intakeDir * 600);
 
-		if (cataFire.changedToPressed()) catapult.fire();
-		else if (cataIntake.changedToPressed()) catapult.intake();
+		if (matchloadTgl.changedToPressed()) {
+			if (catapult.isSettled()) catapult.matchload();
+			else catapult.stop();
+		}
 
-		if (tomTgl.changedToPressed()) tom.toggle();
+		if (cataFire.changedToPressed()) catapult.fire();
+		if (cataIntake.changedToPressed()) {
+			if (cataDist.get() > 20 && cataDist.get() < 10) catapult.intake();
+			else catapult.stop();
+		}
+		pros::lcd::print(0, "dist: %f", cataDist.get());
+
+		if (wingTgl.changedToPressed()) wings.toggle();
+
+		// if (tomTgl.changedToPressed()) tom.toggle();
 
 		pros::delay(20);
 	}
+	#endif
 }
