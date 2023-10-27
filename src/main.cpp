@@ -4,6 +4,7 @@
 #include "16868C/subsystems/chassis/motionProfiling.hpp"
 #include "16868C/util/util.hpp"
 #include "routes.hpp"
+#include <algorithm>
 #include <fstream>
 
 using namespace lib16868C;
@@ -60,14 +61,20 @@ void opcontrol() {
 	#ifdef ODOMBOT
 
 	while (inertial.get_rotation() == INFINITY) pros::delay(20);
+	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 
 	int initX = gps.get_status().x, initY = gps.get_status().y, initTheta = gps.get_status().yaw;
 
+	double kp = 0.115, accelRate = 1.2;
+	double vel = 1000;
 	while (odomDriveEnc.getPose().y < 24_in) {
-		chassis.moveArcade(3000, 0);
+		if (vel < 9000) vel *= accelRate;
+		chassis.moveArcade(vel * std::clamp((24_in - odomDriveEnc.getPose().y).convert(okapi::inch) * kp, -1.0, 1.0), 0);
 		pros::delay(20);
 	}
 	chassis.moveArcade(0, 0);
+
+	pros::delay(1000);
 
 	std::cout << "[Odom] ";
 	odomDriveEnc.getPose().print();
