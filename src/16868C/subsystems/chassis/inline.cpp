@@ -68,13 +68,12 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, lib1
 		double distCtrl = distPID.calculate(dist.abs().convert(okapi::inch), std::abs(currDist));
 		double headingCtrl = headingPID.calculate(heading.convert(okapi::degree), inertial.get_rotation());
 
-		double accelRPM = t - st <= accelProfile.accelTime ?
+		double accelRPM = t - st <= accelProfile.accelTime * 1000 ?
 							accelProfile.profile[i++].velocity * 60.0 / (wheelDiam * okapi::pi).convert(okapi::inch) : maxRPM.convert(okapi::rpm);
 		double decelRPM = maxRPM.convert(okapi::rpm) * distCtrl;
 		double vel = std::min(maxRPM.convert(okapi::rpm), std::min(accelRPM, decelRPM));
 		double volts = vel / static_cast<int>(leftMtrs.getGearing()) * 12000;
 		double turnVolts = turnRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		// std::cout << volts << "\n";
 		moveArcade(volts * dir, turnVolts * headingCtrl);
 
 		pros::Task::delay_until(&time, 20);
