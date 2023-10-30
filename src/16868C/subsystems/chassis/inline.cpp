@@ -87,7 +87,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	PIDController turnPID(gains, 1, -1);
 
 	double currAngle = inertial.get_rotation();
-	double prevVolts = 3000;
+	double accelVolts = 3000;
 	uint st = pros::millis(), t = pros::millis();
 	int inMargin = 0;
 	while (inMargin < numInMargin) {
@@ -103,13 +103,9 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 		else inMargin = 0;
 
 		double turnCtrl = turnPID.calculate(angle.convert(okapi::degree), currAngle);
-		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-
-		volts = std::min(volts * turnCtrl, prevVolts * accelRate * Util::sgn(turnCtrl));
-		prevVolts = volts;
-
-		// std::cout << volts << " " << turnCtrl << " ";
-		// std::cout << inertial.get_rotation() << "\n";
+		double maxVolts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
+		accelVolts *= accelRate;
+		double volts = std::min(maxVolts * std::abs(turnCtrl), accelVolts) * Util::sgn(turnCtrl);
 
 		switch (turnWheel) {
 			case TurnWheel::LEFT:
@@ -118,7 +114,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 				break;
 			case TurnWheel::RIGHT:
 				leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-				moveTank(0, volts);
+				moveTank(0, -volts);
 				break;
 			case TurnWheel::BOTH:
 				moveTank(volts, -volts);
