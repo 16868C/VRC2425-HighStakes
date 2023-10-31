@@ -34,9 +34,11 @@ okapi::Motor rearRightMotor(REAR_RIGHT_PORT, true, okapi::AbstractMotor::gearset
 okapi::MotorGroup leftDrive({frontLeftMotor, rearLeftMotor});
 okapi::MotorGroup rightDrive({frontRightMotor, rearRightMotor});
 
-okapi::Motor intakeMtr(INTAKE_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor intakeMtr1(INTAKE_1_PORT, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor intakeMtr2(INTAKE_2_PORT, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::MotorGroup intakeMtrs({intakeMtr1, intakeMtr2});
 
-okapi::Motor cataMtr(CATA_PORT, false, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor cataMtr(CATA_PORT, true, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::counts);
 okapi::MotorGroup cataMtrs({cataMtr});
 
 lib16868C::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);

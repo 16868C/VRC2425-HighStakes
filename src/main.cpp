@@ -113,7 +113,7 @@ void opcontrol() {
 
 		if (intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
 		else if (outtakeTgl.changedToPressed()) intakeDir = intakeDir == -1 ? 0 : -1;
-		intakeMtr.moveVelocity(intakeDir * 600);
+		intakeMtrs.moveVelocity(intakeDir * 200);
 
 		if (matchloadTgl.changedToPressed()) {
 			if (catapult.isSettled()) catapult.matchload();

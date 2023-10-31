@@ -69,7 +69,8 @@ const int FRONT_LEFT_PORT = 2;
 const int REAR_LEFT_PORT = 1;
 const int FRONT_RIGHT_PORT = 16;
 const int REAR_RIGHT_PORT = 11;
-const int INTAKE_PORT = 4;
+const int INTAKE_1_PORT = 4;
+const int INTAKE_2_PORT = 8;
 const int CATA_PORT = 9;
 
 const int INERTIAL_PORT = 19;
@@ -78,7 +79,7 @@ const int CATA_DIST_PORT = 20;
 const char WING_PORT = 'A';
 
 // Constants
-const double WHEEL_DIAMETER = 3.25;
+const okapi::QLength WHEEL_DIAMETER = 3.25_in;
 const int CHASSIS_WIDTH = 12;
 const int MAX_RPM = 600;
 const double GEAR_RATIO = 3/5.0;
@@ -94,7 +95,9 @@ extern okapi::Motor rearRightMotor;
 extern okapi::MotorGroup leftDrive;
 extern okapi::MotorGroup rightDrive;
 
-extern okapi::Motor intakeMtr;
+extern okapi::Motor intakeMtr1;
+extern okapi::Motor intakeMtr2;
+extern okapi::MotorGroup intakeMtrs;
 
 extern okapi::Motor cataMtr;
 extern okapi::MotorGroup cataMtrs;
