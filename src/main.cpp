@@ -66,16 +66,8 @@ void opcontrol() {
 
 	int initX = gps.get_status().x, initY = gps.get_status().y, initTheta = gps.get_status().yaw;
 
-	double kp = 0.115, accelRate = 1.2;
-	double vel = 1000;
-	while (odomDriveEnc.getPose().y < 24_in) {
-		if (vel < 9000) vel *= accelRate;
-		chassis.moveArcade(vel * std::clamp((24_in - odomDriveEnc.getPose().y).convert(okapi::inch) * kp, -1.0, 1.0), 0);
-		pros::delay(20);
-	}
-	chassis.moveArcade(0, 0);
-
-	pros::delay(1000);
+	// chassis.moveDistance(48_in, 200_rpm, {0.11, 0, 0.5}, 150, 0_deg, 100_rpm, {0.1, 0, 0}, 0);
+	chassis.turnAbsolute(-90_deg, 50_rpm, {0.1, 0, 0.1}, 1.05, 2, 5, lib16868C::TurnWheel::RIGHT, 0);
 
 	std::cout << "[Odom] ";
 	odomDriveEnc.getPose().print();
