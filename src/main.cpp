@@ -11,7 +11,6 @@ using namespace lib16868C;
 
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(0, "Initializing...");
 	
 	// bool inertialResetFailed = true, inertialDrift = false;
 	// do {
@@ -38,9 +37,11 @@ void initialize() {
 	leftDrive.tarePosition();
 	rightDrive.tarePosition();
 	
+	#ifdef ODOMBOT
 	// odomThreeEnc.init();
 	// odomTwoEnc.init();
-	odomDriveEnc.init();
+	// odomDriveEnc.init();
+	#endif
 }
 
 void disabled() {}
@@ -121,11 +122,9 @@ void opcontrol() {
 		}
 
 		if (cataFire.changedToPressed()) catapult.fire();
-		if (cataIntake.changedToPressed()) {
-			if (cataDist.get() > 20 && cataDist.get() < 10) catapult.intake();
-			else catapult.stop();
-		}
-		pros::lcd::print(0, "dist: %f", cataDist.get());
+		if (cataIntake.changedToPressed()) catapult.intake();
+		pros::lcd::print(0, "dist: %f", cataEnc.get());
+		master.setText(0, 0, std::to_string(cataEnc.getVelocity()));
 
 		if (wingTgl.changedToPressed()) wings.toggle();
 

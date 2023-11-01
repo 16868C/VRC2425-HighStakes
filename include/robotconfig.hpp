@@ -1,6 +1,6 @@
 #pragma once
-#define ODOMBOT
-// #define ANSONBOT
+// #define ODOMBOT
+#define ANSONBOT
 
 #include "okapi/api.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
@@ -74,7 +74,7 @@ const int INTAKE_2_PORT = 8;
 const int CATA_PORT = 9;
 
 const int INERTIAL_PORT = 19;
-const int CATA_DIST_PORT = 20;
+const int CATA_ENC_PORT = 3;
 
 const char WING_PORT = 'A';
 
@@ -112,5 +112,5 @@ extern lib16868C::Catapult catapult;
 
 // Sensors
 extern pros::Imu inertial;
-extern okapi::DistanceSensor cataDist;
+extern lib16868C::Rotation cataEnc;
 #endif

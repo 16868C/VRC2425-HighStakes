@@ -2,6 +2,7 @@
 #include "api.h"
 #include "okapi/api.hpp"
 #include "16868C/controllers/pidController.hpp"
+#include "16868C/devices/rotation.hpp"
 
 namespace lib16868C {
 void CataMain(void*);
@@ -16,7 +17,7 @@ public:
 	 * @param mtr The motors on the catapult
 	 * @param limit The limit switch used to determine where the reset position of the catapult is
 	 */
-	Catapult(okapi::MotorGroup& mtr, okapi::DistanceSensor& distance);
+	Catapult(okapi::MotorGroup& mtrs, Rotation& enc);
 	/**
 	 * @brief Destroy the Catapult Subsystem object
 	 * 
@@ -56,9 +57,10 @@ public:
 	void waitForSettled();
 
 private:
-	okapi::MotorGroup& mtr;
+	okapi::MotorGroup& mtrs;
 	// pros::ADIDigitalIn& limitSwitch;
-	okapi::DistanceSensor& distance;
+	// okapi::DistanceSensor& distance;
+	Rotation& enc;
 
 	double settledTick = 0;
 
