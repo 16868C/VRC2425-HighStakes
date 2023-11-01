@@ -2,21 +2,19 @@
 
 using namespace lib16868C;
 
-Rotation::Rotation(int port) : okapi::RotationSensor(port, Util::sgn(port) > 0 ? true : false) {
+Rotation::Rotation(int port) : pros::Rotation(port, Util::sgn(port) > 0 ? true : false) {
 	tpr = 360;
-	reversed = Util::sgn(port) > 0 ? 1 : -1;
 }
-Rotation::Rotation(int port, bool reversed) : okapi::RotationSensor(port, reversed) {
+Rotation::Rotation(int port, bool reversed) : pros::Rotation(port, reversed) {
 	tpr = 360;
-	this->reversed = reversed ? -1 : 1;
 }
 
 double Rotation::getVelocity() {
-	#define USE_OKAPI_VELOCITY
+	#define USE_SENSOR_VELOCITY
 	//#define USE_ENCODER_VELOCITY
 
-	#ifdef USE_OKAPI_VELOCITY
-	return okapi::RotationSensor::getVelocity();
+	#ifdef USE_SENSOR_VELOCITY
+	return pros::Rotation::get_velocity() / 100.0;
 	#endif
 
 	#ifdef USE_ENCODER_VELOCITY

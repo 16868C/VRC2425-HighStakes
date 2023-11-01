@@ -1,28 +1,28 @@
 #pragma once
+#include "api.h"
 #include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/util/util.hpp"
-#include "okapi/api.hpp"
 
 namespace lib16868C {
-class Rotation : private okapi::RotationSensor, public AbstractEncoder {
+class Rotation : private pros::Rotation, public AbstractEncoder {
 	public:
 		Rotation(int port);
 		Rotation(int port, bool reversed);
 
 		/**
-		 * @brief Returns the current position of the encoder.
+		 * @brief Returns the current position of the encoder in degrees.
 		 * 
 		 * @return double 
 		 */
 		inline double get() override {
-			return (okapi::RotationSensor::get() - initPos) * reversed;
+			return get_position() / 100.0;
 		};
 		/**
 		 * @brief Manually sets the zero of the encoder.
 		 * * Does not actually reset the encoder.
 		 */
 		inline void resetZero() override {
-			initPos = get() * reversed;
+			reset_position();
 		};
 
 		/**
@@ -34,9 +34,6 @@ class Rotation : private okapi::RotationSensor, public AbstractEncoder {
 		double getVelocity();
 	
 	private:
-		int initPos;
-		int reversed;
-
 		double prevTicks = 0;
 		uint prevTime = 0;
 };
