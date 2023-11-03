@@ -1,29 +1,41 @@
 #pragma once
-// #define MOABOT
+// #define ODOMBOT
 #define ANSONBOT
 
 #include "okapi/api.hpp"
-#include "16868Z/subsystems/chassis/inline.hpp"
-#include "16868Z/subsystems/intake.hpp"
-#include "16868Z/subsystems/turret.hpp"
-#include "16868Z/subsystems/catapult.hpp"
-#include "16868Z/devices/pneumatic.hpp"
+#include "16868C/subsystems/chassis/odometry.hpp"
+#include "16868C/subsystems/chassis/inline.hpp"
+#include "16868C/subsystems/intake.hpp"
+#include "16868C/subsystems/catapult.hpp"
+#include "16868C/devices/abstractEncoder.hpp"
+#include "16868C/devices/pneumatic.hpp"
+#include "16868C/devices/rotation.hpp"
 
-#ifdef MOABOT
+using namespace okapi::literals;
+
+#ifdef ODOMBOT
 // Ports
-const int FRONT_LEFT_MOTOR = 11;
-const int REAR_LEFT_MOTOR = 2;
-const int FRONT_RIGHT_MOTOR = 14;
-const int REAR_RIGHT_MOTOR = 1;
-const int FRONT_INTAKE_MOTOR = 19;
-const int REAR_INTAKE_MOTOR = 13;
-const int TURRET_MOTOR = 9;
+const int FRONT_LEFT_PORT = 8;
+const int REAR_LEFT_PORT = 2;
+const int FRONT_RIGHT_PORT = 11;
+const int REAR_RIGHT_PORT = 19;
+
+const int LEFT_ROTATION_PORT = 10;
+const int RIGHT_ROTATION_PORT = 15;
+const int REAR_ROTATION_PORT = 12;
+const int DRIVE_ROTATION_PORT = 13;
+const int INERTIAL_PORT = 1;
+const int GPS_PORT = 4;
 
 // Constants
-const double WHEEL_DIAMETER = 4.0;
-const int CHASSIS_WIDTH = 12;
-const int MAX_RPM = 600;
-const double GEAR_RATIO = 3/6.0;
+const okapi::QLength DRIVE_DIAMETER = 4_in;
+const okapi::QLength DRIVE_TRACK = 10.625_in;
+const okapi::QLength ROTATION_TRACK = 10.5_in;
+const okapi::QLength ROTATION_RADIUS = 1.5_in;
+const okapi::QLength ROTATION_DIAMETER = 2.75_in;
+
+const int MAX_RPM = 200;
+const double GEAR_RATIO = 1;
 
 // Controllers
 extern okapi::Controller master;
@@ -36,38 +48,38 @@ extern okapi::Motor rearRightMotor;
 extern okapi::MotorGroup leftDrive;
 extern okapi::MotorGroup rightDrive;
 
-extern okapi::Motor frontIntake;
-extern okapi::Motor rearIntake;
-
-extern okapi::Motor turretMotor;
-
-// Pneumatics
-extern lib16868Z::Pneumatic wings;
-extern lib16868Z::Pneumatic mouth;
-extern lib16868Z::Pneumatic clothesline;
-extern lib16868Z::Pneumatic turretShifter;
-
 // Subsystems
-extern lib16868Z::Inline chassis;
-extern lib16868Z::Intake intake;
-extern lib16868Z::Turret turret;
+extern lib16868C::Odometry odomThreeEnc;
+extern lib16868C::Odometry odomTwoEnc;
+extern lib16868C::Odometry odomDriveEnc;
+extern lib16868C::Inline chassis;
 
 // Sensors
 extern pros::Imu inertial;
-extern okapi::DistanceSensor distance;
+extern lib16868C::Rotation leftRotation;
+extern lib16868C::Rotation rightRotation;
+extern lib16868C::Rotation rearRotation;
+extern lib16868C::Rotation driveRotation;
+extern pros::Gps gps;
 #endif
 
 #ifdef ANSONBOT
 // Ports
-const int FRONT_LEFT_MOTOR = 11;
-const int REAR_LEFT_MOTOR = 2;
-const int FRONT_RIGHT_MOTOR = 14;
-const int REAR_RIGHT_MOTOR = 1;
-const int INTAKE_MOTOR = 19;
-const int CATA_MOTOR = 3;
+const int FRONT_LEFT_PORT = 2;
+const int REAR_LEFT_PORT = 1;
+const int FRONT_RIGHT_PORT = 16;
+const int REAR_RIGHT_PORT = 11;
+const int INTAKE_1_PORT = 4;
+const int INTAKE_2_PORT = 8;
+const int CATA_PORT = 9;
+
+const int INERTIAL_PORT = 19;
+const int CATA_ENC_PORT = 3;
+
+const char WING_PORT = 'A';
 
 // Constants
-const double WHEEL_DIAMETER = 3.25;
+const okapi::QLength WHEEL_DIAMETER = 3.25_in;
 const int CHASSIS_WIDTH = 12;
 const int MAX_RPM = 600;
 const double GEAR_RATIO = 3/5.0;
@@ -83,18 +95,22 @@ extern okapi::Motor rearRightMotor;
 extern okapi::MotorGroup leftDrive;
 extern okapi::MotorGroup rightDrive;
 
-extern okapi::Motor intakeMtr;
+extern okapi::Motor intakeMtr1;
+extern okapi::Motor intakeMtr2;
+extern okapi::MotorGroup intakeMtrs;
 
 extern okapi::Motor cataMtr;
+extern okapi::MotorGroup cataMtrs;
 
 // Pneumatics
-extern lib16868Z::Pneumatic tom;
+// extern lib16868C::Pneumatic tom;
+extern lib16868C::Pneumatic wings;
 
 // Subsystems
-extern lib16868Z::Inline chassis;
-extern lib16868Z::Catapult catapult;
+extern lib16868C::Inline chassis;
+extern lib16868C::Catapult catapult;
 
 // Sensors
 extern pros::Imu inertial;
-extern pros::ADIDigitalIn cataLimit;
+extern lib16868C::Rotation cataEnc;
 #endif

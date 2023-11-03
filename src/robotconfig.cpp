@@ -1,50 +1,52 @@
 #include "robotconfig.hpp"
+#include <memory>
 
 okapi::Controller master(okapi::ControllerId::master);
 
-#ifdef MOABOT
-okapi::Motor frontLeftMotor(FRONT_LEFT_MOTOR, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearLeftMotor(REAR_LEFT_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor frontRightMotor(FRONT_RIGHT_MOTOR, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearRightMotor(REAR_RIGHT_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+#ifdef ODOMBOT
+okapi::Motor frontLeftMotor(FRONT_LEFT_PORT, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor rearLeftMotor(REAR_LEFT_PORT, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor frontRightMotor(FRONT_RIGHT_PORT, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor rearRightMotor(REAR_RIGHT_PORT, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
 okapi::MotorGroup leftDrive({frontLeftMotor, rearLeftMotor});
 okapi::MotorGroup rightDrive({frontRightMotor, rearRightMotor});
 
-okapi::Motor frontIntake(FRONT_INTAKE_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearIntake(REAR_INTAKE_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+lib16868C::Rotation leftRotation(LEFT_ROTATION_PORT);
+lib16868C::Rotation rightRotation(RIGHT_ROTATION_PORT, true);
+lib16868C::Rotation rearRotation(REAR_ROTATION_PORT, true);
+lib16868C::Rotation driveRotation(DRIVE_ROTATION_PORT);
 
-okapi::Motor turretMotor(TURRET_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+pros::Imu inertial(INERTIAL_PORT);
+pros::Gps gps(GPS_PORT);
 
-lib16868Z::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
-lib16868Z::Intake intake(frontIntake, rearIntake, distance, mouth, 1000);
-lib16868Z::Turret turret(turretMotor, inertial, 36/234.0);
+lib16868C::Odometry odomThreeEnc({leftRotation, rightRotation, rearRotation}, {ROTATION_DIAMETER, ROTATION_DIAMETER, ROTATION_TRACK, ROTATION_DIAMETER, ROTATION_RADIUS});
+lib16868C::Odometry odomTwoEnc({leftRotation, rearRotation}, inertial, {ROTATION_DIAMETER, ROTATION_DIAMETER, ROTATION_RADIUS});
+lib16868C::Odometry odomDriveEnc({driveRotation, rearRotation}, inertial, {DRIVE_DIAMETER, ROTATION_DIAMETER, ROTATION_RADIUS});
 
-pros::Imu inertial(15);
-okapi::DistanceSensor distance(18);
-
-lib16868Z::Pneumatic wings('C');
-lib16868Z::Pneumatic mouth('B');
-lib16868Z::Pneumatic clothesline('A');
-lib16868Z::Pneumatic turretShifter('H');
+lib16868C::Inline chassis(leftDrive, rightDrive, inertial, DRIVE_DIAMETER, GEAR_RATIO);
 #endif
 
 #ifdef ANSONBOT
-okapi::Motor frontLeftMotor(FRONT_LEFT_MOTOR, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearLeftMotor(REAR_LEFT_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor frontRightMotor(FRONT_RIGHT_MOTOR, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearRightMotor(REAR_RIGHT_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor frontLeftMotor(FRONT_LEFT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor rearLeftMotor(REAR_LEFT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor frontRightMotor(FRONT_RIGHT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor rearRightMotor(REAR_RIGHT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
 okapi::MotorGroup leftDrive({frontLeftMotor, rearLeftMotor});
 okapi::MotorGroup rightDrive({frontRightMotor, rearRightMotor});
 
-okapi::Motor intakeMtr(INTAKE_MOTOR, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor intakeMtr1(INTAKE_1_PORT, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor intakeMtr2(INTAKE_2_PORT, true, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::MotorGroup intakeMtrs({intakeMtr1, intakeMtr2});
 
-okapi::Motor catapultMotor(CATA_MOTOR, false, okapi::AbstractMotor::gearset::green, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor cataMtr(CATA_PORT, true, okapi::AbstractMotor::gearset::red, okapi::AbstractMotor::encoderUnits::counts);
+okapi::MotorGroup cataMtrs({cataMtr});
 
-lib16868Z::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
-lib16868Z::Catapult catapult(catapultMotor, cataLimit);
+lib16868C::Inline chassis(leftDrive, rightDrive, inertial, WHEEL_DIAMETER, GEAR_RATIO);
+lib16868C::Catapult catapult(cataMtrs, cataEnc);
 
-pros::Imu inertial(15);
+pros::Imu inertial(INERTIAL_PORT);
 
-lib16868Z::Pneumatic tom('A');
-pros::ADIDigitalIn cataLimit('B');
+// lib16868C::Pneumatic tom('A');
+lib16868C::Pneumatic wings(WING_PORT);
+lib16868C::Rotation cataEnc(CATA_ENC_PORT);
 #endif
