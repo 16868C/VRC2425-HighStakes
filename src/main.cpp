@@ -36,6 +36,10 @@ void initialize() {
 	// inertial.reset(true);
 	leftDrive.tarePosition();
 	rightDrive.tarePosition();
+
+	#ifdef ANSONBOT
+	cataEnc.resetZero();
+	#endif
 	
 	#ifdef ODOMBOT
 	// odomThreeEnc.init();
