@@ -33,7 +33,7 @@ void initialize() {
 	// 	master.rumble("-");
 	// }
 
-	// inertial.reset(true);
+	inertial.reset(true);
 	leftDrive.tarePosition();
 	rightDrive.tarePosition();
 
@@ -88,7 +88,15 @@ void opcontrol() {
 	#endif
 
 	#ifdef ANSONBOT
-	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+
+	chassis.moveDistance(48_in, 600_rpm, {0.04, 0, 0.3}, 300, 0_deg, 300_rpm, {0.1, 0, 0}, 0);
+
+	pros::delay(1000);
+	double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
+	std::cout << avgTicks / 300 * (WHEEL_DIAMETER * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
+
+	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
@@ -105,7 +113,6 @@ void opcontrol() {
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
-		pros::lcd::print(2, "Left: %f, Right: %f", left, right);
 		chassis.driveTank(left, right);
 
 		if (intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
@@ -119,8 +126,6 @@ void opcontrol() {
 
 		if (cataFire.changedToPressed()) catapult.fire();
 		if (cataIntake.changedToPressed()) catapult.intake();
-		pros::lcd::print(0, "dist: %f", cataEnc.get());
-		master.setText(0, 0, std::to_string(cataEnc.getVelocity()));
 
 		if (wingTgl.changedToPressed()) wings.toggle();
 
