@@ -33,12 +33,12 @@ void initialize() {
 	// 	master.rumble("-");
 	// }
 
-	inertial.reset(true);
+	// inertial.reset(true);
 	leftDrive.tarePosition();
 	rightDrive.tarePosition();
 
 	#ifdef ANSONBOT
-	cataEnc.resetZero();
+	// cataEnc.resetZero();
 	#endif
 	
 	#ifdef ODOMBOT
@@ -88,15 +88,15 @@ void opcontrol() {
 	#endif
 
 	#ifdef ANSONBOT
-	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 
-	chassis.moveDistance(48_in, 600_rpm, {0.04, 0, 0.3}, 300, 0_deg, 300_rpm, {0.1, 0, 0}, 0);
+	// chassis.moveDistance(48_in, 600_rpm, {0.04, 0, 0.3}, 300, 0_deg, 300_rpm, {0.1, 0, 0}, 0);
 
-	pros::delay(1000);
-	double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
-	std::cout << avgTicks / 300 * (WHEEL_DIAMETER * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
+	// pros::delay(1000);
+	// double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
+	// std::cout << avgTicks / 300 * (WHEEL_DIAMETER * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
 
-	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
@@ -117,7 +117,7 @@ void opcontrol() {
 
 		if (intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
 		else if (outtakeTgl.changedToPressed()) intakeDir = intakeDir == -1 ? 0 : -1;
-		intakeMtrs.moveVelocity(intakeDir * 200);
+		intakeMtrs.moveVelocity(intakeDir * 600);
 
 		if (matchloadTgl.changedToPressed()) {
 			if (catapult.isSettled()) catapult.matchload();
@@ -127,7 +127,7 @@ void opcontrol() {
 		if (cataFire.changedToPressed()) catapult.fire();
 		if (cataIntake.changedToPressed()) catapult.intake();
 
-		if (wingTgl.changedToPressed()) wings.toggle();
+		// if (wingTgl.changedToPressed()) wings.toggle();
 
 		// if (tomTgl.changedToPressed()) tom.toggle();
 

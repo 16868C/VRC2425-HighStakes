@@ -33,6 +33,7 @@ double PIDController::calculate(double error) {
 	prevTime = currTime;
 
 	if (error <= integralRange) integral += error;
+	
 	double dError = error - prevError;
 	double derivative = dError / dT;
 	prevError = error;

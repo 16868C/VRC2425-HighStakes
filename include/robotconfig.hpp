@@ -66,15 +66,16 @@ extern pros::Gps gps;
 #ifdef ANSONBOT
 // Ports
 const int FRONT_LEFT_PORT = 2;
-const int REAR_LEFT_PORT = 1;
-const int FRONT_RIGHT_PORT = 16;
-const int REAR_RIGHT_PORT = 11;
-const int INTAKE_1_PORT = 4;
-const int INTAKE_2_PORT = 8;
-const int CATA_PORT = 9;
+const int MIDDLE_LEFT_PORT = 3;
+const int REAR_LEFT_PORT = 4;
+const int FRONT_RIGHT_PORT = 1;
+const int MIDDLE_RIGHT_PORT = 8;
+const int REAR_RIGHT_PORT = 12;
+const int INTAKE_PORT = 9;
+const int CATA_PORT = 15;
 
 const int INERTIAL_PORT = 19;
-const int CATA_ENC_PORT = 3;
+const int CATA_ENC_PORT = 13;
 
 const char WING_PORT = 'A';
 
@@ -89,14 +90,15 @@ extern okapi::Controller master;
 
 // Motors
 extern okapi::Motor frontLeftMotor;
+extern okapi::Motor middleLeftMotor;
 extern okapi::Motor rearLeftMotor;
 extern okapi::Motor frontRightMotor;
+extern okapi::Motor middleRightMotor;
 extern okapi::Motor rearRightMotor;
 extern okapi::MotorGroup leftDrive;
 extern okapi::MotorGroup rightDrive;
 
-extern okapi::Motor intakeMtr1;
-extern okapi::Motor intakeMtr2;
+extern okapi::Motor intakeMtr;
 extern okapi::MotorGroup intakeMtrs;
 
 extern okapi::Motor cataMtr;
