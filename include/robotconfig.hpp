@@ -69,12 +69,12 @@ const int FRONT_LEFT_PORT = 2;
 const int MIDDLE_LEFT_PORT = 3;
 const int REAR_LEFT_PORT = 4;
 const int FRONT_RIGHT_PORT = 1;
-const int MIDDLE_RIGHT_PORT = 8;
-const int REAR_RIGHT_PORT = 12;
-const int INTAKE_PORT = 9;
-const int CATA_PORT = 15;
+const int MIDDLE_RIGHT_PORT = 12;
+const int REAR_RIGHT_PORT = 9;
+const int INTAKE_PORT = 8;
+const int CATA_PORT = 14;
 
-const int INERTIAL_PORT = 19;
+const int INERTIAL_PORT = 17;
 const int CATA_ENC_PORT = 13;
 
 const char WING_PORT = 'A';
