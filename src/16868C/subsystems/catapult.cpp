@@ -13,16 +13,16 @@ void lib16868C::CataMain(void* param) {
 	uint32_t time = pros::millis();
 	while (true) {
 		if (cata->cataState == CataState::FIRING) {
-			if (cata->enc.get() > 55 && !fireDebounce) {
+			if (cata->enc.get() > 65 && !fireDebounce) {
 				cata->cataState = CataState::SETTLED;
 				fireDebounce = true;
-			} else if (cata->enc.get() < 50 && fireDebounce) fireDebounce = false;
+			} else if (cata->enc.get() < 60 && fireDebounce) fireDebounce = false;
 		} else if (cata->cataState == CataState::INTAKE) {
-			if (cata->enc.get() > 35 && cata->enc.get() < 45 && fired) cata->cataState = CataState::SETTLED;
+			if (cata->enc.get() > 40 && cata->enc.get() < 50 && fired) cata->cataState = CataState::SETTLED;
 		}
 		if (cata->enc.get() < 10) fired = true;
 
-		if (cata->cataState != CataState::SETTLED || cata->cataState == CataState::MATCHLOAD) cata->mtrs.moveVelocity(100);
+		if (cata->cataState != CataState::SETTLED || cata->cataState == CataState::MATCHLOAD) cata->mtrs.moveVoltage(12000);
 		else { cata->stop(); fired = false; }
 
 		pros::Task::delay_until(&time, 10);

@@ -27,12 +27,12 @@ lib16868C::Inline chassis(leftDrive, rightDrive, inertial, DRIVE_DIAMETER, GEAR_
 #endif
 
 #ifdef ANSONBOT
-okapi::Motor frontLeftMotor(FRONT_LEFT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor middleLeftMotor(MIDDLE_LEFT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor frontLeftMotor(FRONT_LEFT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor middleLeftMotor(MIDDLE_LEFT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
 okapi::Motor rearLeftMotor(REAR_LEFT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor frontRightMotor(FRONT_RIGHT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor frontRightMotor(FRONT_RIGHT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
 okapi::Motor middleRightMotor(MIDDLE_RIGHT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
-okapi::Motor rearRightMotor(REAR_RIGHT_PORT, true, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
+okapi::Motor rearRightMotor(REAR_RIGHT_PORT, false, okapi::AbstractMotor::gearset::blue, okapi::AbstractMotor::encoderUnits::counts);
 okapi::MotorGroup leftDrive({frontLeftMotor, middleLeftMotor, rearLeftMotor});
 okapi::MotorGroup rightDrive({frontRightMotor, middleRightMotor, rearRightMotor});
 
@@ -48,6 +48,7 @@ lib16868C::Catapult catapult(cataMtrs, cataEnc);
 pros::Imu inertial(INERTIAL_PORT);
 
 // lib16868C::Pneumatic tom('A');
-lib16868C::Pneumatic wings(WING_PORT);
+lib16868C::Pneumatic leftWing(WING_PORT_LEFT);
+lib16868C::Pneumatic rightWing(WING_PORT_RIGHT);
 lib16868C::Rotation cataEnc(CATA_ENC_PORT);
 #endif

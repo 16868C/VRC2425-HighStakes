@@ -65,19 +65,20 @@ extern pros::Gps gps;
 
 #ifdef ANSONBOT
 // Ports
-const int FRONT_LEFT_PORT = 2;
-const int MIDDLE_LEFT_PORT = 3;
-const int REAR_LEFT_PORT = 4;
-const int FRONT_RIGHT_PORT = 1;
-const int MIDDLE_RIGHT_PORT = 12;
-const int REAR_RIGHT_PORT = 9;
-const int INTAKE_PORT = 8;
-const int CATA_PORT = 14;
+const int FRONT_LEFT_PORT = 14;
+const int MIDDLE_LEFT_PORT = 15;
+const int REAR_LEFT_PORT = 16;
+const int FRONT_RIGHT_PORT = 17;
+const int MIDDLE_RIGHT_PORT = 18;
+const int REAR_RIGHT_PORT = 19;
+const int INTAKE_PORT = 20;
+const int CATA_PORT = 5;
 
-const int INERTIAL_PORT = 17;
-const int CATA_ENC_PORT = 13;
+const int INERTIAL_PORT = 8;
+const int CATA_ENC_PORT = 4;
 
-const char WING_PORT = 'A';
+const char WING_PORT_LEFT = 'G';
+const char WING_PORT_RIGHT = 'H';
 
 // Constants
 const okapi::QLength WHEEL_DIAMETER = 3.25_in;
@@ -106,7 +107,8 @@ extern okapi::MotorGroup cataMtrs;
 
 // Pneumatics
 // extern lib16868C::Pneumatic tom;
-extern lib16868C::Pneumatic wings;
+extern lib16868C::Pneumatic leftWing;
+extern lib16868C::Pneumatic rightWing;
 
 // Subsystems
 extern lib16868C::Inline chassis;

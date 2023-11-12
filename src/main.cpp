@@ -38,7 +38,7 @@ void initialize() {
 	rightDrive.tarePosition();
 
 	#ifdef ANSONBOT
-	// cataEnc.resetZero();
+	cataEnc.resetZero();
 	#endif
 	
 	#ifdef ODOMBOT
@@ -90,8 +90,8 @@ void opcontrol() {
 	#ifdef ANSONBOT
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 
-	// chassis.moveDistance(72_in, 600_rpm, {0.08, 0, 0.3}, 400, 0_deg, 300_rpm, {0.1, 0, 0}, 0);
-	chassis.turnAbsolute(90_deg, 600_rpm, {0.03, 0, 0.6}, 1.04, 3, 5, lib16868C::TurnWheel::BOTH, 0);
+	// chassis.moveDistance(24_in, 600_rpm, {0.065, 0, 0.35}, 400, 0_deg, 300_rpm, {0.1, 0, 0}, 0);
+	chassis.turnAbsolute(90_deg, 600_rpm, {0.015, 0, 0.5}, 1.06, 3, 5, lib16868C::TurnWheel::BOTH, 0);
 
 	pros::delay(1000);
 	double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
@@ -109,8 +109,11 @@ void opcontrol() {
 	bool matchloading = false;
 
 	// okapi::ControllerButton tomTgl(okapi::ControllerDigital::B);
-	okapi::ControllerButton wingTgl(okapi::ControllerDigital::A);
+	okapi::ControllerButton wingTgl(okapi::ControllerDigital::X);
+	okapi::ControllerButton leftWingTgl(okapi::ControllerDigital::Y);
+	okapi::ControllerButton rightWingTgl(okapi::ControllerDigital::A);
 
+	uint st = pros::millis();
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
@@ -128,9 +131,19 @@ void opcontrol() {
 		if (cataFire.changedToPressed()) catapult.fire();
 		if (cataIntake.changedToPressed()) catapult.intake();
 
-		// if (wingTgl.changedToPressed()) wings.toggle();
+		if (wingTgl.changedToPressed()) { leftWing.toggle(); rightWing.toggle(); }
+		if (leftWingTgl.changedToPressed()) leftWing.toggle();
+		if (rightWingTgl.changedToPressed()) rightWing.toggle();
 
 		// if (tomTgl.changedToPressed()) tom.toggle();
+
+		pros::lcd::print(0, "Time: %d", pros::millis() - st);
+		pros::lcd::print(1, "Left Temp: %.0f, Right Temp: %.0f", leftDrive.getTemperature(), rightDrive.getTemperature());
+		pros::lcd::print(2, "Intake Temp: %.0f", intakeMtr.getTemperature());
+		pros::lcd::print(3, "Cata Temp: %.0f", cataMtr.getTemperature());
+		pros::lcd::print(4, "Cata Enc: %.2f", cataEnc.get());
+		pros::lcd::print(5, "Left Wing: %d, Right Wing: %d", leftWing.getState(), rightWing.getState());
+		pros::lcd::print(6, "Inertial: %.2f", inertial.get_rotation());
 
 		pros::delay(20);
 	}
