@@ -1,6 +1,11 @@
 #pragma once
 
-void goalSide();
-void goalSideBar();
-void matchloadSide();
+void goalAWP();
+void goalAWPBar();
+void goalRush();
+
 void matchloadAWP();
+void matchloadAWPBar();
+void matchloadRush();
+
+void skills();

@@ -20,11 +20,11 @@ const int REAR_LEFT_PORT = 2;
 const int FRONT_RIGHT_PORT = 11;
 const int REAR_RIGHT_PORT = 19;
 
-const int LEFT_ROTATION_PORT = 10;
-const int RIGHT_ROTATION_PORT = 15;
+const int VERTICAL_DISTANCE_PORT = 10;
+const int HORIZONTAL_DISTANCE_PORT = 15;
 const int REAR_ROTATION_PORT = 12;
 const int DRIVE_ROTATION_PORT = 13;
-const int INERTIAL_PORT = 1;
+const int INERTIAL_PORT = 3;
 const int GPS_PORT = 4;
 
 // Constants
@@ -56,10 +56,10 @@ extern lib16868C::Inline chassis;
 
 // Sensors
 extern pros::Imu inertial;
-extern lib16868C::Rotation leftRotation;
-extern lib16868C::Rotation rightRotation;
 extern lib16868C::Rotation rearRotation;
 extern lib16868C::Rotation driveRotation;
+extern okapi::DistanceSensor verticalDistance;
+extern okapi::DistanceSensor horizontalDistance;
 extern pros::Gps gps;
 #endif
 
@@ -77,8 +77,9 @@ const int CATA_PORT = 5;
 const int INERTIAL_PORT = 8;
 const int CATA_ENC_PORT = 4;
 
-const char WING_PORT_LEFT = 'G';
-const char WING_PORT_RIGHT = 'H';
+const char INTAKE_RAISER_PORT = 'A';
+const char WING_PORT_LEFT = 'H';
+const char WING_PORT_RIGHT = 'G';
 
 // Constants
 const okapi::QLength WHEEL_DIAMETER = 3.25_in;
@@ -100,13 +101,13 @@ extern okapi::MotorGroup leftDrive;
 extern okapi::MotorGroup rightDrive;
 
 extern okapi::Motor intakeMtr;
-extern okapi::MotorGroup intakeMtrs;
+extern okapi::MotorGroup intake;
 
 extern okapi::Motor cataMtr;
 extern okapi::MotorGroup cataMtrs;
 
 // Pneumatics
-// extern lib16868C::Pneumatic tom;
+extern lib16868C::Pneumatic intakeRaiser;
 extern lib16868C::Pneumatic leftWing;
 extern lib16868C::Pneumatic rightWing;
 

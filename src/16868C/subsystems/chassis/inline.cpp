@@ -68,19 +68,22 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, lib1
 		double distCtrl = distPID.calculate(dist.abs().convert(okapi::inch), std::abs(currDist));
 		double headingCtrl = headingPID.calculate(heading.convert(okapi::degree), inertial.get_rotation());
 
-		double accelRPM = t - st <= accelProfile.accelTime * 1000 ?
+		double accelRPM = t - st < accelProfile.accelTime * 1000 ?
 							accelProfile.profile[i++].velocity * 60.0 / (wheelDiam * okapi::pi).convert(okapi::inch) : maxRPM.convert(okapi::rpm);
 		double decelRPM = maxRPM.convert(okapi::rpm) * distCtrl;
 		double vel = std::min(maxRPM.convert(okapi::rpm), std::min(accelRPM, decelRPM));
 		double volts = vel / static_cast<int>(leftMtrs.getGearing()) * 12000;
 		double turnVolts = turnRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		moveArcade(volts * dir, turnVolts * headingCtrl);
+		moveArcade(volts * dir, turnVolts * headingCtrl * (i / accelProfile.profile.size() + 0.5));
 
 		pros::Task::delay_until(&time, 20);
 	}
 
 	moveTank(0, 0);
-	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation() << " deg" << std::endl;
+	// pros::delay(1000);
+	double avgTicks = std::abs((leftMtrs.getEncoder()->get() + rightMtrs.getEncoder()->get()) / 2.0);
+	currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
+	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
 
 void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains gains, double accelRate, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
@@ -127,7 +130,8 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	moveTank(0, 0);
-	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial.get_rotation() << " deg" << std::endl;
+	// pros::delay(1000);
+	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
 
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {

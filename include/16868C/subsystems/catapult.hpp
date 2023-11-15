@@ -43,6 +43,8 @@ public:
 	 */
 	void moveVelocity(double vel);
 
+	int inline getNumFired() { return numFired; }
+
 	/**
 	 * @brief Whether the catapult is moving or not
 	 * 
@@ -62,14 +64,11 @@ private:
 	// okapi::DistanceSensor& distance;
 	Rotation& enc;
 
-	double settledTick = 0;
-
 	CataState cataState { CataState::SETTLED };
 
-	PIDGains gains {0, 0, 0};
+	int numFired = 0;
 
 	pros::task_t ctrlTask;
-
 	friend void CataMain(void*);
 };
 }

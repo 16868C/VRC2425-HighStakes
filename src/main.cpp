@@ -55,9 +55,10 @@ void competition_initialize() {}
 void autonomous() {
 	int st = pros::millis();
 	
-	// goalSide();
-	// goalSideBar();
-	// matchloadAWP();
+	// goalAWPBar();
+	// matchloadAWPBar();
+
+	skills();
 
 	std::cout << "Auton took " << pros::millis() - st << " ms" << std::endl;
 }
@@ -65,39 +66,49 @@ void autonomous() {
 void opcontrol() {
 	#ifdef ODOMBOT
 
-	while (inertial.get_rotation() == INFINITY) pros::delay(20);
-	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+	// while (inertial.get_rotation() == INFINITY) pros::delay(20);
+	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 
-	int initX = gps.get_status().x, initY = gps.get_status().y, initTheta = gps.get_status().yaw;
+	// int initX = gps.get_status().x, initY = gps.get_status().y, initTheta = gps.get_status().yaw;
 
-	// chassis.moveDistance(48_in, 200_rpm, {0.11, 0, 0.5}, 150, 0_deg, 100_rpm, {0.1, 0, 0}, 0);
-	chassis.turnAbsolute(-90_deg, 50_rpm, {0.1, 0, 0.1}, 1.05, 2, 5, lib16868C::TurnWheel::RIGHT, 0);
+	// // chassis.moveDistance(48_in, 200_rpm, {0.11, 0, 0.5}, 150, 0_deg, 100_rpm, {0.1, 0, 0}, 0);
+	// chassis.turnAbsolute(-90_deg, 50_rpm, {0.1, 0, 0.1}, 1.05, 2, 5, lib16868C::TurnWheel::RIGHT, 0);
 
-	std::cout << "[Odom] ";
-	odomDriveEnc.getPose().print();
+	// std::cout << "[Odom] ";
+	// odomDriveEnc.getPose().print();
 
-	std::cout << "[GPS] x: " << Util::mToIn(gps.get_status().x - initX) << " y: " << Util::mToIn(gps.get_status().y - initY) << " theta: " << gps.get_status().yaw - initTheta << "\n";
+	// std::cout << "[GPS] x: " << Util::mToIn(gps.get_status().x - initX) << " y: " << Util::mToIn(gps.get_status().y - initY) << " theta: " << gps.get_status().yaw - initTheta << "\n";
+
+	okapi::ControllerButton calcPos(okapi::ControllerDigital::A);
 
 	while (true) {
 		double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
 		chassis.driveArcade(forward, turn);
 
+		double hDist = Util::mToIn(horizontalDistance.get() / 1000);
+		double vDist = Util::mToIn(verticalDistance.get() / 1000);
+		pros::lcd::print(0, "V: %.2f, H: %.2f", hDist, vDist);
+		pros::lcd::print(1, "Theta: %.2f", inertial.get_rotation());
+
+		double xPos = hDist * std::cos(inertial.get_rotation() * okapi::pi / 180.0);
+		double yPos = vDist * std::cos(inertial.get_rotation() * okapi::pi / 180.0);
+		pros::lcd::print(2, "X: %.2f, Y: %.2f", xPos, yPos);
+
 		pros::delay(20);
 	}
 	#endif
 
 	#ifdef ANSONBOT
+	skills();
+	// chassis.moveDistance(72_in, 600_rpm, {0.18, 0, 10}, 1150, 0_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	// chassis.turnAbsolute(270_deg, 600_rpm, {0.03, 0, 2.5}, 2, 3, 5, lib16868C::TurnWheel::BOTH, 0);
+
+	// pros::delay(1000);
+	// double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
+	// std::cout << avgTicks / 300 * (WHEEL_DIAMETER * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
+
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-
-	// chassis.moveDistance(24_in, 600_rpm, {0.065, 0, 0.35}, 400, 0_deg, 300_rpm, {0.1, 0, 0}, 0);
-	chassis.turnAbsolute(90_deg, 600_rpm, {0.015, 0, 0.5}, 1.06, 3, 5, lib16868C::TurnWheel::BOTH, 0);
-
-	pros::delay(1000);
-	double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
-	std::cout << avgTicks / 300 * (WHEEL_DIAMETER * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
-
-	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
@@ -108,20 +119,25 @@ void opcontrol() {
 	okapi::ControllerButton matchloadTgl(okapi::ControllerDigital::up);
 	bool matchloading = false;
 
-	// okapi::ControllerButton tomTgl(okapi::ControllerDigital::B);
+	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::left);
 	okapi::ControllerButton wingTgl(okapi::ControllerDigital::X);
 	okapi::ControllerButton leftWingTgl(okapi::ControllerDigital::Y);
 	okapi::ControllerButton rightWingTgl(okapi::ControllerDigital::A);
+
+	okapi::ControllerButton matchloadComplete(okapi::ControllerDigital::down);
 
 	uint st = pros::millis();
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 		chassis.driveTank(left, right);
+		// double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
+		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
+		// chassis.driveArcade(forward, turn);
 
 		if (intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
 		else if (outtakeTgl.changedToPressed()) intakeDir = intakeDir == -1 ? 0 : -1;
-		intakeMtrs.moveVelocity(intakeDir * 600);
+		intake.moveVelocity(intakeDir * 600);
 
 		if (matchloadTgl.changedToPressed()) {
 			if (catapult.isSettled()) catapult.matchload();
@@ -131,11 +147,13 @@ void opcontrol() {
 		if (cataFire.changedToPressed()) catapult.fire();
 		if (cataIntake.changedToPressed()) catapult.intake();
 
+		if (intakeRaiserTgl.changedToPressed()) intakeRaiser.toggle();
+
 		if (wingTgl.changedToPressed()) { leftWing.toggle(); rightWing.toggle(); }
 		if (leftWingTgl.changedToPressed()) leftWing.toggle();
 		if (rightWingTgl.changedToPressed()) rightWing.toggle();
-
-		// if (tomTgl.changedToPressed()) tom.toggle();
+		
+		if (matchloadComplete.changedToPressed()) chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 
 		pros::lcd::print(0, "Time: %d", pros::millis() - st);
 		pros::lcd::print(1, "Left Temp: %.0f, Right Temp: %.0f", leftDrive.getTemperature(), rightDrive.getTemperature());
