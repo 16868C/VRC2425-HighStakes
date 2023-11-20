@@ -77,7 +77,11 @@ const int CATA_PORT = 5;
 const int INERTIAL_PORT = 8;
 const int CATA_ENC_PORT = 4;
 
+const int VERT_DIST_PORT = 1;
+const int HORI_DIST_PORT = 2;
+
 const char INTAKE_RAISER_PORT = 'A';
+const char HANG_PORT = 'B';
 const char WING_PORT_LEFT = 'H';
 const char WING_PORT_RIGHT = 'G';
 
@@ -108,6 +112,7 @@ extern okapi::MotorGroup cataMtrs;
 
 // Pneumatics
 extern lib16868C::Pneumatic intakeRaiser;
+extern lib16868C::Pneumatic hang;
 extern lib16868C::Pneumatic leftWing;
 extern lib16868C::Pneumatic rightWing;
 
@@ -118,4 +123,7 @@ extern lib16868C::Catapult catapult;
 // Sensors
 extern pros::Imu inertial;
 extern lib16868C::Rotation cataEnc;
+
+extern okapi::DistanceSensor vertDist;
+extern okapi::DistanceSensor horiDist;
 #endif

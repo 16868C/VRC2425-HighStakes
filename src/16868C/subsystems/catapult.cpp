@@ -18,7 +18,7 @@ void lib16868C::CataMain(void* param) {
 				fireDebounce = true;
 			} else if (cata->enc.get() < 50 && fireDebounce) fireDebounce = false;
 		} else if (cata->cataState == CataState::INTAKE) {
-			if (cata->enc.get() > 30 && cata->enc.get() < 45 && fired) cata->cataState = CataState::SETTLED;
+			if (cata->enc.get() > 35 && cata->enc.get() < 45 && fired) cata->cataState = CataState::SETTLED;
 		}
 		if (cata->enc.get() < 10 && !fired) { fired = true; cata->numFired++; }
 
@@ -42,7 +42,7 @@ void Catapult::fire() {
 	cataState = CataState::FIRING;
 }
 void Catapult::intake() {
-	if (enc.get() > 30 && enc.get() < 45) return;
+	if (enc.get() > 35 && enc.get() < 45) return;
 	cataState = CataState::INTAKE;
 }
 void Catapult::matchload() {

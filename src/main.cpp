@@ -56,9 +56,11 @@ void autonomous() {
 	int st = pros::millis();
 	
 	// goalAWPBar();
+	// goalAWP();
 	// matchloadAWPBar();
+	matchloadRush();
 
-	skills();
+	// skills();
 
 	std::cout << "Auton took " << pros::millis() - st << " ms" << std::endl;
 }
@@ -100,7 +102,7 @@ void opcontrol() {
 	#endif
 
 	#ifdef ANSONBOT
-	skills();
+	// skillsStart();
 	// chassis.moveDistance(72_in, 600_rpm, {0.18, 0, 10}, 1150, 0_deg, 300_rpm, {0.1, 0, 0.1}, 0);
 	// chassis.turnAbsolute(270_deg, 600_rpm, {0.03, 0, 2.5}, 2, 3, 5, lib16868C::TurnWheel::BOTH, 0);
 
@@ -108,7 +110,8 @@ void opcontrol() {
 	// double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
 	// std::cout << avgTicks / 300 * (WHEEL_DIAMETER * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
 
-	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
@@ -117,19 +120,24 @@ void opcontrol() {
 	okapi::ControllerButton cataFire(okapi::ControllerDigital::L1);
 	okapi::ControllerButton cataIntake(okapi::ControllerDigital::L2);
 	okapi::ControllerButton matchloadTgl(okapi::ControllerDigital::up);
-	bool matchloading = false;
+	bool matchloading = true;
 
 	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::left);
+	okapi::ControllerButton hangTgl(okapi::ControllerDigital::down);
 	okapi::ControllerButton wingTgl(okapi::ControllerDigital::X);
 	okapi::ControllerButton leftWingTgl(okapi::ControllerDigital::Y);
 	okapi::ControllerButton rightWingTgl(okapi::ControllerDigital::A);
 
-	okapi::ControllerButton matchloadComplete(okapi::ControllerDigital::down);
+	okapi::ControllerButton matchloadComplete(okapi::ControllerDigital::right);
 
 	uint st = pros::millis();
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
+		if (hang.getState()) {
+			left = std::clamp(left, -0.55, 0.55);
+			right = std::clamp(right, -0.55, 0.55);
+		}
 		chassis.driveTank(left, right);
 		// double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
 		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
@@ -146,6 +154,8 @@ void opcontrol() {
 
 		if (cataFire.changedToPressed()) catapult.fire();
 		if (cataIntake.changedToPressed()) catapult.intake();
+
+		if (hangTgl.changedToPressed()) hang.toggle();
 
 		if (intakeRaiserTgl.changedToPressed()) intakeRaiser.toggle();
 

@@ -46,7 +46,11 @@ lib16868C::Catapult catapult(cataMtrs, cataEnc);
 pros::Imu inertial(INERTIAL_PORT);
 lib16868C::Rotation cataEnc(CATA_ENC_PORT);
 
+okapi::DistanceSensor vertDist(VERT_DIST_PORT);
+okapi::DistanceSensor horiDist(HORI_DIST_PORT);
+
 lib16868C::Pneumatic intakeRaiser(INTAKE_RAISER_PORT);
+lib16868C::Pneumatic hang(HANG_PORT);
 lib16868C::Pneumatic leftWing(WING_PORT_LEFT);
 lib16868C::Pneumatic rightWing(WING_PORT_RIGHT);
 #endif
