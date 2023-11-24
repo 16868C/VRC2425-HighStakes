@@ -103,14 +103,7 @@ void opcontrol() {
 
 	#ifdef ANSONBOT
 	// skillsStart();
-	// chassis.moveDistance(72_in, 600_rpm, {0.18, 0, 10}, 1150, 0_deg, 300_rpm, {0.1, 0, 0.1}, 0);
-	// chassis.turnAbsolute(270_deg, 600_rpm, {0.03, 0, 2.5}, 2, 3, 5, lib16868C::TurnWheel::BOTH, 0);
-
-	// pros::delay(1000);
-	// double avgTicks = std::abs((leftDrive.getEncoder()->get() + rightDrive.getEncoder()->get()) / 2.0);
-	// std::cout << avgTicks / 300 * (WHEEL_DIAMETER * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
-
-	// chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+	
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);

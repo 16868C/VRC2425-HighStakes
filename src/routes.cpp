@@ -121,15 +121,20 @@ void skills() {
 
 	// catapult.fire();
 	
-	chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 10}, 1200, -35_deg, 150_rpm, {0.07, 0, 10}, 1200);
-	chassis.turnAbsolute(-115_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::LEFT, 1000);
+	// chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 10}, 1200, -35_deg, 150_rpm, {0.07, 0, 10}, 1200);
+	// chassis.turnAbsolute(-115_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::LEFT, 1000);
+
+	chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 10}, 1200, -35_deg, 150_rpm, {0.07, 0, 10}, 1100);
+	chassis.moveDistance(-3_in, 600_rpm, {0.21, 0, 10}, 1200, -35_deg, 150_rpm, {0.1, 0, 0.1}, 1000);
+	chassis.turnAbsolute(-105_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::LEFT, 1000);
 
 	// pros::delay(1000);
 	double startHeading = inertial.get_rotation();
 	leftWing.extend();
 	catapult.matchload();
 	int c = 0;
-	while (catapult.getNumFired() < 35 || c < 28000) { pros::delay(50); c += 50; }
+	waitUntilButton();
+	// while (catapult.getNumFired() < 35 || c < 28000) { pros::delay(50); c += 50; }
 	catapult.intake();
 	leftWing.retract();
 	inertial.set_rotation(startHeading - 10);
@@ -142,9 +147,11 @@ void skills() {
 	inertial.set_rotation(-210);
 	pros::delay(200);
 
-	rightWing.extend();
-	chassis.turnAbsolute(-125_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::RIGHT, 0);
-	chassis.moveDistance(75_in, 600_rpm, {0.19, 0, 10}, 1200, -125_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	// rightWing.extend();
+	// chassis.turnAbsolute(-125_deg, 400_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::RIGHT, 0);
+	chassis.moveDistance(-3_in, 600_rpm, {0.2, 0, 10}, 1200, -210_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	chassis.turnAbsolute(-120_deg, 600_rpm, {0.025, 0, 1.2}, 2, 3, 5, TurnWheel::BOTH, 0);
+	chassis.moveDistance(75_in, 600_rpm, {0.19, 0, 10}, 1200, -120_deg, 300_rpm, {0.1, 0, 0.1}, 0);
 	
 	chassis.turnAbsolute(-70_deg, 600_rpm, {0.027, 0, 1.3}, 2, 3, 5, TurnWheel::LEFT, 1000);
 	intakeRaiser.retract();
@@ -156,10 +163,12 @@ void skills() {
 
 	chassis.turnAbsolute(55_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 0);
 	chassis.moveDistance(40_in, 600_rpm, {0.2, 0, 10}, 1200, 55_deg, 300_rpm, {0.1, 0, 0.1}, 0);
-	chassis.turnAbsolute(-70_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 0);
+	chassis.turnAbsolute(-30_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 0);
+	chassis.moveDistance(36_in, 600_rpm, {0.2, 0, 10}, 1200, -30_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	chassis.turnAbsolute(-120_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 0);
 	leftWing.extend();
 	rightWing.extend();
-	chassis.moveDistance(50_in, 600_rpm, {0.2, 0, 10}, 1200, -70_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	chassis.moveDistance(50_in, 600_rpm, {0.2, 0, 10}, 1200, -120_deg, 300_rpm, {0.1, 0, 0.1}, 0);
 
 	// pose.x = (vertDist.get() * okapi::millimeter).convert(okapi::inch) * okapi::inch;
 	// pose.y = (horiDist.get() * okapi::millimeter).convert(okapi::inch) * okapi::inch;
@@ -174,9 +183,11 @@ void skills() {
 }
 
 void skillsStart() {
-	chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 10}, 1200, -35_deg, 150_rpm, {0.07, 0, 10}, 1200);
-	chassis.turnAbsolute(-115_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::LEFT, 1000);
-	
+	chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 10}, 1200, -35_deg, 150_rpm, {0.07, 0, 10}, 1100);
+	chassis.moveDistance(-3_in, 600_rpm, {0.21, 0, 10}, 1200, -35_deg, 150_rpm, {0.1, 0, 0.1}, 1000);
+	chassis.turnAbsolute(-105_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::LEFT, 1000);
+	// chassis.moveDistance(-12_in, 600_rpm, {0.2, 0, 10}, 1200, -70_deg, 350_rpm, {0.3, 0, 10}, 1500);
+
 	leftWing.extend();
 	catapult.matchload();
 }
