@@ -57,10 +57,11 @@ void autonomous() {
 	
 	// goalAWPBar();
 	// goalAWP();
+	goalRush();
 	// matchloadAWPBar();
-	matchloadRush();
+	// matchloadRush();
 
-	// skills();
+	// skills2();
 
 	std::cout << "Auton took " << pros::millis() - st << " ms" << std::endl;
 }
@@ -103,7 +104,8 @@ void opcontrol() {
 
 	#ifdef ANSONBOT
 	// skillsStart();
-	
+	// skills2();
+
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
