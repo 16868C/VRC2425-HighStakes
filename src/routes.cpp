@@ -9,32 +9,39 @@ void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A)
 
 #ifdef ANSONBOT
 void goalAWPBar() {
+	// pros::Task heading([&]() {
+	// 	while (true) {
+	// 		std::cout << inertial.get_rotation() << "\n";
+	// 		pros::delay(50);
+	// 	}
+	// });
+
 	catapult.intake();
 	// intake.moveVoltage(12000);
-	// intakeRaiser.extend();
+	intakeRaiser.extend();
 
 	// pros::delay(300);
 	// chassis.moveDistance(29_in, 600_rpm, {0.2, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 0);
 	// chassis.turnAbsolute(-45_deg, 600_rpm, {0.028, 0, 1.3}, 2, 3, 5, TurnWheel::RIGHT, 0);
-	inertial.set_rotation(-45);
 	rightWing.extend();
-	chassis.moveDistance(12_in, 600_rpm, {0.21, 0, 10}, 1200, -45_deg, 300_rpm, {0.1, 0, 0.1}, 600);
+	chassis.moveDistance(18_in, 600_rpm, {0.22, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 800);
 	rightWing.retract();
-	chassis.turnAbsolute(-90_deg, 600_rpm, {0.025, 0, 1.2}, 2, 3, 5, TurnWheel::RIGHT, 0);
+	chassis.turnAbsolute(-35_deg, 600_rpm, {0.025, 0, 1.2}, 2, 3, 5, TurnWheel::RIGHT, 0);
 
-	chassis.moveDistance(18_in, 600_rpm, {0.2, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	chassis.moveDistance(-6_in, 600_rpm, {0.21, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 0);
-	// chassis.turnAbsolute(90_deg, 600_rpm, {0.02, 0, 1.4}, 2, 3, 5, TurnWheel::BOTH, 0);
+	chassis.moveDistance(10_in, 600_rpm, {0.2, 0, 10}, 1200, -35_deg, 300_rpm, {0.1, 0, 0.1}, 1200);
+	chassis.moveDistance(-6_in, 600_rpm, {0.21, 0, 10}, 1200, -35_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	// chassis.moveDistance(-12_in, 600_rpm, {0.21, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	// chassis.turnAbsolute(90_deg, 600_rpm, {0.019, 0, 1.4}, 2, 3, 5, TurnWheel::BOTH, 0);
 	// intake.moveVoltage(-12000);
 	// intakeRaiser.retract();
-	// chassis.moveDistance(-13_in, 600_rpm, {0.2, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
-	// chassis.moveDistance(6_in, 600_rpm, {0.21, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 0);
+	// chassis.moveDistance(-13_in, 600_rpm, {0.2, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 1200);
+	// chassis.moveDistance(5_in, 600_rpm, {0.21, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 0);
 
-	// chassis.turnAbsolute(180_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 0);
-	chassis.turnAbsolute(-180_deg, 600_rpm, {0.025, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 0);
-	leftWing.extend();
-	chassis.moveDistance(48_in, 600_rpm, {0.2, 0, 10}, 1200, -180_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
-	chassis.turnAbsolute(200_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::RIGHT, 0);
+	chassis.turnAbsolute(55_deg, 600_rpm, {0.023, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 0);
+	// leftWing.extend();
+	intakeRaiser.extend();
+	chassis.moveDistance(-48_in, 600_rpm, {0.2, 0, 10}, 1200, 55_deg, 300_rpm, {0.05, 0, 0.1}, 0);
+	// chassis.turnAbsolute(200_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::RIGHT, 0);
 }
 
 void goalAWP() {

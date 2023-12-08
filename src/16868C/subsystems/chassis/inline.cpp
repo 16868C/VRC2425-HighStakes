@@ -24,13 +24,14 @@ void Inline::moveArcade(double forward, double turn) {
 	double left = forward + turn;
 	double right = forward - turn;
 	// Normalize the values so neither exceed 12000 but keep the ratio
-	if (std::abs(left) > 12000) {
-		right *= 12000 / left;
-		left = 12000 * Util::sgn(left);
-	} else if (std::abs(right) > 12000) {
-		left *= 12000 / right;
-		right = 12000 * Util::sgn(right);
-	}
+	// if (std::abs(left) > 12000) {
+	// 	right *= 12000 / left;
+	// 	left = 12000 * Util::sgn(left);
+	// } else if (std::abs(right) > 12000) {
+	// 	left *= 12000 / right;
+	// 	right = 12000 * Util::sgn(right);
+	// }
+	// std::cout << left << " " << right << "\n";
 
 	leftMtrs.moveVoltage(left);
 	rightMtrs.moveVoltage(right);
