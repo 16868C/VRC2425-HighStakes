@@ -80,22 +80,34 @@ void goalRush() {
 	intake.moveVoltage(12000);
 
 	pros::Task wingOpen([&]() {
-		pros::delay(700);
+		leftWing.extend();
+		pros::delay(300);
+		leftWing.retract();
+		pros::delay(400);
 		rightWing.extend();
 	});
 	chassis.moveDistance(-47_in, 600_rpm, {0.2, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
+	// chassis.moveDistance(10_in, 600_rpm, {0.2, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
 	chassis.turnAbsolute(100_deg, 600_rpm, {0.021, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	rightWing.retract();
 	intake.moveVoltage(-12000);
-	intakeRaiser.retract();
-	chassis.moveDistance(-20_in, 600_rpm, {0.2, 0, 10}, 1200, 100_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	pros::delay(500);
 
-	chassis.moveDistance(15_in, 600_rpm, {0.2, 0, 10}, 1200, 100_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
-	chassis.turnAbsolute(10_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 1500);
-	chassis.moveDistance(55_in, 600_rpm, {0.2, 0, 10}, 1200, 10_deg, 300_rpm, {0.1, 0, 0.1}, 1200);
-	chassis.turnAbsolute(-125_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 10}, 1200, -125_deg, 300_rpm, {0.1, 0, 0.1}, 3000);
-	chassis.moveDistance(-5_in, 600_rpm, {0.2, 0, 10}, 1200, -125_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	chassis.turnAbsolute(240_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 1500);
+	intake.moveVoltage(12000);
+	chassis.moveDistance(-15_in, 600_rpm, {0.2, 0, 10}, 1200, 240_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	chassis.moveDistance(15_in, 600_rpm, {0.2, 0, 10}, 1200, 240_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	chassis.turnAbsolute(100_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	intake.moveVoltage(-12000);
+	pros::delay(400);
+	intakeRaiser.retract();
+	chassis.moveDistance(-22_in, 600_rpm, {0.2, 0, 10}, 1200, 100_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
+	
+	chassis.moveDistance(8_in, 600_rpm, {0.2, 0, 10}, 1200, 100_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
+	chassis.turnAbsolute(190_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	chassis.moveDistance(-50_in, 600_rpm, {0.2, 0, 10}, 1200, 190_deg, 300_rpm, {0.1, 0, 0.1}, 2000);
+	rightWing.extend();
+	chassis.turnAbsolute(260_deg, 600_rpm, {0.02, 0, 1.3}, 2, 3, 5, TurnWheel::BOTH, 1000);
 }
 
 void matchloadAWPBar() {
