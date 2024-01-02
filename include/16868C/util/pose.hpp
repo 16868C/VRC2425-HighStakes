@@ -1,37 +1,26 @@
 #pragma once
 #include "okapi/api.hpp"
-#include "16868C/util/util.hpp"
+#include "16868C/util/math.hpp"
+#include <string>
 
 namespace lib16868C {
 class Pose {
 	public:
-		okapi::QLength x, y;
-		okapi::QAngle theta;
+		Point pos;
+		double theta;
 		uint time;
 
-		inline okapi::QLength distTo(Pose point) {
-			return hypot(point.x - x, point.y - y);
-		}
-		inline okapi::QAngle angleTo(Pose point) {
-			return atan2(point.y - y, point.x - x);
-		}
-		
-		inline Pose operator+(Pose point) {
-			return {x + point.x, y + point.y, theta + point.theta, time};
-		}
-		inline Pose operator-(Pose point) {
-			return {x - point.x, y - point.y, theta - point.theta, time};
-		}
-		
-		inline Pose operator*(double factor) {
-			return {x * factor, y * factor, theta * factor, time};
-		}
-		inline Pose operator/(double divisor) {
-			return {x / divisor, y / divisor, theta / divisor, time};
-		}
+		Pose();
+		Pose(Point pos, double theta, uint time);
+		Pose(double x, double y, double theta, uint time);
+		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, uint time);
+		Pose(Pose& p);
 
-		inline void print() {
-			std::cout << "t: " << time << " x: " << x.convert(okapi::inch) << " y: " << y.convert(okapi::inch) << " theta: " << theta.convert(okapi::degree) << "\n";
-		}
+		okapi::QLength distTo(Point p);
+		okapi::QLength distTo(Pose p);
+		okapi::QAngle angleTo(Point p);
+		okapi::QAngle angleTo(Pose p);
+
+		std::string toStr();
 };
 } // namespace lib16868C
