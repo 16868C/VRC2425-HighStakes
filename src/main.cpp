@@ -12,28 +12,28 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 	
-	// bool inertialResetFailed = true, inertialDrift = false;
-	// do {
-	// 	if (!inertialResetFailed) {
-	// 		std::cerr << "Inertial Reset Failed" << std::endl;
-	// 		master.setText(0, 0, "Inertial Reset Failed");
-	// 		pros::lcd::print(0, "Inertial Reset Failed");
-	// 		master.rumble("-");
-	// 	}
-	// 	inertialResetFailed = inertial.reset(true) - 1;
-	// } while (inertialResetFailed);
-	// double h1 = inertial.get_rotation();
-	// pros::delay(300);
-	// double h2 = inertial.get_rotation();
-	// if (std::abs(h1 - h2) > 0.5) {
-	// 	inertialDrift = true;
-	// 	std::cerr << "Inertial Drift Detected: " << std::abs(h1 - h2) << " deg difference in 300ms" << std::endl;
-	// 	master.setText(0, 0, "Inertial Drift Detected: " + std::to_string(std::abs(h1 - h2)) + " deg difference in 300ms");
-	// 	pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 300ms", std::abs(h1 - h2));
-	// 	master.rumble("-");
-	// }
+	bool inertialResetFailed = true, inertialDrift = false;
+	do {
+		if (!inertialResetFailed) {
+			std::cerr << "Inertial Reset Failed" << std::endl;
+			master.setText(0, 0, "Inertial Reset Failed");
+			pros::lcd::print(0, "Inertial Reset Failed");
+			master.rumble("-");
+		}
+		inertialResetFailed = inertial.reset(true) - 1;
+	} while (inertialResetFailed);
+	double h1 = inertial.get_rotation();
+	pros::delay(300);
+	double h2 = inertial.get_rotation();
+	if (std::abs(h1 - h2) > 0.5) {
+		inertialDrift = true;
+		std::cerr << "Inertial Drift Detected: " << std::abs(h1 - h2) << " deg difference in 300ms" << std::endl;
+		master.setText(0, 0, "Inertial Drift Detected: " + std::to_string(std::abs(h1 - h2)) + " deg difference in 300ms");
+		pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 300ms", std::abs(h1 - h2));
+		master.rumble("-");
+	}
 
-	inertial.reset(true);
+	// inertial.reset(true);
 	leftDrive.tarePosition();
 	rightDrive.tarePosition();
 
@@ -104,6 +104,11 @@ void opcontrol() {
 
 	#ifdef ANSONBOT
 	// skillsStart();
+	// pros::Task touchBar([&]() {
+	// 	chassis.moveTank(-2000, -2000);
+	// 	pros::delay(500);
+	// 	chassis.moveTank(0, 0);
+	// });
 	// skills2();
 
 	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
@@ -130,8 +135,8 @@ void opcontrol() {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 		if (hang.getState()) {
-			left = std::clamp(left, -0.55, 0.55);
-			right = std::clamp(right, -0.55, 0.55);
+			left = std::clamp(left, -0.65, 1.0);
+			right = std::clamp(right, -0.65, 1.0);
 		}
 		chassis.driveTank(left, right);
 		// double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
