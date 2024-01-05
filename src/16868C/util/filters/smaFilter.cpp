@@ -13,3 +13,6 @@ double SMAFilter::filter(double input) {
 	}
 	return output = sum / static_cast<double>(samples.size());
 }
+double SMAFilter::getOutput() {
+	return output;
+}

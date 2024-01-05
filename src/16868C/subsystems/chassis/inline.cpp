@@ -1,5 +1,6 @@
 #include "inline.hpp"
 #include "16868C/subsystems/chassis/motionProfiling.hpp"
+#include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
 
 using namespace lib16868C;
@@ -92,7 +93,6 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, lib1
 	}
 
 	moveTank(0, 0);
-	// pros::delay(1000);
 	double avgTicks = std::abs((leftMtrs.getEncoder()->get() + rightMtrs.getEncoder()->get()) / 2.0);
 	currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
 	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
@@ -142,7 +142,6 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	moveTank(0, 0);
-	// pros::delay(1000);
 	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
 

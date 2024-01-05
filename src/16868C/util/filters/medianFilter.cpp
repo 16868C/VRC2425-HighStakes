@@ -9,9 +9,7 @@ MedianFilter::MedianFilter(int sampleSize) : sampleSize(sampleSize) {}
 
 double MedianFilter::filter(double input) {
 	samples.push(input);
-	if (samples.size() > sampleSize) {
-		samples.pop();
-	}
+	if (samples.size() > sampleSize) samples.pop();
 
 	std::vector<double> v = Util::queueToVector(samples);
 
@@ -19,5 +17,8 @@ double MedianFilter::filter(double input) {
 	std::nth_element(v.begin(), v.begin() + medianIndex, v.end());
 	output = (v.size() & 1) ? (v[medianIndex])
 							: ((v[medianIndex] + *std::min_element(v.begin(), v.begin() + medianIndex - 1)) / 2.0);
+	return output;
+}
+double MedianFilter::getOutput() {
 	return output;
 }

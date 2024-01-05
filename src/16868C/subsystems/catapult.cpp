@@ -59,6 +59,10 @@ void Catapult::moveVelocity(double vel) {
 	mtrs.moveVelocity(vel);
 }
 
+int Catapult::getNumFired() {
+	return numFired;
+}
+
 bool Catapult::isSettled() {
 	return cataState == CataState::SETTLED;
 }

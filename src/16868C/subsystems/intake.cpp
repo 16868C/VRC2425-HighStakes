@@ -105,3 +105,10 @@ void Intake::matchload() {
 	frontTarget = 12000;
 	rearTarget = -12000;
 }
+
+bool Intake::hasBall() const  {
+	return distSnsr.get() < 150;
+}
+IntakeState Intake::getState() const {
+	return state;
+}

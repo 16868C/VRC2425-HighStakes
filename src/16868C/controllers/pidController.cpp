@@ -5,6 +5,17 @@
 
 using namespace lib16868C;
 
+PIDController::PIDController(PIDGains gains, double outputMax, double outputMin, double maxIntegral, double integralRange, bool resetIntegralOnCross, std::function<bool()> settleCond) {
+	this->gains = gains;
+	this->outputMax = outputMax;
+	this->outputMin = outputMin;
+	this->maxIntegral = std::abs(maxIntegral);
+	this->integralRange = std::fabs(integralRange);
+	this->resetIntegralOnCross = resetIntegralOnCross;
+	this->output = 0;
+	this->settleCond = settleCond;
+}
+
 PIDController::PIDController(const PIDController& pidController) {
 	this->gains = pidController.gains;
 	this->outputMax = pidController.outputMax;
@@ -16,14 +27,21 @@ PIDController::PIDController(const PIDController& pidController) {
 	this->prevError = pidController.prevError;
 	this->prevTime = pidController.prevTime;
 }
-PIDController::PIDController(PIDGains gains, double outputMax, double outputMin, double maxIntegral, double integralRange, bool resetIntegralOnCross, std::function<bool()> settleCond) {
+
+void PIDController::setGains(PIDGains gains) {
 	this->gains = gains;
-	this->outputMax = outputMax;
-	this->outputMin = outputMin;
-	this->maxIntegral = std::abs(maxIntegral);
-	this->integralRange = std::fabs(integralRange);
-	this->resetIntegralOnCross = resetIntegralOnCross;
-	this->output = 0;
+}
+void PIDController::setOutputMaxMin(double max, double min) {
+	outputMax = max;
+	outputMin = min;
+}
+void PIDController::setMaxIntegral(double max) {
+	maxIntegral = max;
+}
+void PIDController::setResetIntegralOnCross(bool reset) {
+	resetIntegralOnCross = reset;
+}
+void PIDController::setSettleCondition(std::function<bool()> settleCond) {
 	this->settleCond = settleCond;
 }
 

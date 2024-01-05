@@ -6,7 +6,7 @@ class SMAFilter {
 	public:
 		SMAFilter(int sampleSize);
 		double filter(double input);
-		inline double getOutput() { return output; };
+		double getOutput();
 
 	private:
 		double sum = 0;

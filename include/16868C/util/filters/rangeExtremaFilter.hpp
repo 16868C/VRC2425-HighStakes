@@ -6,7 +6,7 @@ class RangeExtremaFilter {
 	public:
 		RangeExtremaFilter(int sampleSize);
 		double filter(double input);
-		inline double getOutput() { return output; }
+		double getOutput();
 
 	private:
 		int sampleSize;

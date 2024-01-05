@@ -1,6 +1,6 @@
 #pragma once
 #include "16868C/devices/abstractEncoder.hpp"
-#include "16868C/util/util.hpp"
+#include "16868C/util/math.hpp"
 #include "okapi/api.hpp"
 
 namespace lib16868C {
@@ -10,12 +10,8 @@ class OpticalEncoder : private okapi::ADIEncoder, public AbstractEncoder {
 		OpticalEncoder(int portTop, int portBottom, bool reverse);
 		OpticalEncoder(int smartPort, int portTop, int portBottom, bool reverse);
 
-		inline double get() override {
-			return okapi::ADIEncoder::get();
-		}
-		inline void resetZero() override {
-			okapi::ADIEncoder::reset();
-		}
+		double get() override;
+		void resetZero() override;
 		double getVelocity() override;
 	
 	private:

@@ -3,6 +3,46 @@
 using namespace lib16868C;
 using namespace okapi::literals;
 
+/** OdomSensors **/
+void OdomSensors::reset() {
+	if (left) left->resetZero();
+	if (right) right->resetZero();
+	if (middle) middle->resetZero();
+	if (inertial) inertial->reset(true);
+};
+std::vector<double> OdomSensors::getTicks() {
+	if (right) return {left->get(), right->get(), middle->get()};
+	else return {left->get(), 0, middle->get()};
+}
+std::vector<int> OdomSensors::getTPR() {
+	if (right) return {left->getTPR(), right->getTPR(), middle->getTPR()};
+	else return {left->getTPR(), 0x3f, middle->getTPR()};
+}
+
+/** EncoderScales **/
+EncoderScales::EncoderScales(okapi::QLength leftDiam, okapi::QLength rightDiam, okapi::QLength wheelTrack, okapi::QLength middleDiam, okapi::QLength middleTrack)
+	: leftDiam(leftDiam.convert(okapi::inch)), rightDiam(rightDiam.convert(okapi::inch)), wheelTrack(wheelTrack.convert(okapi::inch)), middleDiam(middleDiam.convert(okapi::inch)), middleTrack(middleTrack.convert(okapi::inch)) {}
+EncoderScales::EncoderScales(okapi::QLength leftDiam, okapi::QLength middleDiam, okapi::QLength middleTrack)
+	: leftDiam(leftDiam.convert(okapi::inch)), middleDiam(middleDiam.convert(okapi::inch)), middleTrack(middleTrack.convert(okapi::inch)) {}
+
+double EncoderScales::getDiam(int index) {
+	switch(index) {
+		case 0: return leftDiam;
+		case 1: return rightDiam;
+		case 2: return middleDiam;
+		default: return 0;
+	}
+}
+double EncoderScales::getTrack(int index) {
+	switch(index) {
+		case 0: return wheelTrack;
+		case 1: return wheelTrack;
+		case 2: return middleTrack;
+		default: return 0;
+	}
+}
+
+/** Odometry **/
 void Odometry::odomManager(void* param) {
 	std::vector<double> prev(4, 0);
 
@@ -13,7 +53,7 @@ void Odometry::odomManager(void* param) {
 		std::vector<double> curr;
 		// Distance and theta
 		curr = odom->ticksToDist(odom->snsrs.getTicks(), odom->snsrs.getTPR());
-		if (odom->snsrs.right) curr.push_back((curr[1] - curr[0]) / odom->encScales.wheelTrack.convert(okapi::inch));
+		if (odom->snsrs.right) curr.push_back((curr[1] - curr[0]) / odom->encScales.wheelTrack);
 		else curr.push_back(Util::degToRad(odom->snsrs.inertial->get_rotation()));
 
 		std::vector<double> deltas;
@@ -21,8 +61,8 @@ void Odometry::odomManager(void* param) {
 		odom->step(deltas);
 
 		Pose pose = odom->getPose();
-		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.x.convert(okapi::inch), pose.y.convert(okapi::inch));
-		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", pose.theta.convert(okapi::degree), pose.theta.convert(okapi::radian));
+		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.x, pose.y);
+		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(pose.theta), pose.theta);
 
 		OdomSensors snsrs = odom->getSensors();
 		if (snsrs.right) pros::lcd::print(2, "Left: %.2f, Right: %.2f", snsrs.left->get(), snsrs.right->get());
@@ -64,7 +104,7 @@ void Odometry::init() {
 	snsrs.reset();
 
 	// Resetting pose
-	pose = { 0_in, 0_in, 0_deg, 0 };
+	pose = { 0_in, 0_in, 0_rad, 0 };
 
 	// Starting task
 	odomTask = pros::c::task_create(odomManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odometry");
@@ -109,7 +149,7 @@ void Odometry::step(std::vector<double> deltas) {
 	double deltaM = deltas[2];
 	double deltaA = deltas[3];
 
-	deltaM -= deltaA * encScales.middleTrack.convert(okapi::inch); // Original equation: (deltaA / 2pi) * (2pi * middleTrack)
+	deltaM -= deltaA * encScales.middleTrack; // Original equation: (deltaA / 2pi) * (2pi * middleTrack)
 	
 	// std::cout << deltaL << " " << deltaR << " " << deltaM << " " << deltaA << "\n";
 
@@ -117,12 +157,12 @@ void Odometry::step(std::vector<double> deltas) {
 	double localOffsetX = deltaM;
 	double localOffsetY = deltaL;
 	if (deltaA != 0) {
-		localOffsetX = 2 * sin(deltaA / 2.0) * (deltaM / deltaA + encScales.middleTrack.convert(okapi::inch) * 2);
-		localOffsetY = 2 * sin(deltaA / 2.0) * (deltaL / deltaA + encScales.wheelTrack.convert(okapi::inch) / 2.0);
+		localOffsetX = 2 * sin(deltaA / 2.0) * (deltaM / deltaA + encScales.middleTrack * 2);
+		localOffsetY = 2 * sin(deltaA / 2.0) * (deltaL / deltaA + encScales.wheelTrack / 2.0);
 	}
 
 	// Polar offsets
-	double avgA = pose.theta.convert(okapi::radian) + (deltaA / 2.0);
+	double avgA = pose.theta + (deltaA / 2.0);
 
 	double polarR = hypot(localOffsetX, localOffsetY);
 	double polarA = atan2(localOffsetY, localOffsetX);
@@ -136,8 +176,17 @@ void Odometry::step(std::vector<double> deltas) {
 	if (std::isnan(globalDeltaY)) globalDeltaY = 0;
 	if (std::isnan(deltaA)) deltaA = 0;
 
-	double globalX = pose.x.convert(okapi::inch) + globalDeltaX;
-	double globalY = pose.y.convert(okapi::inch) + globalDeltaY;
-	double globalTheta = pose.theta.convert(okapi::radian) + deltaA;
-	pose = {globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()};
+	double globalX = pose.x + globalDeltaX;
+	double globalY = pose.y + globalDeltaY;
+	double globalTheta = pose.theta + deltaA;
+	pose = { globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis() };
+}
+
+std::vector<double> Odometry::ticksToDist(std::vector<double> ticks, std::vector<int> tpr)  {
+	if (ticks.size() != tpr.size()) { std::cerr << "ticksToDist: ticks and tpr must be the same size\n"; return std::vector<double>(ticks.size(), 0); }
+
+	std::vector<double> dists;
+	for (int i = 0; i < ticks.size(); i++)
+		dists.push_back(ticks[i] / tpr[i] * encScales.getDiam(i) * M_PI);
+	return dists;
 }

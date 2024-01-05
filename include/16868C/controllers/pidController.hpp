@@ -8,32 +8,19 @@ struct PIDGains {
 
 class PIDController {
 	public:
-		PIDController(const PIDController& pidController);
 		PIDController(PIDGains gains, double outputMax = 1, double outputMin = -1, double maxIntegral = 1e5, double integralRange = 15, bool resetIntegralOnCross = true, std::function<bool()> settleCond = {[]() { return false; }});
+		PIDController(const PIDController& pidController);
 
-		inline void setGains(PIDGains gains) {
-			this->gains = gains;
-		}
-		inline void setOutputMaxMin(double outputMax, double outputMin) {
-			this->outputMax = outputMax;
-			this->outputMin = outputMin;
-		}
-		inline void setMaxIntegral(double maxIntegral) {
-			this->maxIntegral = maxIntegral;
-		}
-		inline void setResetIntegralOnCross(bool resetIntegralOnCross) {
-			this->resetIntegralOnCross = resetIntegralOnCross;
-		}
-		inline void setSettleCondition(std::function<bool()> settleCond) {
-			this->settleCond = settleCond;
-		}
+		void setGains(PIDGains gains);
+		void setOutputMaxMin(double max, double min);
+		void setMaxIntegral(double max);
+		void setResetIntegralOnCross(bool resetIntegralOnCross);
+		void setSettleCondition(std::function<bool()> settleCond);
 
 		double calculate(double error);
 		double calculate(double target, double curent);
 
-		inline bool isSettled() {
-			return settleCond();
-		}
+		bool isSettled();
 
 	private:
 		PIDGains gains;

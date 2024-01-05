@@ -2,6 +2,24 @@
 
 using namespace lib16868C;
 
+/** MotionLimit **/
+MotionLimit MotionLimit::operator*(double factor) {
+	return {maxVel * factor, maxAccel * factor};
+}
+MotionLimit MotionLimit::operator/(double divisor) {
+	return {maxVel / divisor, maxAccel / divisor};
+}
+
+/** MotionProfile **/
+MotionData MotionProfile::operator[](int i) {
+	return profile[i];
+}
+MotionProfile MotionProfile::operator+=(const MotionProfile& other) {
+	profile.insert(profile.end(), other.profile.begin(), other.profile.end());
+	return *this;
+}
+
+/** MotionProfiling **/
 MotionProfile MotionProfiling::generateAccel(double dist, MotionLimit motionLimit) {
 	MotionProfile profile;
 

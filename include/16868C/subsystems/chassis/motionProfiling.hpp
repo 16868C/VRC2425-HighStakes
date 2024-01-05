@@ -7,12 +7,8 @@ struct MotionLimit {
 	double maxVel;
 	double maxAccel;
 
-	inline MotionLimit operator*(double factor) {
-		return {maxVel * factor, maxAccel * factor};
-	}
-	inline MotionLimit operator/(double divisor) {
-		return {maxVel / divisor, maxAccel / divisor};
-	}
+	MotionLimit operator*(double factor);
+	MotionLimit operator/(double divisor);
 };
 
 struct MotionData {
@@ -26,14 +22,9 @@ struct MotionProfile {
 	std::vector<MotionData> profile;
 	double accelTime;
 
-	inline MotionData operator[](int i) {
-		return profile[i];
-	}
+	MotionData operator[](int i);
 
-	inline MotionProfile operator+=(const MotionProfile& other) {
-		profile.insert(profile.end(), other.profile.begin(), other.profile.end());
-		return *this;
-	}
+	MotionProfile operator+=(const MotionProfile& other);
 };
 
 class MotionProfiling {

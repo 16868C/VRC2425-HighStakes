@@ -9,5 +9,4 @@ void matchloadAWPBar();
 void matchloadRush();
 
 void skills();
-void skills2();
 void skillsStart();

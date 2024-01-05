@@ -1,4 +1,5 @@
 #include "16868C/devices/rotation.hpp"
+#include "16868C/util/util.hpp"
 
 using namespace lib16868C;
 
@@ -7,6 +8,13 @@ Rotation::Rotation(int port) : pros::Rotation(port, Util::sgn(port) > 0 ? true :
 }
 Rotation::Rotation(int port, bool reversed) : pros::Rotation(port, reversed) {
 	tpr = 360;
+}
+
+double Rotation::get() {
+	return pros::Rotation::get_position() / 100.0;
+}
+void Rotation::resetZero() {
+	pros::Rotation::reset_position();
 }
 
 double Rotation::getVelocity() {

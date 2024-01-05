@@ -16,50 +16,23 @@ struct OdomSensors {
 	std::shared_ptr<AbstractEncoder> middle { nullptr };
 	std::shared_ptr<pros::Imu> inertial { nullptr };
 
-	inline void reset() {
-		if (left) left->resetZero();
-		if (right) right->resetZero();
-		if (middle) middle->resetZero();
-		if (inertial) inertial->reset(true);
-	}
-	inline std::vector<double> getTicks() {
-		if (right) return {left->get(), right->get(), middle->get()};
-		else return {left->get(), 0, middle->get()};
-	}
-	inline std::vector<int> getTPR() {
-		if (right) return {left->getTPR(), right->getTPR(), middle->getTPR()};
-		else return {left->getTPR(), 0x3f, middle->getTPR()};
-	}
+	void reset();
+	std::vector<double> getTicks();
+	std::vector<int> getTPR();
 };
 
 struct EncoderScales {
-	okapi::QLength leftDiam { 0_in };
-	okapi::QLength rightDiam { 0_in };
-	okapi::QLength wheelTrack { 0_in };
-	okapi::QLength middleDiam { 0_in };
-	okapi::QLength middleTrack { 0_in };
+	double leftDiam;
+	double rightDiam = 0;
+	double wheelTrack = 0;
+	double middleDiam;
+	double middleTrack;
 
-	EncoderScales(okapi::QLength leftDiam, okapi::QLength rightDiam, okapi::QLength wheelTrack, okapi::QLength middleDiam, okapi::QLength middleTrack)
-				: leftDiam(leftDiam), rightDiam(rightDiam), wheelTrack(wheelTrack), middleDiam(middleDiam), middleTrack(middleTrack) {}
-	EncoderScales(okapi::QLength leftDiam, okapi::QLength middleDiam, okapi::QLength middleTrack)
-				: leftDiam(leftDiam), middleDiam(middleDiam), middleTrack(middleTrack) {}
+	EncoderScales(okapi::QLength leftDiam, okapi::QLength rightDiam, okapi::QLength wheelTrack, okapi::QLength middleDiam, okapi::QLength middleTrack);
+	EncoderScales(okapi::QLength leftDiam, okapi::QLength middleDiam, okapi::QLength middleTrack);
 
-	inline okapi::QLength getDiam(int index) {
-		switch(index) {
-			case 0: return leftDiam;
-			case 1: return rightDiam;
-			case 2: return middleDiam;
-			default: return 0_in;
-		}
-	}
-	inline okapi::QLength getTrack(int index) {
-		switch(index) {
-			case 0: return wheelTrack;
-			case 1: return wheelTrack;
-			case 2: return middleTrack;
-			default: return 0_in;
-		}
-	}
+	double getDiam(int index);
+	double getTrack(int index);
 };
 
 class Odometry {
@@ -82,14 +55,7 @@ class Odometry {
 		EncoderScales getEncoderScales();
 
 	private:
-		inline std::vector<double> ticksToDist(std::vector<double> ticks, std::vector<int> tpr) {
-			if (ticks.size() != tpr.size()) { std::cerr << "ticksToDist: ticks and tpr must be the same size\n"; return std::vector<double>(ticks.size(), 0); }
-
-			std::vector<double> dists;
-			for (int i = 0; i < ticks.size(); i++)
-				dists.push_back(ticks[i] / tpr[i] * (encScales.getDiam(i) * okapi::pi).convert(okapi::inch));
-			return dists;
-		}
+		std::vector<double> ticksToDist(std::vector<double> ticks, std::vector<int> tpr);
 
 		Pose pose { 0_in, 0_in, 0_deg, 0 };
 

@@ -30,7 +30,7 @@ template<typename T> T lib16868C::ReduceAngle::radPi2(T rad) {
 /** Point **/
 lib16868C::Point::Point() : Point(0, 0) {}
 lib16868C::Point::Point(double x, double y) : x(x), y(y) {}
-lib16868C::Point::Point(Point& p) : Point(p.x, p.y) {}
+lib16868C::Point::Point(const Point& p) : Point(p.x, p.y) {}
 
 double lib16868C::Point::distTo(Point p) {
 	return std::hypot(p.x - x, p.y - y);
@@ -41,6 +41,12 @@ double lib16868C::Point::angleTo(Point p) {
 
 std::string lib16868C::Point::toStr() {
 	return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
+}
+
+Point& lib16868C::Point::operator=(const Point& p) {
+	x = p.x;
+	y = p.y;
+	return *this;
 }
 
 /** Line **/
@@ -56,7 +62,7 @@ lib16868C::Line::Line(double m, Point p) {
 	B = 1;
 	C = -p.y + m * p.x;
 }
-lib16868C::Line::Line(Line& l) : Line(l.A, l.B, l.C) {}
+lib16868C::Line::Line(const Line& l) : Line(l.A, l.B, l.C) {}
 
 double lib16868C::Line::getSlope() const {
 	return -A / B;
@@ -89,4 +95,11 @@ bool lib16868C::Line::isOnLine(Point p) {
 
 std::string lib16868C::Line::toStr() {
 	return std::to_string(A) + "x + " + std::to_string(B) + "y + " + std::to_string(C) + " = 0";
+}
+
+Line& lib16868C::Line::operator=(const Line& l) {
+	A = l.A;
+	B = l.B;
+	C = l.C;
+	return *this;
 }

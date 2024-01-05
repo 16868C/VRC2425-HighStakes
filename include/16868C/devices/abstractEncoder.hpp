@@ -7,9 +7,7 @@ class AbstractEncoder {
 		virtual void resetZero() = 0;
 		virtual double getVelocity() = 0;
 
-		inline int getTPR() {
-			return tpr;
-		}
+		int getTPR();
 	
 	protected:
 		int tpr;

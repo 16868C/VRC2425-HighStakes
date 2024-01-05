@@ -1,6 +1,6 @@
 #pragma once
 #include "api.h"
-#include "16868C/util/util.hpp"
+#include "16868C/util/math.hpp"
 
 namespace lib16868C {
 class Pneumatic {

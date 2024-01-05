@@ -6,7 +6,7 @@ class MedianFilter {
 	public:
 		MedianFilter(int sampleSize);
 		double filter(double input);
-		inline double getOutput() { return output; };
+		double getOutput();
 	
 	private:
 		int sampleSize;

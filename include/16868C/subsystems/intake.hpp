@@ -1,6 +1,7 @@
 #pragma once
 #include "okapi/api.hpp"
 #include "16868C/devices/pneumatic.hpp"
+#include "16868C/util/util.hpp"
 
 namespace lib16868C {
 enum class IntakeState {
@@ -26,13 +27,9 @@ class Intake {
 		void shoot();
 		void matchload();
 
-		bool inline hasBall() const {
-			return distSnsr.get() < 150;
-		}
+		bool hasBall() const;
 
-		IntakeState inline getState() const {
-			return state;
-		}
+		IntakeState getState() const;
 
 	private:
 		okapi::Motor& front, rear;

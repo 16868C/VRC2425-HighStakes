@@ -1,7 +1,7 @@
 #pragma once
 #include "api.h"
 #include "16868C/devices/abstractEncoder.hpp"
-#include "16868C/util/util.hpp"
+#include "16868C/util/math.hpp"
 
 namespace lib16868C {
 class Rotation : private pros::Rotation, public AbstractEncoder {
@@ -14,16 +14,12 @@ class Rotation : private pros::Rotation, public AbstractEncoder {
 		 * 
 		 * @return double 
 		 */
-		inline double get() override {
-			return get_position() / 100.0;
-		};
+		double get() override;
 		/**
 		 * @brief Manually sets the zero of the encoder.
 		 * * Does not actually reset the encoder.
 		 */
-		inline void resetZero() override {
-			reset_position();
-		};
+		void resetZero() override;
 
 		/**
 		 * @brief Gets the velocity of the encoder.

@@ -6,6 +6,13 @@ template<typename T> int Util::sgn(T n) {
 	return (n > T(0)) - (n < T(0));
 }
 
+double Util::degToRad(double deg) {
+	return deg * M_PI / 180;
+}
+double Util::radToDeg(double rad) {
+	return rad * 180 / M_PI;
+}
+
 template<typename T> T Util::avg(std::vector<T> v) {
 	T sum = T(0);
 	for (size_t i = 0; i < v.size(); i++) sum += v[i];

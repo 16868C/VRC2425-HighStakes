@@ -14,6 +14,12 @@ OpticalEncoder::OpticalEncoder(int smartPort, int portTop, int portBottom, bool 
 	tpr = 360;
 }
 
+double OpticalEncoder::get() {
+	return okapi::ADIEncoder::get();
+}
+void OpticalEncoder::resetZero() {
+	okapi::ADIEncoder::reset();
+}
 double OpticalEncoder::getVelocity() {
 	double dTicks = get() - prevTicks;
 	double dT = pros::millis() - prevTime;

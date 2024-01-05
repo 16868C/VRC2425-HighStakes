@@ -14,3 +14,6 @@ double RangeExtremaFilter::filter(double input) {
 	std::vector<double> v = Util::queueToVector(samples);
 	return output = *std::max_element(v.begin(), v.end());
 }
+double RangeExtremaFilter::getOutput() {
+	return output;
+}

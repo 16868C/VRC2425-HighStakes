@@ -43,7 +43,7 @@ public:
 	 */
 	void moveVelocity(double vel);
 
-	int inline getNumFired() { return numFired; }
+	int getNumFired();
 
 	/**
 	 * @brief Whether the catapult is moving or not
@@ -71,4 +71,4 @@ private:
 	pros::task_t ctrlTask;
 	friend void CataMain(void*);
 };
-}
+} // namespace lib16868C
