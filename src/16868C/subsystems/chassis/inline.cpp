@@ -5,8 +5,8 @@
 
 using namespace lib16868C;
 
-Inline::Inline(okapi::MotorGroup& leftMtrs, okapi::MotorGroup& rightMtrs, pros::Imu& inertial, okapi::QLength wheelDiam, double gearRatio)
-	: leftMtrs(leftMtrs), rightMtrs(rightMtrs), inertial(inertial), wheelDiam(wheelDiam), gearRatio(gearRatio) {
+Inline::Inline(MotorGroup& leftMtrs, MotorGroup& rightMtrs, Inertial& inertial, okapi::QLength wheelDiam, double gearRatio, Odometry& odom)
+	: leftMtrs(leftMtrs), rightMtrs(rightMtrs), inertial(inertial), wheelDiam(wheelDiam), gearRatio(gearRatio), odom(odom) {
 
 	tpr = leftMtrs.getGearing() == okapi::AbstractMotor::gearset::red ? 1800 : 
 			leftMtrs.getGearing() == okapi::AbstractMotor::gearset::green ? 900 :
@@ -75,7 +75,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, lib1
 			break;
 		}
 
-		double avgTicks = std::abs((leftMtrs.getEncoder()->get() + rightMtrs.getEncoder()->get()) / 2.0);
+		double avgTicks = std::abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2.0);
 		currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
 
 		double distCtrl = distPID.calculate(dist.abs().convert(okapi::inch), std::abs(currDist));
@@ -93,7 +93,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, lib1
 	}
 
 	moveTank(0, 0);
-	double avgTicks = std::abs((leftMtrs.getEncoder()->get() + rightMtrs.getEncoder()->get()) / 2.0);
+	double avgTicks = std::abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2.0);
 	currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
 	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
@@ -145,7 +145,28 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
 
+void Inline::moveToPoint(Point target, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains distGains, double maxAccelRPM, okapi::QAngularSpeed turnRPM, lib16868C::PIDGains headingGains, int timeout) {
+	Pose curPose = odom.getPose();
+	okapi::QLength dist = curPose.distTo(target);
+	okapi::QAngle heading = curPose.angleTo(target);
+	if (maxRPM.convert(okapi::rpm) < 0) {
+		dist *= -1;
+		heading -= okapi::pi * okapi::radian;
+	}
+	
+	moveDistance(dist, maxRPM, distGains, maxAccelRPM, heading, turnRPM, headingGains, timeout);
+}
+
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {
 	leftMtrs.setBrakeMode(mode);
 	rightMtrs.setBrakeMode(mode);
+}
+void Inline::coast() {
+	setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+}
+void Inline::brake() {
+	setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
+}
+void Inline::hold() {
+	setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
 }
