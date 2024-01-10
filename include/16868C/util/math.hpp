@@ -56,4 +56,24 @@ class Line {
 
 	Line& operator=(const Line& l);
 };
+
+class LineSegment : public Line{
+	public:
+	Point p1, p2;
+
+	LineSegment();
+	LineSegment(Point p1, Point p2);
+	LineSegment(const LineSegment& l);
+
+	Line getLine() const;
+
+	double getLength();
+	Point getMidpoint() const;
+
+	bool isInsideSegment(Point p);
+
+	std::string toStr();
+
+	LineSegment& operator=(const LineSegment& l);
+};
 } // namespace lib16868C
