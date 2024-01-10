@@ -40,5 +40,7 @@ class Inline {
 		okapi::QLength wheelDiam;
 		double gearRatio;
 		double tpr;
+
+		const int MAX_VOLT = 12000;
 };
 } // namespace lib16868C

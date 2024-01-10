@@ -17,6 +17,12 @@ Inline::Inline(MotorGroup& leftMtrs, MotorGroup& rightMtrs, Inertial& inertial, 
 }
 
 void Inline::moveTank(double left, double right) {
+	double max = std::max(std::abs(left), std::abs(right));
+	if (max > MAX_VOLT) {
+		left *= MAX_VOLT / max;
+		right *= MAX_VOLT / max;
+	}
+
 	leftMtrs.moveVoltage(left);
 	rightMtrs.moveVoltage(right);
 }
@@ -24,18 +30,8 @@ void Inline::moveTank(double left, double right) {
 void Inline::moveArcade(double forward, double turn) {
 	double left = forward + turn;
 	double right = forward - turn;
-	// Normalize the values so neither exceed 12000 but keep the ratio
-	// if (std::abs(left) > 12000) {
-	// 	right *= 12000 / left;
-	// 	left = 12000 * Util::sgn(left);
-	// } else if (std::abs(right) > 12000) {
-	// 	left *= 12000 / right;
-	// 	right = 12000 * Util::sgn(right);
-	// }
-	// std::cout << left << " " << right << "\n";
 
-	leftMtrs.moveVoltage(left);
-	rightMtrs.moveVoltage(right);
+	moveTank(left, right);
 }
 
 void Inline::driveTank(double left, double right, double deadzone) {
