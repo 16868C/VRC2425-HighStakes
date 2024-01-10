@@ -6,6 +6,7 @@
 namespace lib16868C {
 class Pose {
 	public:
+		Point& pos = _pos;
 		double& x = _pos.x;
 		double& y = _pos.y;
 		double& theta = _theta;
