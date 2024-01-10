@@ -11,6 +11,9 @@ template<typename T> int sgn(T n);
 double degToRad(double deg);
 double radToDeg(double rad);
 
+double mToIn(double m);
+double inToM(double in);
+
 template<typename T> T avg(std::vector<T> v);
 template<typename T> T avg(std::initializer_list<T> l);
 

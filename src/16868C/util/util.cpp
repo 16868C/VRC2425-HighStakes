@@ -13,6 +13,13 @@ double Util::radToDeg(double rad) {
 	return rad * 180 / M_PI;
 }
 
+double Util::mToIn(double m) {
+	return m * 39.3701;
+}
+double Util::inToM(double in) {
+	return in / 39.3701;
+}
+
 template<typename T> T Util::avg(std::vector<T> v) {
 	T sum = T(0);
 	for (size_t i = 0; i < v.size(); i++) sum += v[i];
