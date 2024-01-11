@@ -6,7 +6,8 @@
 namespace lib16868C {
 class MotorGroup {
 	public:
-	MotorGroup(const std::initializer_list<Motor&> mtrs);
+	MotorGroup(std::initializer_list<Motor> mtrs);
+	MotorGroup(std::vector<Motor> mtrs);
 
 	void moveVoltage(double volts);
 	void moveVelocity(double vel);
@@ -25,6 +26,6 @@ class MotorGroup {
 	int getSize();
 
 	private:
-	std::vector<Motor&> mtrs;
+	std::vector<Motor> mtrs;
 };
 } // namespace lib16868C

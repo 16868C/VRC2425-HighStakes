@@ -2,7 +2,10 @@
 
 using namespace lib16868C;
 
-MotorGroup::MotorGroup(const std::initializer_list<Motor&> mtrs) : mtrs(mtrs) {
+MotorGroup::MotorGroup(std::initializer_list<Motor> mtrs) : mtrs(mtrs) {
+	if (mtrs.size() == 0) std::cerr << "[MotorGroup] No motors in group" << std::endl;
+}
+MotorGroup::MotorGroup(std::vector<Motor> mtrs) : mtrs(mtrs) {
 	if (mtrs.size() == 0) std::cerr << "[MotorGroup] No motors in group" << std::endl;
 }
 
