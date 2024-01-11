@@ -16,7 +16,7 @@ enum class TurnWheel {
 
 class Inline {
 	public:
-		Inline(MotorGroup& left, MotorGroup& right, Inertial& inertial, okapi::QLength wheelDiam, double gearRatio = 1, Odometry& odom);
+		Inline(MotorGroup& left, MotorGroup& right, Inertial& inertial, Odometry& odom, okapi::QLength wheelDiam, double gearRatio = 1.0);
 
 		void moveTank(double left, double right);
 		void moveArcade(double forward, double turn);

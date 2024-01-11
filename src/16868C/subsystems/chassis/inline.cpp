@@ -5,8 +5,8 @@
 
 using namespace lib16868C;
 
-Inline::Inline(MotorGroup& leftMtrs, MotorGroup& rightMtrs, Inertial& inertial, okapi::QLength wheelDiam, double gearRatio, Odometry& odom)
-	: leftMtrs(leftMtrs), rightMtrs(rightMtrs), inertial(inertial), wheelDiam(wheelDiam), gearRatio(gearRatio), odom(odom) {
+Inline::Inline(MotorGroup& leftMtrs, MotorGroup& rightMtrs, Inertial& inertial, Odometry& odom, okapi::QLength wheelDiam, double gearRatio)
+	: leftMtrs(leftMtrs), rightMtrs(rightMtrs), inertial(inertial), odom(odom), wheelDiam(wheelDiam), gearRatio(gearRatio) {
 
 	tpr = leftMtrs.getGearing() == okapi::AbstractMotor::gearset::red ? 1800 : 
 			leftMtrs.getGearing() == okapi::AbstractMotor::gearset::green ? 900 :
