@@ -1,31 +1,9 @@
 #include "math.hpp"
+#include <limits>
+#include <iomanip>
+#include <sstream>
 
 using namespace lib16868C;
-
-template<typename T> T ReduceAngle::reduce(T ang, T max, T min) {
-	T range = max - min;
-	while (ang > max) ang -= range;
-	while (ang < min) ang += range;
-	return ang;
-}
-template<typename T> T ReduceAngle::deg360(T deg) {
-	return reduce(deg, T(360), T(0));
-}
-template<typename T> T ReduceAngle::deg180(T deg) {
-	return reduce(deg, T(180), T(0));
-}
-template<typename T> T ReduceAngle::deg90(T deg) {
-	return reduce(deg, T(90), T(-90));
-}
-template<typename T> T ReduceAngle::rad2Pi(T rad) {
-	return reduce(rad, T(M_PI * 2), T(0));
-}
-template<typename T> T ReduceAngle::radPi(T rad) {
-	return reduce(rad, T(M_PI), T(0));
-}
-template<typename T> T ReduceAngle::radPi2(T rad) {
-	return reduce(rad, T(M_PI_2), T(-M_PI_2));
-}
 
 /** Point **/
 Point::Point() : Point(0, 0) {}
@@ -53,26 +31,39 @@ Point& Point::operator=(const Point& p) {
 Line::Line() : Line(-1, 1, 0) {}
 Line::Line(double A, double B, double C) : A(A), B(B), C(C) {}
 Line::Line(Point p1, Point p2) {
-	A = -(p2.y - p1.y) / (p2.x - p1.x);
-	B = 1;
-	C = -p1.y + A * p1.x;
+	if (p1.x == p2.x) {
+		A = 1;
+		B = 0;
+		C = -p1.x;
+	} else {
+		A = -(p2.y - p1.y) / (p2.x - p1.x);
+		B = 1;
+		C = -p1.y + A * p1.x;
+	}
 }
 Line::Line(double m, Point p) {
-	A = -m;
-	B = 1;
-	C = -p.y + m * p.x;
+	if (std::isinf(m)) {
+		A = 1;
+		B = 0;
+		C = -p.x;
+	} else {
+		A = -m;
+		B = 1;
+		C = -p.y + m * p.x;
+	}
 }
 Line::Line(const Line& l) : Line(l.A, l.B, l.C) {}
 
 double Line::getSlope() const {
+	if (B == 0) return std::numeric_limits<double>::infinity();
 	return -A / B;
 }
 
 Point Line::getIntersection(Line l) {
 	double det = A * l.B - l.A * B;
-	if (det == 0) return Point(NAN, NAN);
+	if (det == 0) return Point(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity());
 
-	double x = (l.B * C - B * l.C) / det;
+	double x = (B * l.C - l.B * C) / det;
 	double y = (l.A * C - A * l.C) / det;
 	return Point(x, y);
 }
@@ -94,7 +85,9 @@ bool Line::isOnLine(Point p) {
 }
 
 std::string Line::toStr() {
-	return std::to_string(A) + "x + " + std::to_string(B) + "y + " + std::to_string(C) + " = 0";
+	std::stringstream ss;
+	ss << std::fixed << std::setprecision(2) << A << "x + " << B << "y + " << C << " = 0";
+	return ss.str();
 }
 
 Line& Line::operator=(const Line& l) {

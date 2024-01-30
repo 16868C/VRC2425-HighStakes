@@ -2,10 +2,6 @@
 
 using namespace lib16868C;
 
-template<typename T> int Util::sgn(T n) {
-	return (n > T(0)) - (n < T(0));
-}
-
 double Util::degToRad(double deg) {
 	return deg * M_PI / 180;
 }
@@ -18,32 +14,6 @@ double Util::mToIn(double m) {
 }
 double Util::inToM(double in) {
 	return in / 39.3701;
-}
-
-template<typename T> T Util::avg(std::vector<T> v) {
-	T sum = T(0);
-	for (size_t i = 0; i < v.size(); i++) sum += v[i];
-	return sum / v.size();
-}
-template<typename T> T Util::avg(std::initializer_list<T> l) {
-	return avg(std::vector<T>(l));
-}
-
-template<typename T> std::vector<T> Util::queueToVector(const std::queue<T>& q) {
-	std::vector<T> v;
-	std::queue<T> tmp = q;
-	while (!tmp.empty()) {
-		v.push_back(tmp.front());
-		tmp.pop();
-	}
-	return v;
-}
-template<typename T> std::queue<T> Util::vectorToQueue(const std::vector<T>& v) {
-	std::queue<T> q;
-	for (size_t i = 0; i < v.size(); i++) {
-		q.push(v[i]);
-	}
-	return q;
 }
 
 void Util::runAsBlocking(std::function<void()> fn, std::function<bool()> endCond, int timeout, int pollRate, int paddingDelay) {

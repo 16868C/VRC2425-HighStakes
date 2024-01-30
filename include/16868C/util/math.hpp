@@ -6,14 +6,31 @@ namespace lib16868C {
 typedef unsigned int uint;
 
 namespace ReduceAngle {
-	template<typename T> T reduce(T ang, T max, T min);
+	template<typename T> inline T reduce(T ang, T max, T min) {
+		T range = max - min;
+		while (ang > max) ang -= range;
+		while (ang < min) ang += range;
+		return ang;
+	}
 
-	template<typename T> T deg360(T deg);
-	template<typename T> T deg180(T deg);
-	template<typename T> T deg90(T deg);
-	template<typename T> T rad2Pi(T rad);
-	template<typename T> T radPi(T rad);
-	template<typename T> T radPi2(T rad);
+	template<typename T> inline T deg360(T deg) {
+		return reduce(deg, T(360), T(0));
+	}
+	template<typename T> inline T deg180(T deg) {
+		return reduce(deg, T(180), T(0));
+	}
+	template<typename T> inline T deg90(T deg) {
+		return reduce(deg, T(90), T(-90));
+	}
+	template<typename T> inline T rad2Pi(T rad) {
+		return reduce(rad, T(M_PI * 2), T(0));
+	}
+	template<typename T> inline T radPi(T rad) {
+		return reduce(rad, T(M_PI), T(0));
+	}
+	template<typename T> inline T radPi2(T rad) {
+		return reduce(rad, T(M_PI_2), T(-M_PI_2));
+	}
 }
 
 class Point {
