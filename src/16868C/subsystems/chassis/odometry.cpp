@@ -1,22 +1,25 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
+#include "16868C/util/math.hpp"
 #include <limits>
 
 using namespace lib16868C;
 using namespace okapi::literals;
 
 /** Encoders **/
-std::vector<double> Encoders::getTicks() const {
-	std::vector<double> ticks(3, std::numeric_limits<double>::quiet_NaN());
-	if (left) ticks[0] = left->get();
-	if (right) ticks[1] = right->get();
-	if (middle) ticks[2] = middle->get();
+std::array<double, 3> Encoders::getTicks() const {
+	std::array<double, 3> ticks;
+	ticks.fill(std::numeric_limits<double>::quiet_NaN());
+	if (left != nullptr) ticks[0] = left->get();
+	if (right != nullptr) ticks[1] = right->get();
+	if (middle != nullptr) ticks[2] = middle->get();
 	return ticks;
 }
-std::vector<int> Encoders::getTPR() const {
-	std::vector<int> tpr(3, std::numeric_limits<int>::quiet_NaN());
-	if (left) tpr.push_back(left->getTPR());
-	if (right) tpr.push_back(right->getTPR());
-	if (middle) tpr.push_back(middle->getTPR());
+std::array<int, 3> Encoders::getTPR() const {
+	std::array<int, 3> tpr;
+	tpr.fill(std::numeric_limits<int>::quiet_NaN());
+	if (left) tpr[0] = left->getTPR();
+	if (right) tpr[1] = left->getTPR();
+	if (middle) tpr[2] = left->getTPR();
 	return tpr;
 }
 
@@ -27,20 +30,22 @@ void Encoders::reset() {
 }
 
 /** Distances **/
-std::vector<double> DistanceSnsrs::getDists() const {
-	std::vector<double> dists(4, std::numeric_limits<double>::quiet_NaN());
+std::array<double, 4> DistanceSnsrs::getDists() const {
+	std::array<double, 4> dists;
+	dists.fill(std::numeric_limits<double>::quiet_NaN());
 	if (front) dists[0] = Util::mToIn(front->get() / 1000.0);
-	if (back) dists[1] = Util::mToIn(back->get() / 1000.0);
-	if (left) dists[2] = Util::mToIn(left->get() / 1000.0);
-	if (right) dists[3] = Util::mToIn(right->get() / 1000.0);
+	if (right) dists[1] = Util::mToIn(right->get() / 1000.0);
+	if (back) dists[2] = Util::mToIn(back->get() / 1000.0);
+	if (left) dists[3] = Util::mToIn(left->get() / 1000.0);
 	return dists;
 }
-std::vector<int> DistanceSnsrs::getConfidences() const {
-	std::vector<int> conf(4, std::numeric_limits<int>::quiet_NaN());
+std::array<int, 4> DistanceSnsrs::getConfidences() const {
+	std::array<int, 4> conf;
+	conf.fill(std::numeric_limits<int>::quiet_NaN());
 	if (front) conf[0] = front->getConfidence();
-	if (back) conf[1] = back->getConfidence();
-	if (left) conf[2] = left->getConfidence();
-	if (right) conf[3] = right->getConfidence();
+	if (right) conf[1] = right->getConfidence();
+	if (back) conf[2] = back->getConfidence();
+	if (left) conf[3] = left->getConfidence();
 	return conf;
 }
 
@@ -69,12 +74,16 @@ double EncoderScales::getTrack(int index) {
 }
 
 /** Distance Scales**/
+DistanceScales::DistanceScales() {}
+DistanceScales::DistanceScales(okapi::QLength frontDist, okapi::QLength backDist, okapi::QLength leftDist, okapi::QLength rightDist)
+	: frontDist(frontDist.convert(okapi::inch)), backDist(backDist.convert(okapi::inch)), leftDist(leftDist.convert(okapi::inch)), rightDist(rightDist.convert(okapi::inch)) {}
+
 double DistanceScales::getDist(int index) {
 	switch(index) {
 		case 0: return frontDist;
-		case 1: return backDist;
-		case 2: return leftDist;
-		case 3: return rightDist;
+		case 1: return rightDist;
+		case 2: return backDist;
+		case 3: return leftDist;
 		default: return 0;
 	}
 }
@@ -87,11 +96,14 @@ void Odometry::odomManager(void* param) {
 
 	uint32_t time = pros::millis();
 	while (true) {
+		std::array<double, 3> ticks = odom->encs.getTicks();
+		if (std::isnan(ticks[0]) && std::isnan(ticks[1]) && std::isnan(ticks[2])) continue;
+
 		std::vector<double> curr;
 		// Distance and theta
-		curr = odom->ticksToDist(odom->encs.getTicks(), odom->encs.getTPR());
+		curr = odom->ticksToDist(ticks, odom->encs.getTPR());
 		if (odom->encs.right) curr.push_back((curr[1] - curr[0]) / odom->encScales.wheelTrack);
-		else curr.push_back(Util::degToRad(odom->inertial->get_rotation()));
+		else curr.push_back(odom->inertial->get_rotation(AngleUnit::RAD));
 
 		std::vector<double> deltas;
 		for (int i = 0; i < 4; i++) deltas.push_back(curr[i] - prev[i]);
@@ -105,7 +117,7 @@ void Odometry::odomManager(void* param) {
 		DistanceSnsrs dists = odom->dists;
 		if (encs.right) pros::lcd::print(2, "Left: %.2f, Right: %.2f", encs.left->get(), encs.right->get());
 		else pros::lcd::print(2, "Forward: %.2f", encs.left->get());
-		if (odom->inertial) pros::lcd::print(3, "Middle: %.2f, Theta: %.2f", encs.middle->get(), odom->inertial->get_rotation());
+		if (odom->inertial) pros::lcd::print(3, "Middle: %.2f, Theta: %.2f", encs.middle->get(), odom->inertial->get_rotation(AngleUnit::DEG));
 		else pros::lcd::print(3, "Middle: %.2f", encs.middle->get());
 
 		prev = curr;
@@ -120,19 +132,15 @@ Odometry::Odometry(Encoders encs, DistanceSnsrs dists, std::shared_ptr<Inertial>
 Odometry::Odometry(std::vector<std::shared_ptr<AbstractEncoder>> encs, EncoderScales encScales) : encScales(encScales) {
 	this->encs = {encs[0], encs[1], encs[2]};
 }
-Odometry::Odometry(std::vector<std::shared_ptr<AbstractEncoder>> encs, Inertial inertial, EncoderScales encScales) : encScales(encScales) {
+Odometry::Odometry(std::vector<std::shared_ptr<AbstractEncoder>> encs, Inertial& inertial, EncoderScales encScales) : encScales(encScales) {
 	this->encs = {encs[0], nullptr, encs[1]};
 	this->inertial = std::make_shared<Inertial>(inertial);
 };
-Odometry::Odometry(std::vector<std::shared_ptr<okapi::DistanceSensor>> dists, Inertial inertial, DistanceScales distScales) : distScales(distScales) {
-	// this->dists.front = std::make_shared<okapi::DistanceSensor>(dists[0]);
-	// this->dists.back = std::make_shared<okapi::DistanceSensor>(dists[1]);
-	// this->dists.left = std::make_shared<okapi::DistanceSensor>(dists[2]);
-	// this->dists.right = std::make_shared<okapi::DistanceSensor>(dists[3]);
-	this->dists.front = dists[0];
-	this->dists.back = dists[1];
-	this->dists.left = dists[2];
-	this->dists.right = dists[3];
+Odometry::Odometry(std::vector<std::shared_ptr<okapi::DistanceSensor>> dists, Inertial& inertial, DistanceScales distScales) : distScales(distScales) {
+	this->dists = {dists[0], dists[1], dists[2], dists[3]};
+	this->inertial = std::make_shared<Inertial>(inertial);
+}
+Odometry::Odometry(DistanceSnsrs dists, Inertial& inertial, DistanceScales distScales) : dists(dists), distScales(distScales) {
 	this->inertial = std::make_shared<Inertial>(inertial);
 }
 Odometry::Odometry(Odometry& odom) {
@@ -147,6 +155,7 @@ void Odometry::init() {
 	// Resetting sensors
 	pros::delay(100); // Just in case the sensors have not been initialized yet
 	encs.reset();
+	if (inertial) inertial->calibrate();
 
 	// Resetting pose
 	pose = { 0_in, 0_in, 0_rad, 0 };
@@ -181,21 +190,58 @@ Pose Odometry::getState() {
 	return getPose();
 }
 
-void Odometry::update() {
-	Pose newPose;
+void Odometry::update(bool front, bool right, bool back, bool left) {
+	std::array<Pose, 5> newPose;
 
 	Pose curPose = getPose();
-	double theta = ReduceAngle::radPi2(curPose.theta);
+	double theta = ReduceAngle::radPi2(inertial->get_rotation(AngleUnit::RAD));
 	if (std::abs(theta) > M_PI / 12.0 && std::abs(theta) < M_PI * 5 / 12.0) return; // Not perpendicular to wall
-	theta = ReduceAngle::rad2Pi(curPose.theta);
-	std::vector<double> distReads = dists.getDists();
-	std::vector<int> distConf = dists.getConfidences();
+	theta = ReduceAngle::rad2Pi(inertial->get_rotation(AngleUnit::RAD));
+	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5;
+	std::array<double, 4> distReads = dists.getDists();
+	std::array<int, 4> distConf = dists.getConfidences();
+	std::array<bool, 4> useSnsr {front, right, back, left};
+	for (int i = 0; i < 4; i++)
+		std::cout << i << ": (" << distReads[i] << ", " << distConf[i] << ") ";
+	std::cout << "\n";
 
 	for (int i = 0; i < 4; i++) {
-		if (std::isnan(distReads[i])) continue; // Not using the sensor
+		if (std::isnan(distReads[i]) || !useSnsr[i]) continue; // Not using the sensor
 		if (distReads[i] > FIELD_WIDTH.convert(okapi::inch) || distReads[i] < 0) continue; // Read error
-		if (distConf[i] < MIN_CONFIDENCE) continue; // Not confident enough
+		if (distConf[i] < MIN_CONFIDENCE) continue; // Confidence too low
 
+		double distTheta = theta + i * M_PI_2;
+		Line dist(std::tan(distTheta), curPose.pos);
+		// std::cout << i << " " << dist.toStr() << "\n";
+		double distToWall = distReads[i] + distScales.getDist(i), newPos = distToWall;
+		for (double a = 0; a <= 2 * M_PI; a += M_PI_2) {
+			// std::cout << a << "\n";
+			// std::cout << a << " " << distTheta << " " << ReduceAngle::rad2Pi(a - M_PI / 12.0) << " " << ReduceAngle::rad2Pi(a + M_PI / 12.0) << "\n";
+			if (a == 0 && std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) && std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0)) continue; // Not within 15 deg of an axis
+			else if (a != 0 && (std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) || std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0))) continue; // Not within 15 deg of an axis
+
+			// std::cout << " " << walls[a].getLine().toStr() << "\n";
+			// std::cout << walls[a].getIntersection(dist).toStr() << "\n";
+			if (walls[a].isInsideSegment(walls[a].getIntersection(dist))) { // Distance sensor is reading distance to correct wall
+				distToWall *= std::abs(std::sin(distTheta + a + M_PI_2));
+				newPos = distToWall;
+				// std::cout << i << " " << a << " " << std::abs(std::sin(distTheta + a + M_PI_2)) << "\n";
+				if (oppWall[std::round(theta / M_PI_2) * M_PI_2](i)) { std::cout << std::round(theta / M_PI_2) * M_PI_2 << "\n"; newPos = fieldWidth - distToWall; }
+
+				getDistUpdateCoord(distTheta, i, newPose, distConf) = newPos;
+				std::cout << newPose[1].toStr() << ", " << newPose[2].toStr() << "\n";
+			}
+		}
+	}
+
+	newPose[0].x = newPose[3].x > newPose[4].x ? newPose[1].x : newPose[2].x;
+	newPose[0].y = newPose[3].y > newPose[4].y ? newPose[1].y : newPose[2].y;
+	newPose[0].theta = inertial->get_rotation(AngleUnit::RAD);
+	if (std::isnan(newPose[0].x) || std::isnan(newPose[0].y)) return;
+	update(newPose[0]);
+
+	/**
+	for (int i = 0; i < 4; i++) {
 		Line dist(std::tan(theta), curPose.pos);
 		double distToWall = distReads[i] + distScales.getDist(i), newPos = distToWall;
 		if (theta >= M_PI * 23 / 12.0 || theta <= M_PI / 12.0) { // Facing north wall; 345-15 deg
@@ -310,6 +356,7 @@ void Odometry::update() {
 
 	if (std::isnan(newPose.x) || std::isnan(newPose.y)) return;
 	update(newPose);
+	*/
 }
 void Odometry::update(Pose pose) {
 	if (!poseMutex.take(50)) {
@@ -393,13 +440,43 @@ void Odometry::step(std::vector<double> deltas) {
 	poseMutex.give();
 }
 
-std::vector<double> Odometry::ticksToDist(std::vector<double> ticks, std::vector<int> tpr)  {
-	if (ticks.size() != tpr.size()) { std::cerr << "ticksToDist: ticks and tpr must be the same size\n"; return std::vector<double>(ticks.size(), 0); }
-
-	std::vector<double> dists(3);
+std::vector<double> Odometry::ticksToDist(std::array<double, 3> ticks, std::array<int, 3> tpr)  {
+	std::vector<double> dists;
 	for (int i = 0; i < ticks.size(); i++) {
 		if (std::isnan(ticks[i]) || std::isnan(tpr[i])) continue;
 		dists[i] = ticks[i] / tpr[i] * encScales.getDiam(i) * M_PI;
 	}
 	return dists;
+}
+
+double& Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
+	std::cout << a << " " << i << " ";
+	if (std::abs(a - 0) <= 15 || std::abs(a - M_PI) <= 15) {
+		switch(i) {
+			case 0:
+			case 2:
+				std::cout << 0.5 * i + 1 << " x\n";
+				newPose[0.5 * i + 3].x = confs[i];
+				return newPose[0.5 * i + 1].x;
+			case 1:
+			case 3:
+				std::cout << 0.5 * i + 0.5 << " y\n";
+				newPose[0.5 * i + 2.5].y = confs[i];
+				return newPose[0.5 * i + 0.5].y;
+		}
+	} else {
+		switch(i) {
+			case 0:
+			case 2:
+				std::cout << 0.5 * i + 1 << " y\n";
+				newPose[0.5 * i + 3].y = confs[i];
+				return newPose[0.5 * i + 1].y;
+			case 1:
+			case 3:
+				std::cout << 0.5 * i + 0.5 << " x\n";
+				newPose[0.5 * i + 2.5].x = confs[i];
+				return newPose[0.5 * i + 0.5].x;
+		}
+	}
+	return newPose[0].x;
 }

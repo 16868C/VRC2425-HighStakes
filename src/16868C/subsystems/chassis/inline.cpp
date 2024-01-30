@@ -75,7 +75,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, lib1
 		currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
 
 		double distCtrl = distPID.calculate(dist.abs().convert(okapi::inch), std::abs(currDist));
-		double headingCtrl = headingPID.calculate(heading.convert(okapi::degree), inertial.get_rotation());
+		double headingCtrl = headingPID.calculate(heading.convert(okapi::degree), inertial.get_rotation(AngleUnit::DEG));
 
 		double accelRPM = t - st < accelProfile.accelTime * 1000 ?
 							accelProfile.profile[i++].velocity * 60.0 / (wheelDiam * okapi::pi).convert(okapi::inch) : maxRPM.convert(okapi::rpm);
@@ -91,13 +91,13 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, lib1
 	moveTank(0, 0);
 	double avgTicks = std::abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2.0);
 	currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
-	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
+	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation(AngleUnit::DEG) << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
 
 void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains gains, double accelRate, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
 	PIDController turnPID(gains, 1, -1);
 
-	double currAngle = inertial.get_rotation();
+	double currAngle = inertial.get_rotation(AngleUnit::DEG);
 	double accelVolts = 3000;
 	uint st = pros::millis(), t = pros::millis();
 	int inMargin = 0;
@@ -108,7 +108,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 			break;
 		}
 
-		currAngle = inertial.get_rotation();
+		currAngle = inertial.get_rotation(AngleUnit::DEG);
 
 		if (std::abs(angle.convert(okapi::degree) - currAngle) < errorMargin) inMargin++;
 		else inMargin = 0;
@@ -138,19 +138,27 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	moveTank(0, 0);
-	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial.get_rotation() << " deg, taking " << pros::millis() - st << "ms" << std::endl;
+	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial.get_rotation(AngleUnit::DEG) << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
 
-void Inline::moveToPoint(Point target, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains distGains, double maxAccelRPM, okapi::QAngularSpeed turnRPM, lib16868C::PIDGains headingGains, int timeout) {
+void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains distGains, double maxAccelRPM, okapi::QAngularSpeed turnRPM, lib16868C::PIDGains headingGains, int timeout) {
 	Pose curPose = odom.getPose();
 	okapi::QLength dist = curPose.distTo(target);
 	okapi::QAngle heading = curPose.angleTo(target);
+
+	okapi::QAngle lo = std::floor(curPose.theta / (2 * M_PI)) * 2 * M_PI * okapi::radian;
+	okapi::QAngle hi = std::ceil(curPose.theta / (2 * M_PI)) * 2 * M_PI * okapi::radian;
+	heading = ReduceAngle::reduce(heading, lo, hi);
+
 	if (maxRPM.convert(okapi::rpm) < 0) {
 		dist *= -1;
 		heading -= okapi::pi * okapi::radian;
 	}
 	
-	moveDistance(dist, maxRPM, distGains, maxAccelRPM, heading, turnRPM, headingGains, timeout);
+	moveDistance(dist, abs(maxRPM), distGains, maxAccelRPM, heading, turnRPM, headingGains, timeout);
+
+	target.theta = inertial.get_rotation(AngleUnit::RAD);
+	odom.update(target);
 }
 
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {

@@ -3,10 +3,14 @@
 #include "16868C/devices/inertial.hpp"
 #include "16868C/devices/rotation.hpp"
 #include "16868C/devices/opticalEncoder.hpp"
+#include "16868C/util/math.hpp"
 #include "16868C/util/pose.hpp"
 #include "16868C/util/util.hpp"
 #include "api.h"
+#include <array>
+#include <functional>
 #include <memory>
+#include <utility>
 
 using namespace okapi::literals;
 
@@ -16,19 +20,19 @@ struct Encoders {
 	std::shared_ptr<AbstractEncoder> right { nullptr };
 	std::shared_ptr<AbstractEncoder> middle { nullptr };
 
-	std::vector<double> getTicks() const;
-	std::vector<int> getTPR() const;
+	std::array<double, 3> getTicks() const;
+	std::array<int, 3> getTPR() const;
 
 	void reset();
 };
 struct DistanceSnsrs {
 	std::shared_ptr<okapi::DistanceSensor> front { nullptr };
+	std::shared_ptr<okapi::DistanceSensor> right { nullptr };
 	std::shared_ptr<okapi::DistanceSensor> back { nullptr };
 	std::shared_ptr<okapi::DistanceSensor> left { nullptr };
-	std::shared_ptr<okapi::DistanceSensor> right { nullptr };
 
-	std::vector<double> getDists() const;
-	std::vector<int> getConfidences() const;
+	std::array<double, 4> getDists() const;
+	std::array<int, 4> getConfidences() const;
 };
 
 struct EncoderScales {
@@ -49,9 +53,12 @@ struct EncoderScales {
 };
 struct DistanceScales {
 	double frontDist = 0;
+	double rightDist = 0;
 	double backDist = 0;
 	double leftDist = 0;
-	double rightDist = 0;
+
+	DistanceScales();
+	DistanceScales(okapi::QLength frontDist, okapi::QLength rightDist, okapi::QLength backDist, okapi::QLength leftDist);
 
 	double getDist(int index);
 };
@@ -61,8 +68,9 @@ class Odometry {
 		Odometry();
 		Odometry(Encoders snsrs, DistanceSnsrs dists, std::shared_ptr<Inertial> inertial, EncoderScales encScales, DistanceScales distScales);
 		Odometry(std::vector<std::shared_ptr<AbstractEncoder>> encs, EncoderScales encScales);
-		Odometry(std::vector<std::shared_ptr<AbstractEncoder>> encs, Inertial inertial, EncoderScales encScales);
-		Odometry(std::vector<std::shared_ptr<okapi::DistanceSensor>> dists, Inertial inertial, DistanceScales distScales);
+		Odometry(std::vector<std::shared_ptr<AbstractEncoder>> encs, Inertial& inertial, EncoderScales encScales);
+		Odometry(std::vector<std::shared_ptr<okapi::DistanceSensor>> dists, Inertial& inertial, DistanceScales distScales);
+		Odometry(DistanceSnsrs dists, Inertial& inertial, DistanceScales distScales);
 		Odometry(Odometry& odom);
 
 		void init();
@@ -71,7 +79,7 @@ class Odometry {
 		Pose getPose();
 		Pose getState();
 
-		void update();
+		void update(bool front, bool right, bool back, bool left);
 		void update(Pose pose);
 
 		Encoders getEncoders() const;
@@ -83,7 +91,8 @@ class Odometry {
 		void resetSensors();
 
 	private:
-		std::vector<double> ticksToDist(std::vector<double> ticks, std::vector<int> tpr);
+		std::vector<double> ticksToDist(std::array<double, 3> ticks, std::array<int, 3> tpr);
+		double& getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose1, std::array<int, 4> confs);
 
 		Pose pose { 0_in, 0_in, 0_deg, 0 };
 		pros::Mutex poseMutex;
@@ -107,10 +116,17 @@ class Odometry {
 		Point p_10 { fieldWidth, 0 };
 		Point p_01 { 0, fieldWidth };
 		Point p_11 { fieldWidth, fieldWidth };
-		LineSegment north {p_01, p_11};
-		LineSegment south {p_00, p_10};
-		LineSegment east {p_10, p_11};
-		LineSegment west {p_00, p_01};
+		LineSegment north {p_10, p_11};
+		LineSegment south {p_00, p_01};
+		LineSegment east {p_00, p_10};
+		LineSegment west {p_01, p_11};
+		std::map<double, LineSegment> walls {{0.0, north}, {M_PI_2, east}, {M_PI, south}, {M_PI_2 * 3, west}};
+		std::map<double, std::function<bool(int)>> oppWall {
+			std::make_pair(0.0, [](int i) -> bool { return i == 0 || i == 3; }),
+			std::make_pair(M_PI_2, [](int i) -> bool { return i == 2 || i == 3; }),
+			std::make_pair(M_PI, [](int i) -> bool { return i == 2 || i == 1; }),
+			std::make_pair(M_PI_2 * 3, [](int i) -> bool { return i == 0 || i == 1; })
+		};
 
 		void step(std::vector<double> deltas);
 };

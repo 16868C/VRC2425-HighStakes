@@ -13,6 +13,7 @@ class Pose {
 		uint& time = _time;
 
 		Pose();
+		Pose(okapi::QLength x, okapi::QLength y);
 		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, uint time);
 		Pose(const Pose& p);
 

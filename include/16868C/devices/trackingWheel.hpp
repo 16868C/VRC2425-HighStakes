@@ -1,0 +1,40 @@
+#pragma once
+#include "okapi/api.hpp"
+#include "16868C/devices/motor.hpp"
+#include "16868C/devices/motorGroup.hpp"
+#include "16868C/devices/opticalEncoder.hpp"
+#include "16868C/devices/rotation.hpp"
+
+namespace lib16868C {
+enum class TrackingWheelType {
+	ROTATION,
+	OPTICAL_ENCODER,
+	MOTOR,
+	MOTOR_GROUP
+};
+
+class TrackingWheel {
+public:
+	TrackingWheel();
+	TrackingWheel(lib16868C::Rotation* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio = 1);
+	TrackingWheel(lib16868C::OpticalEncoder* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio = 1);
+	TrackingWheel(lib16868C::Motor* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio = 1);
+	TrackingWheel(lib16868C::MotorGroup* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio = 1);
+
+	double getRaw();
+	double getDist();
+	double getOffset();
+	void reset();
+
+	TrackingWheelType getType();
+
+private:
+	AbstractEncoder* enc = nullptr;
+
+	double wheelDiameter = 0;
+	double offset = 0;
+	double gearRatio = 1;
+
+	TrackingWheelType type;
+};
+} // namespace lib16868C
