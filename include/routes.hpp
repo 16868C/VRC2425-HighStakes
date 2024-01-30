@@ -1,12 +1,13 @@
 #pragma once
 
-void goalAWP();
-void goalAWPBar();
-void goalRush();
+void farAWP();
+void farAWPBar();
+void farRush();
 
-void matchloadAWP();
-void matchloadAWPBar();
-void matchloadRush();
+void nearAWP();
+void nearAWPBar();
+void nearRush();
 
 void skills();
+void skills2();
 void skillsStart();

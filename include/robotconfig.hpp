@@ -11,6 +11,7 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/subsystems/catapult.hpp"
 #include "16868C/subsystems/intake.hpp"
+#include "16868C/subsystems/kicker.hpp"
 
 using namespace okapi::literals;
 
@@ -26,6 +27,15 @@ const int RIGHT_REAR = 20;
 const int RIGHT_TOP = -18;
 const int KICKER = 2;
 const int INTAKE = 7;
+const int INERTIAL = 17;
+const int FRONT_DIST = 6;
+const int BACK_DIST = 15;
+const int LEFT_DIST = 1;
+const int RIGHT_DIST = 5;
+const char HORI_HANG = 'A';
+const char LEFT_WING = 'C';
+const char RIGHT_WING = 'B';
+const char VERT_WINGS = 'D';
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;
@@ -41,11 +51,22 @@ extern lib16868C::Motor rightTop;
 extern lib16868C::MotorGroup leftDrive;
 extern lib16868C::MotorGroup rightDrive;
 extern lib16868C::Motor intake;
-extern lib16868C::Motor kicker;
+extern lib16868C::Motor kickerMtr;
+
+// Pneumatics
+extern lib16868C::Pneumatic horiHang;
+extern lib16868C::Pneumatic leftWing;
+extern lib16868C::Pneumatic rightWing;
+extern lib16868C::Pneumatic vertWings;
+
+// Sensors
+extern lib16868C::Inertial inertial;
+extern okapi::DistanceSensor frontDist;
+extern okapi::DistanceSensor backDist;
+extern okapi::DistanceSensor leftDist;
+extern okapi::DistanceSensor rightDist;
 
 // Subsystems
 extern lib16868C::Odometry odometry;
 extern lib16868C::Inline chassis;
-
-// Sensors
-extern lib16868C::Inertial inertial;
+extern lib16868C::Kicker kicker;

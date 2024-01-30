@@ -13,6 +13,8 @@ using namespace lib16868C;
 
 void initialize() {
 	pros::lcd::initialize();
+
+	odometry.init();
 }
 
 void disabled() {}
@@ -22,12 +24,20 @@ void competition_initialize() {}
 void autonomous() {
 	int st = pros::millis();
 
+	// nearAWPBar();
+	farAWP();
+	// farAWPBar();
+	// nearRush();
+	// skillsStart();
+	// skills();
+	// skills2();
+
 	std::cout << "Auton took " << pros::millis() - st << " ms" << std::endl;
 }
 
 void opcontrol() {
 	int kickerSpd = 100;
-	bool displayKicker = true;
+	bool displayKicker = false;
 	pros::Task displayController([&] {
 		uint st = pros::millis();
 		master.clear();
@@ -48,13 +58,20 @@ void opcontrol() {
 		}
 	});
 
+	// skillsStart();
+
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::R2);
-	okapi::ControllerButton kickerTgl(okapi::ControllerDigital::A);
+	okapi::ControllerButton kickerTgl(okapi::ControllerDigital::left);
+	okapi::ControllerButton leftWingTgl(okapi::ControllerDigital::A);
+	okapi::ControllerButton rightWingTgl(okapi::ControllerDigital::Y);
+	okapi::ControllerButton frontWingsTgl(okapi::ControllerDigital::L1);
+	okapi::ControllerButton vertWingsTgl(okapi::ControllerDigital::L2);
+	okapi::ControllerButton horiHangTgl(okapi::ControllerDigital::X);
 
 	okapi::ControllerButton increaseKickerSpd(okapi::ControllerDigital::up);
 	okapi::ControllerButton decreaseKickerSpd(okapi::ControllerDigital::down);
-	okapi::ControllerButton switchDisplay(okapi::ControllerDigital::X);
+	okapi::ControllerButton switchDisplay(okapi::ControllerDigital::right);
 
 	int intakeDir = 0;
 	bool matchloading = false;
@@ -71,11 +88,18 @@ void opcontrol() {
 		intake.moveVoltage(intakeDir * 12000);
 
 		if (kickerTgl.changedToPressed()) matchloading = !matchloading;
-		kicker.moveVelocity(matchloading * kickerSpd);
+		kicker.move(matchloading * kickerSpd);
 		if (increaseKickerSpd.changedToPressed()) if (kickerSpd + 10 <= 200) kickerSpd += 10;
 		if (decreaseKickerSpd.changedToPressed()) if (kickerSpd - 10 >= 0) kickerSpd -= 10;
 
 		if (switchDisplay.changedToPressed()) { master.clearLine(1); master.clearLine(2); displayKicker = !displayKicker; }
+
+		if (leftWingTgl.changedToPressed()) leftWing.toggle();
+		if (rightWingTgl.changedToPressed()) rightWing.toggle();
+		if (frontWingsTgl.changedToPressed()) { leftWing.toggle(); rightWing.toggle(); }
+		if (vertWingsTgl.changedToPressed()) vertWings.toggle();
+
+		if (horiHangTgl.changedToPressed()) horiHang.toggle();
 
 		pros::delay(50);
 	}
