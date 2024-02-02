@@ -28,7 +28,7 @@ const int RIGHT_TOP = -18;
 const int KICKER = 2;
 const int INTAKE = 7;
 const int INERTIAL = 17;
-const int FRONT_DIST = 6;
+const int MIDDLE_ROT = 6;
 const int BACK_DIST = 15;
 const int LEFT_DIST = 1;
 const int RIGHT_DIST = 5;
@@ -61,10 +61,16 @@ extern lib16868C::Pneumatic vertWings;
 
 // Sensors
 extern lib16868C::Inertial inertial;
-extern okapi::DistanceSensor frontDist;
-extern okapi::DistanceSensor backDist;
-extern okapi::DistanceSensor leftDist;
-extern okapi::DistanceSensor rightDist;
+extern lib16868C::Rotation middleRot;
+extern lib16868C::TrackingWheel leftEnc;
+extern lib16868C::TrackingWheel rightEnc;
+extern lib16868C::TrackingWheel middleEnc;
+extern okapi::DistanceSensor rightDistance;
+extern okapi::DistanceSensor backDistance;
+extern okapi::DistanceSensor leftDistance;
+extern lib16868C::DistanceSensor rightDist;
+extern lib16868C::DistanceSensor backDist;
+extern lib16868C::DistanceSensor leftDist;
 
 // Subsystems
 extern lib16868C::Odometry odometry;

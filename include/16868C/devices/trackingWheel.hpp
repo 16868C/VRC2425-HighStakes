@@ -10,7 +10,8 @@ enum class TrackingWheelType {
 	ROTATION,
 	OPTICAL_ENCODER,
 	MOTOR,
-	MOTOR_GROUP
+	MOTOR_GROUP,
+	INVALID
 };
 
 class TrackingWheel {
@@ -21,12 +22,12 @@ public:
 	TrackingWheel(lib16868C::Motor* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio = 1);
 	TrackingWheel(lib16868C::MotorGroup* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio = 1);
 
-	double getRaw();
-	double getDist();
-	double getOffset();
+	double getRaw() const;
+	double getDist() const;
+	double getOffset() const;
 	void reset();
 
-	TrackingWheelType getType();
+	TrackingWheelType getType() const;
 
 private:
 	AbstractEncoder* enc = nullptr;

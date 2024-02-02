@@ -5,7 +5,7 @@
 
 using namespace lib16868C;
 
-Inline::Inline(MotorGroup& leftMtrs, MotorGroup& rightMtrs, Inertial& inertial, Odometry& odom, okapi::QLength wheelDiam, double gearRatio)
+Inline::Inline(MotorGroup& leftMtrs, MotorGroup& rightMtrs, Inertial& inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio)
 	: leftMtrs(leftMtrs), rightMtrs(rightMtrs), inertial(inertial), odom(odom), wheelDiam(wheelDiam), gearRatio(gearRatio) {
 
 	tpr = leftMtrs.getGearing() == okapi::AbstractMotor::gearset::red ? 1800 : 
@@ -142,7 +142,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 }
 
 void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains distGains, double maxAccelRPM, okapi::QAngularSpeed turnRPM, lib16868C::PIDGains headingGains, int timeout) {
-	Pose curPose = odom.getPose();
+	Pose curPose = odom->getPose();
 	okapi::QLength dist = curPose.distTo(target);
 	okapi::QAngle heading = curPose.angleTo(target);
 
@@ -158,7 +158,7 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, lib16868C::PI
 	moveDistance(dist, abs(maxRPM), distGains, maxAccelRPM, heading, turnRPM, headingGains, timeout);
 
 	target.theta = inertial.get_rotation(AngleUnit::RAD);
-	odom.update(target);
+	odom->update(target);
 }
 
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {
