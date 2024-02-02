@@ -142,6 +142,11 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 }
 
 void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains distGains, double maxAccelRPM, okapi::QAngularSpeed turnRPM, lib16868C::PIDGains headingGains, int timeout) {
+	if (!odom) {
+		std::cerr << "[Inline::moveToPoint] No odometry class was provided, unable to use moveToPoint" << std::endl;
+		return;
+	}
+	
 	Pose curPose = odom->getPose();
 	okapi::QLength dist = curPose.distTo(target);
 	okapi::QAngle heading = curPose.angleTo(target);
