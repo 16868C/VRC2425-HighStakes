@@ -5,6 +5,9 @@
 namespace lib16868C {
 typedef unsigned int uint;
 
+double sma(double input, double prev);
+double ema(double input, double prev, double a);
+
 namespace ReduceAngle {
 	template<typename T> inline T reduce(T ang, T max, T min) {
 		T range = max - min;

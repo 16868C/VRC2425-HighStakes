@@ -5,6 +5,13 @@
 
 using namespace lib16868C;
 
+double sma(double input, double prev) {
+	return (input + prev) / 2.0;
+}
+double ema(double input, double prev, double a) {
+	return (a * input + (1 - a) * prev) / 2.0;
+}
+
 /** Point **/
 Point::Point() : Point(0, 0) {}
 Point::Point(double x, double y) : x(x), y(y) {}
