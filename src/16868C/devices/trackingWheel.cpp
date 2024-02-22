@@ -9,32 +9,33 @@ TrackingWheel::TrackingWheel(Rotation* enc, okapi::QLength wheelDiameter, okapi:
 	this->offset = offset.convert(okapi::inch);
 	this->gearRatio = gearRatio;
 	
-	type = enc ? TrackingWheelType::ROTATION : TrackingWheelType::INVALID;
+	type = TrackingWheelType::ROTATION;
 }
 TrackingWheel::TrackingWheel(OpticalEncoder* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio) : enc(enc) {
 	this->wheelDiameter = wheelDiameter.convert(okapi::inch);
 	this->offset = offset.convert(okapi::inch);
 	this->gearRatio = gearRatio;
 
-	type = enc ? TrackingWheelType::OPTICAL_ENCODER : TrackingWheelType::INVALID;
+	type = TrackingWheelType::OPTICAL_ENCODER;
 }
 TrackingWheel::TrackingWheel(Motor* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio) : enc(enc) {
 	this->wheelDiameter = wheelDiameter.convert(okapi::inch);
 	this->offset = offset.convert(okapi::inch);
 	this->gearRatio = gearRatio;
 
-	type = enc ? TrackingWheelType::MOTOR : TrackingWheelType::INVALID;
+	type = TrackingWheelType::MOTOR;
 }
 TrackingWheel::TrackingWheel(MotorGroup* enc, okapi::QLength wheelDiameter, okapi::QLength offset, double gearRatio) : enc(enc) {
 	this->wheelDiameter = wheelDiameter.convert(okapi::inch);
 	this->offset = offset.convert(okapi::inch);
 	this->gearRatio = gearRatio;
 
-	type = enc ? TrackingWheelType::MOTOR_GROUP : TrackingWheelType::INVALID;
+	type = TrackingWheelType::MOTOR_GROUP;
 }
 
 double TrackingWheel::getDist() const {
-	return (getRaw() / enc->getTPR() * wheelDiameter * M_PI) / gearRatio;
+	if (!enc) return 0;
+	return (getRaw() / enc->getTPR()) * (wheelDiameter * M_PI) * gearRatio;
 }
 double TrackingWheel::getRaw() const {
 	return enc ? enc->get() : 0;

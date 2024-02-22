@@ -11,6 +11,15 @@ DistanceSensor::DistanceSensor(okapi::DistanceSensor* snsr, okapi::QLength offse
 	this->offset = offset.convert(okapi::inch);
 }
 
+double DistanceSensor::getDist() const {
+	if (snsr) return snsr->get();
+	return 0;
+}
+double DistanceSensor::getConfidence() const {
+	if (snsr) return snsr->getConfidence();
+	return 0;
+}
+
 /** Odometry **/
 void Odometry::odomManager(void* param) {
 	std::array<double, 4> prev;
@@ -21,24 +30,28 @@ void Odometry::odomManager(void* param) {
 	uint32_t time = pros::millis();
 	while (true) {
 		// Distance and theta
-		std::array<double, 4> curr = { odom->trackingWheels[0].getDist(), odom->trackingWheels[1].getDist(), odom->trackingWheels[2].getDist() };
-		if (!odom->inertial) curr[3] = (curr[1] - curr[0]) / (odom->trackingWheels[0].getOffset() + odom->trackingWheels[1].getOffset());
+		std::array<double, 4> curr;
+		for (int i = 0; i < 3; i++) curr[i] = odom->trackingWheels[i]->getDist();
+		if (!odom->inertial) curr[3] = (curr[1] - curr[0]) / (odom->trackingWheels[0]->getOffset() + odom->trackingWheels[1]->getOffset());
 		else curr[3] = odom->inertial->get_rotation(AngleUnit::RAD);
 
-		std::vector<double> deltas;
-		for (int i = 0; i < 4; i++) deltas.push_back(curr[i] - prev[i]);
+		// Deltas
+		std::array<double, 4> deltas;
+		for (int i = 0; i < 4; i++) deltas[i] = curr[i] - prev[i];
+
 		odom->step(deltas);
 
+		// Output
 		Pose pose = odom->getPose();
-		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.x, pose.y);
-		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(pose.theta), pose.theta);
+		pros::lcd::print(0, "X: %.2f, Y: %.2f", *pose.x(), *pose.y());
+		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(*pose.theta()), *pose.theta());
 
-		std::array<TrackingWheel, 3> encs = odom->trackingWheels;
-		std::array<DistanceSensor, 4> dists = odom->distanceSensors;
-		if (encs[1].getType() != TrackingWheelType::INVALID) pros::lcd::print(2, "Left: %.2f, Right: %.2f", encs[0].getDist(), encs[1].getDist());
-		else pros::lcd::print(2, "Forward: %.2f", encs[1].getDist());
-		if (odom->inertial) pros::lcd::print(3, "Middle: %.2f, Theta: %.2f", encs[2].getDist(), odom->inertial->get_rotation(AngleUnit::DEG));
-		else pros::lcd::print(3, "Middle: %.2f", encs[2].getDist());
+		std::array<TrackingWheel*, 3> encs = odom->trackingWheels;
+		std::array<DistanceSensor*, 4> dists = odom->distanceSensors;
+		if (encs[1]->getType() != TrackingWheelType::INVALID) pros::lcd::print(2, "Left: %.2f, Right: %.2f", encs[0]->getDist(), encs[1]->getDist());
+		else pros::lcd::print(2, "Forward: %.2f", encs[1]->getDist());
+		if (odom->inertial) pros::lcd::print(3, "Middle: %.2f, Theta: %.2f", encs[2]->getDist(), odom->inertial->get_rotation(AngleUnit::DEG));
+		else pros::lcd::print(3, "Middle: %.2f", encs[2]->getDist());
 
 		prev = curr;
 
@@ -58,11 +71,14 @@ Odometry::Odometry(std::array<TrackingWheel, 3> trackingWheels, std::array<Dista
 	leftDist = distanceSensors[3];
 }
 Odometry::Odometry(TrackingWheel left, TrackingWheel right, TrackingWheel middle)
-	: leftEnc(left), rightEnc(right), middleEnc(middle) {}
+	: leftEnc(left), rightEnc(right), middleEnc(middle) {
+}
 Odometry::Odometry(TrackingWheel left, TrackingWheel right, TrackingWheel middle, Inertial* inertial)
-	: leftEnc(left), rightEnc(right), middleEnc(middle), inertial(inertial) {}
+	: leftEnc(left), rightEnc(right), middleEnc(middle), inertial(inertial) {
+}
 Odometry::Odometry(DistanceSensor front, DistanceSensor right, DistanceSensor rear, DistanceSensor left, Inertial* inertial)
-	: frontDist(front), rightDist(right), rearDist(rear), leftDist(left), inertial(inertial) {}
+	: frontDist(front), rightDist(right), rearDist(rear), leftDist(left), inertial(inertial) {
+}
 Odometry::Odometry::Odometry(Odometry& odom) {
 	leftEnc = odom.leftEnc;
 	rightEnc = odom.rightEnc;
@@ -82,7 +98,8 @@ void Odometry::init() {
 void Odometry::init(Pose pose) {
 	// Resetting sensors
 	pros::delay(100); // Just in case the sensors have not been initialized yet
-	for (int i = 0; i < 3; i++) trackingWheels[i].reset();
+	for (int i = 0; i < 3; i++) trackingWheels[i]->reset();
+	inertial->calibrate();
 
 	// Resetting pose
 	this->pose = pose;
@@ -114,18 +131,13 @@ void Odometry::update(bool front, bool right, bool back, bool left) {
 	double theta = ReduceAngle::radPi2(inertial->get_rotation(AngleUnit::RAD));
 	if (std::abs(theta) > M_PI / 12.0 && std::abs(theta) < M_PI * 5 / 12.0) return; // Not perpendicular to wall
 	theta = ReduceAngle::rad2Pi(inertial->get_rotation(AngleUnit::RAD));
-	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5;
+	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5; // Avoid tan(90) and tan(270)
 
 	std::array<double, 4> distReads;
-	for (int i = 0; i < 4; i++) distReads[i] = distanceSensors[i].getDist();
-
+	for (int i = 0; i < 4; i++) distReads[i] = distanceSensors[i]->getDist();
 	std::array<int, 4> distConf;
-	for (int i = 0; i < 4; i++) distConf[i] = distanceSensors[i].getConfidence();
-	
+	for (int i = 0; i < 4; i++) distConf[i] = distanceSensors[i]->getConfidence();
 	std::array<bool, 4> useSnsr {front, right, back, left};
-
-	for (int i = 0; i < 4; i++) std::cout << i << ": (" << distReads[i] << ", " << distConf[i] << ") ";
-	std::cout << "\n";
 
 	for (int i = 0; i < 4; i++) {
 		if (std::isnan(distReads[i]) || !useSnsr[i]) continue; // Not using the sensor
@@ -133,152 +145,26 @@ void Odometry::update(bool front, bool right, bool back, bool left) {
 		if (distConf[i] < MIN_CONFIDENCE) continue; // Confidence too low
 
 		double distTheta = theta + i * M_PI_2;
-		Line dist(std::tan(distTheta), curPose.pos);
-		// std::cout << i << " " << dist.toStr() << "\n";
-		double distToWall = distReads[i] + distanceSensors[i].offset, newPos = distToWall;
+		Line dist(std::tan(distTheta), *curPose.pos());
+		double distToWall = distReads[i] + distanceSensors[i]->offset, newPos = distToWall;
 		for (double a = 0; a <= 2 * M_PI; a += M_PI_2) {
-			// std::cout << a << "\n";
-			// std::cout << a << " " << distTheta << " " << ReduceAngle::rad2Pi(a - M_PI / 12.0) << " " << ReduceAngle::rad2Pi(a + M_PI / 12.0) << "\n";
 			if (a == 0 && std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) && std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0)) continue; // Not within 15 deg of an axis
 			else if (a != 0 && (std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) || std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0))) continue; // Not within 15 deg of an axis
 
-			// std::cout << " " << walls[a].getLine().toStr() << "\n";
-			// std::cout << walls[a].getIntersection(dist).toStr() << "\n";
 			if (walls[a].isInsideSegment(walls[a].getIntersection(dist))) { // Distance sensor is reading distance to correct wall
 				distToWall *= std::abs(std::sin(distTheta + a + M_PI_2));
 				newPos = distToWall;
-				// std::cout << i << " " << a << " " << std::abs(std::sin(distTheta + a + M_PI_2)) << "\n";
-				if (oppWall[std::round(theta / M_PI_2) * M_PI_2](i)) { std::cout << std::round(theta / M_PI_2) * M_PI_2 << "\n"; newPos = fieldWidth - distToWall; }
-
-				getDistUpdateCoord(distTheta, i, newPose, distConf) = newPos;
-				std::cout << newPose[1].toStr() << ", " << newPose[2].toStr() << "\n";
-			}
-		}
-	}
-
-	newPose[0].x = newPose[3].x > newPose[4].x ? newPose[1].x : newPose[2].x;
-	newPose[0].y = newPose[3].y > newPose[4].y ? newPose[1].y : newPose[2].y;
-	newPose[0].theta = inertial->get_rotation(AngleUnit::RAD);
-	if (std::isnan(newPose[0].x) || std::isnan(newPose[0].y)) return;
-	update(newPose[0]);
-
-	/**
-	for (int i = 0; i < 4; i++) {
-		Line dist(std::tan(theta), curPose.pos);
-		double distToWall = distReads[i] + distScales.getDist(i), newPos = distToWall;
-		if (theta >= M_PI * 23 / 12.0 || theta <= M_PI / 12.0) { // Facing north wall; 345-15 deg
-			if (north.isInsideSegment(north.getIntersection(dist))) {
-				if (i < 2) distToWall *= std::abs(std::cos(theta));
-				else distToWall *= std::abs(std::sin(theta));
-
-				if (i == 0 || i == 3) newPos = fieldWidth - distToWall;
 				
-				switch (i) {
-					case 0:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						newPose.y = newPos;
-						break;
-					case 1:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						if (distConf[1] > distConf[0]) newPose.y = newPos;
-						break;
-					case 2:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						newPose.x = newPos;
-						break;
-					case 3:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						if (distConf[3] > distConf[2]) newPose.x = newPos;
-						break;
-				}
+				*getDistUpdateCoord(distTheta, i, newPose, distConf) = newPos;
 			}
-		} else if (theta >= M_PI * 5 / 12.0 && theta <= M_PI * 7 / 12.0) { // Facing east wall; 75-105 deg
-			if (east.isInsideSegment(east.getIntersection(dist))) {
-				if (i < 2) distToWall *= std::abs(std::sin(theta));
-				else distToWall *= std::abs(std::cos(theta));
-
-				if (i == 0 || i == 2) newPos = fieldWidth - distToWall;
-
-				switch (i) {
-					case 0:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						newPose.x = newPos;
-						break;
-					case 1:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						if (distConf[1] > distConf[0]) newPose.x = newPos;
-						break;
-					case 2:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						newPose.y = newPos;
-						break;
-					case 3:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						if (distConf[3] > distConf[2]) newPose.y = newPos;
-						break;
-				}
-			}
-		} else if (theta >= M_PI * 11 / 12.0 && theta <= M_PI * 13 / 12.0) { // Facing south wall; 165-195 deg
-			if (south.isInsideSegment(south.getIntersection(dist))) {
-				if (i < 2) distToWall *= std::abs(std::cos(theta));
-				else distToWall *= std::abs(std::sin(theta));
-
-				if (i == 1 || i == 2) newPos = fieldWidth - distToWall;
-
-				switch (i) {
-					case 0:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						newPose.y = newPos;
-						break;
-					case 1:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						if (distConf[1] > distConf[0]) newPose.y = newPos;
-						break;
-					case 2:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						newPose.x = newPos;
-						break;
-					case 3:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						if (distConf[3] > distConf[2]) newPose.x = newPos;
-						break;
-				}
-			}
-		} else if (theta >= M_PI * 17 / 12.0 && theta <= M_PI * 19 / 12.0) { // Facing west wall; 255-285 deg
-			if (west.isInsideSegment(west.getIntersection(dist))) {
-				if (i < 2) distToWall *= std::abs(std::sin(theta));
-				else distToWall *= std::abs(std::cos(theta));
-
-				if (i == 1 || i == 3) newPos = fieldWidth - distToWall;
-
-				switch (i) {
-					case 0:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						newPose.x = newPos;
-						break;
-					case 1:
-						if (newPos - curPose.x > MAX_DELTA.convert(okapi::inch) || newPos - curPose.x < 0) continue; // Delta too large or too small
-						if (distConf[1] > distConf[0]) newPose.x = newPos;
-						break;
-					case 2:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						newPose.y = newPos;
-						break;
-					case 3:
-						if (newPos - curPose.y > MAX_DELTA.convert(okapi::inch) || newPos - curPose.y < 0) continue; // Delta too large or too small
-						if (distConf[3] > distConf[2]) newPose.y = newPos;
-						break;
-				}
-			}
-		} else {
-			std::cerr << "Invalid theta: " << theta << "\n";
-			return;
 		}
 	}
 
-	if (std::isnan(newPose.x) || std::isnan(newPose.y)) return;
-	update(newPose);
-	*/
+	newPose[0].setX(*newPose[3].x() > *newPose[4].x() ? *newPose[1].x() : *newPose[2].x());
+	newPose[0].setY(*newPose[3].y() > *newPose[4].y() ? *newPose[1].y() : *newPose[2].y());
+	newPose[0].setTheta(inertial->get_rotation(AngleUnit::RAD));
+	if (std::isnan(*newPose[0].x()) || std::isnan(*newPose[0].y())) return;
+	update(newPose[0]);
 }
 void Odometry::update(Pose pose) {
 	if (!poseMutex.take(50)) {
@@ -290,9 +176,10 @@ void Odometry::update(Pose pose) {
 }
 
 std::array<TrackingWheel, 3> Odometry::getEncoders() const {
+std::array<TrackingWheel*, 3> Odometry::getEncoders() const {
 	return trackingWheels;
 }
-std::array<DistanceSensor, 4> Odometry::getDistanceSensors() const {
+std::array<DistanceSensor*, 4> Odometry::getDistanceSensors() const {
 	return distanceSensors;
 }
 Inertial* Odometry::getInertial() const {
@@ -300,11 +187,12 @@ Inertial* Odometry::getInertial() const {
 }
 
 void Odometry::resetSensors() {
-	for (int i = 0; i < 3; i++) trackingWheels[i].reset();
+	for (int i = 0; i < 3; i++) trackingWheels[i]->reset();
 	inertial->reset();
 }
 
 void Odometry::step(std::vector<double> deltas) {
+void Odometry::step(std::array<double, 4> deltas) {
 	for (double d : deltas) {
 		if (std::abs(d) > MAX_DELTA) {
 			std::cerr << "Odometry delta too large: " << d << "\n";
@@ -318,72 +206,53 @@ void Odometry::step(std::vector<double> deltas) {
 	double deltaM = deltas[2];
 	double deltaA = deltas[3];
 
-	deltaM -= deltaA * trackingWheels[2].getOffset(); // Original equation: (deltaA / 2pi) * (2pi * middleTrack)
-	
-	// std::cout << deltaL << " " << deltaR << " " << deltaM << " " << deltaA << "\n";
-
 	// Local offsets
 	double localOffsetX = deltaM;
 	double localOffsetY = deltaL;
 	if (deltaA != 0) {
-		localOffsetX = 2 * sin(deltaA / 2.0) * (deltaM / deltaA + trackingWheels[2].getOffset() * 2);
-		localOffsetY = 2 * sin(deltaA / 2.0) * (deltaL / deltaA + trackingWheels[1].getOffset() / 2.0);
+		localOffsetX = 2 * std::sin(deltaA / 2.0) * (deltaM / deltaA - trackingWheels[2]->getOffset());
+		localOffsetY = 2 * std::sin(deltaA / 2.0) * (deltaL / deltaA - trackingWheels[0]->getOffset());
 	}
 
-	// Polar offsets
-	double avgA = pose.theta + (deltaA / 2.0);
-
-	double polarR = hypot(localOffsetX, localOffsetY);
-	double polarA = atan2(localOffsetY, localOffsetX);
-
-	// Rotating and converting to global offsets
-	polarA -= avgA;
-	double globalDeltaX = polarR * cos(polarA);
-	double globalDeltaY = polarR * sin(polarA);
+	// Adding the x and y components of each of the local offsets to calculate the global offsets
+	double avgA = *pose.theta() + (deltaA / 2.0);
+	double globalDeltaX = localOffsetX * -sin(avgA) + localOffsetY * sin(avgA);
+	double globalDeltaY = localOffsetX * cos(avgA) + localOffsetY * cos(avgA);
 
 	if (std::isnan(globalDeltaX)) globalDeltaX = 0;
 	if (std::isnan(globalDeltaY)) globalDeltaY = 0;
 	if (std::isnan(deltaA)) deltaA = 0;
 
-	double globalX = pose.x + globalDeltaX;
-	double globalY = pose.y + globalDeltaY;
-	double globalTheta = pose.theta + deltaA;
-	if (!poseMutex.take(20)) {
-		std::cerr << "[Odometry::step] Mutex timeout - unable to update pose" << std::endl;
-		return;
-	}
-	pose = { globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis() };
-	poseMutex.give();
+	double globalX = *pose.x() + globalDeltaX;
+	double globalY = *pose.y() + globalDeltaY;
+	double globalTheta = inertial->get_rotation(AngleUnit::RAD);
+	update({globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()});
 }
 
 double& Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
-	std::cout << a << " " << i << " ";
+double* Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
 	if (std::abs(a - 0) <= 15 || std::abs(a - M_PI) <= 15) {
 		switch(i) {
 			case 0:
 			case 2:
-				std::cout << 0.5 * i + 1 << " x\n";
-				newPose[0.5 * i + 3].x = confs[i];
-				return newPose[0.5 * i + 1].x;
+				newPose[0.5 * i + 3].setX(confs[i]);
+				return (double*) newPose[0.5 * i + 1].x();
 			case 1:
 			case 3:
-				std::cout << 0.5 * i + 0.5 << " y\n";
-				newPose[0.5 * i + 2.5].y = confs[i];
-				return newPose[0.5 * i + 0.5].y;
+				newPose[0.5 * i + 2.5].setY(confs[i]);
+				return (double*) newPose[0.5 * i + 0.5].y();
 		}
 	} else {
 		switch(i) {
 			case 0:
 			case 2:
-				std::cout << 0.5 * i + 1 << " y\n";
-				newPose[0.5 * i + 3].y = confs[i];
-				return newPose[0.5 * i + 1].y;
+				newPose[0.5 * i + 3].setY(confs[i]);
+				return (double*) newPose[0.5 * i + 1].y();
 			case 1:
 			case 3:
-				std::cout << 0.5 * i + 0.5 << " x\n";
-				newPose[0.5 * i + 2.5].x = confs[i];
-				return newPose[0.5 * i + 0.5].x;
+				newPose[0.5 * i + 2.5].setX(confs[i]);
+				return (double*) newPose[0.5 * i + 0.5].x();
 		}
 	}
-	return newPose[0].x;
+	return (double*) newPose[0].x();
 }

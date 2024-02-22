@@ -15,6 +15,7 @@ void Inertial::calibrate() {
 			pros::lcd::print(0, "Inertial Reset Failed");
 		}
 		resetSuccess = reset(true) - 1;
+		pros::delay(10);
 	} while (!resetSuccess);
 
 	double h1 = get_rotation(AngleUnit::DEG);
@@ -28,12 +29,18 @@ void Inertial::calibrate() {
 }
 
 double Inertial::get_rotation(AngleUnit unit) const {
-	double a = pros::Imu::get_rotation();
+double a = pros::Imu::get_rotation();
 	if (std::isinf(a)) {
 		std::cerr << "[Inertial] Rotation of Infinity" << std::endl;
-		while (std::isinf(a)) a = pros::Imu::get_rotation();
+		while (std::isinf(a)) {
+			a = pros::Imu::get_rotation();
+			pros::delay(20);
+		}
 	}
 
 	if (unit == AngleUnit::RAD) a = Util::degToRad(a);
 	return a;
+}
+void Inertial::set_rotation(okapi::QAngle heading) {
+	pros::Imu::set_rotation(heading.convert(okapi::degree));
 }

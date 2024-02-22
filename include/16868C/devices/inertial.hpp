@@ -1,5 +1,5 @@
 #pragma once
-#include "api.h"
+#include "okapi/api.hpp"
 #include "16868C/util/math.hpp"
 
 namespace lib16868C {
@@ -14,6 +14,7 @@ class Inertial : public pros::Imu {
 
 		void calibrate();
 		double get_rotation(AngleUnit unit) const;
+		void set_rotation(okapi::QAngle heading);
 	
 	private:
 		double DRIFT_THRESHOLD = 1;

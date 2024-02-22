@@ -7,11 +7,11 @@
 
 namespace lib16868C {
 enum class TrackingWheelType {
-	ROTATION,
-	OPTICAL_ENCODER,
-	MOTOR,
-	MOTOR_GROUP,
-	INVALID
+	ROTATION = 0,
+	OPTICAL_ENCODER = 1,
+	MOTOR = 2,
+	MOTOR_GROUP = 3,
+	INVALID = -1
 };
 
 class TrackingWheel {
@@ -36,6 +36,6 @@ private:
 	double offset = 0;
 	double gearRatio = 1;
 
-	TrackingWheelType type;
+	TrackingWheelType type = TrackingWheelType::INVALID;
 };
 } // namespace lib16868C

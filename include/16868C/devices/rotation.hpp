@@ -7,7 +7,7 @@ namespace lib16868C {
 class Rotation : private pros::Rotation, public AbstractEncoder {
 	public:
 		Rotation(int port);
-		Rotation(int port, bool reversed);
+		Rotation(uint port, bool reversed);
 
 		/**
 		 * @brief Returns the current position of the encoder in degrees.

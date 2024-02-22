@@ -3,10 +3,10 @@
 
 using namespace lib16868C;
 
-Rotation::Rotation(int port) : pros::Rotation(port, Util::sgn(port) > 0 ? true : false) {
+Rotation::Rotation(int port) : pros::Rotation(std::abs(port), Util::sgn(port) > 0 ? true : false) {
 	tpr = 360;
 }
-Rotation::Rotation(int port, bool reversed) : pros::Rotation(port, reversed) {
+Rotation::Rotation(uint port, bool reversed) : pros::Rotation(port, reversed) {
 	tpr = 360;
 }
 

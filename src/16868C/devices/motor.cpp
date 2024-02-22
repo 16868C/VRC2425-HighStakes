@@ -20,7 +20,7 @@ double Motor::getPosition() {
 	
 	if (std::isinf(ticks)) {
 		std::cerr << "[Motor] Position of Infinity" << std::endl;
-		while (std::isinf(ticks)) ticks = okapi::Motor::getPosition();
+		while (std::isinf(ticks)) { ticks = okapi::Motor::getPosition(); pros::delay(20); }
 	}
 
 	return ticks;
