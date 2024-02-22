@@ -28,7 +28,7 @@ void lib16868C::CataMain(void* param) {
 		else if (cata->cataState != CataState::SETTLED) cata->mtrs.moveVoltage(11000);
 		else cata->stop();
 
-		pros::Task::delay_until(&time, 10);
+		pros::Task::delay_until(&time, 20);
 	}
 }
 
