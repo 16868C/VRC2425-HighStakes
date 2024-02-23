@@ -38,8 +38,7 @@ void lib16868C::turretManager(void* param) {
 		double sgnl = pid.calculate(error);
 
 		turret->spin(600 * sgnl);
-		// std::cout << targetAngle << " " << targetTicks << " " << turret->motor.getPosition() << " " << error << " " << sgnl << "\n";
-
+		
 		pros::Task::delay_until(&time, 100);
 	}
 }
@@ -50,7 +49,6 @@ Turret::Turret(okapi::Motor& motor, pros::Imu& inertial, double gearRatio)
 }
 
 void Turret::spin(double vel) {
-	// std::cout << vel << " " << static_cast<double>(motor.getGearing()) << " " << vel / static_cast<double>(motor.getGearing()) * 12000 << "\n";
 	motor.moveVoltage(vel / static_cast<double>(motor.getGearing()) * 12000);
 }
 void Turret::spinTo(double angle, double vel) {

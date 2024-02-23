@@ -1,17 +1,33 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
+#include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"
 #include <limits>
 
 using namespace lib16868C;
 using namespace okapi::literals;
 
-/** Distance Sensor **/
+/* -------------------------------------------------------------------------- */
+/*                               Distance Sensor                              */
+/* -------------------------------------------------------------------------- */
 DistanceSensor::DistanceSensor() {}
 DistanceSensor::DistanceSensor(okapi::DistanceSensor* snsr, okapi::QLength offset) : snsr(snsr) {
 	this->offset = offset.convert(okapi::inch);
 }
 
-/** Odometry **/
+double DistanceSensor::getDist() const {
+	if (snsr) return snsr->get();
+	return 0;
+}
+double DistanceSensor::getConfidence() const {
+	if (snsr) return snsr->getConfidence();
+	return 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                  Odometry                                  */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------- Main Loop ------------------------------- */
 void Odometry::odomManager(void* param) {
 	std::array<double, 4> prev;
 	prev.fill(0);
@@ -46,6 +62,7 @@ void Odometry::odomManager(void* param) {
 	}
 }
 
+/* ------------------------------ Constructors ------------------------------ */
 Odometry::Odometry() {}
 Odometry::Odometry(std::array<TrackingWheel, 3> trackingWheels, std::array<DistanceSensor, 4> distanceSensors, Inertial* inertial) : inertial(inertial) {
 	leftEnc = trackingWheels[0];
@@ -76,6 +93,7 @@ Odometry::Odometry::Odometry(Odometry& odom) {
 	inertial = odom.inertial;
 }
 
+/* --------------------------- Initialize Methods --------------------------- */
 void Odometry::init() {
 	init({ 0_in, 0_in, 0_rad, 0 });
 }
@@ -91,6 +109,7 @@ void Odometry::init(Pose pose) {
 	odomTask = pros::c::task_create(odomManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odometry");
 }
 
+/* -------------------------- Pose Related Methods -------------------------- */
 Pose Odometry::getPose() {
 	if (!poseMutex.take(50)) {
 		std::cerr << "[Odometry::getPose] Mutex timeout - unable to read current pose" << std::endl;
@@ -124,9 +143,6 @@ void Odometry::update(bool front, bool right, bool back, bool left) {
 	
 	std::array<bool, 4> useSnsr {front, right, back, left};
 
-	for (int i = 0; i < 4; i++) std::cout << i << ": (" << distReads[i] << ", " << distConf[i] << ") ";
-	std::cout << "\n";
-
 	for (int i = 0; i < 4; i++) {
 		if (std::isnan(distReads[i]) || !useSnsr[i]) continue; // Not using the sensor
 		if (distReads[i] > FIELD_WIDTH || distReads[i] < 0) continue; // Read error
@@ -134,24 +150,17 @@ void Odometry::update(bool front, bool right, bool back, bool left) {
 
 		double distTheta = theta + i * M_PI_2;
 		Line dist(std::tan(distTheta), curPose.pos);
-		// std::cout << i << " " << dist.toStr() << "\n";
 		double distToWall = distReads[i] + distanceSensors[i].offset, newPos = distToWall;
 		for (double a = 0; a <= 2 * M_PI; a += M_PI_2) {
-			// std::cout << a << "\n";
-			// std::cout << a << " " << distTheta << " " << ReduceAngle::rad2Pi(a - M_PI / 12.0) << " " << ReduceAngle::rad2Pi(a + M_PI / 12.0) << "\n";
 			if (a == 0 && std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) && std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0)) continue; // Not within 15 deg of an axis
 			else if (a != 0 && (std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) || std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0))) continue; // Not within 15 deg of an axis
 
-			// std::cout << " " << walls[a].getLine().toStr() << "\n";
-			// std::cout << walls[a].getIntersection(dist).toStr() << "\n";
 			if (walls[a].isInsideSegment(walls[a].getIntersection(dist))) { // Distance sensor is reading distance to correct wall
 				distToWall *= std::abs(std::sin(distTheta + a + M_PI_2));
 				newPos = distToWall;
-				// std::cout << i << " " << a << " " << std::abs(std::sin(distTheta + a + M_PI_2)) << "\n";
-				if (oppWall[std::round(theta / M_PI_2) * M_PI_2](i)) { std::cout << std::round(theta / M_PI_2) * M_PI_2 << "\n"; newPos = fieldWidth - distToWall; }
+				if (oppWall[std::round(theta / M_PI_2) * M_PI_2](i)) newPos = fieldWidth - distToWall;
 
 				getDistUpdateCoord(distTheta, i, newPose, distConf) = newPos;
-				std::cout << newPose[1].toStr() << ", " << newPose[2].toStr() << "\n";
 			}
 		}
 	}
@@ -289,7 +298,8 @@ void Odometry::update(Pose pose) {
 	poseMutex.give();
 }
 
-std::array<TrackingWheel, 3> Odometry::getEncoders() const {
+/* --------------------------- Getters and Setter --------------------------- */
+std::array<TrackingWheel*, 3> Odometry::getEncoders() const {
 	return trackingWheels;
 }
 std::array<DistanceSensor, 4> Odometry::getDistanceSensors() const {
@@ -304,7 +314,8 @@ void Odometry::resetSensors() {
 	inertial->reset();
 }
 
-void Odometry::step(std::vector<double> deltas) {
+/* ---------------------------- Main calculations --------------------------- */
+void Odometry::step(std::array<double, 4> deltas) {
 	for (double d : deltas) {
 		if (std::abs(d) > MAX_DELTA) {
 			std::cerr << "Odometry delta too large: " << d << "\n";
@@ -319,8 +330,6 @@ void Odometry::step(std::vector<double> deltas) {
 	double deltaA = deltas[3];
 
 	deltaM -= deltaA * trackingWheels[2].getOffset(); // Original equation: (deltaA / 2pi) * (2pi * middleTrack)
-	
-	// std::cout << deltaL << " " << deltaR << " " << deltaM << " " << deltaA << "\n";
 
 	// Local offsets
 	double localOffsetX = deltaM;
@@ -356,18 +365,16 @@ void Odometry::step(std::vector<double> deltas) {
 	poseMutex.give();
 }
 
-double& Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
-	std::cout << a << " " << i << " ";
+/* ----------------------------- Utility Methods ---------------------------- */
+double* Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
 	if (std::abs(a - 0) <= 15 || std::abs(a - M_PI) <= 15) {
 		switch(i) {
 			case 0:
 			case 2:
-				std::cout << 0.5 * i + 1 << " x\n";
 				newPose[0.5 * i + 3].x = confs[i];
 				return newPose[0.5 * i + 1].x;
 			case 1:
 			case 3:
-				std::cout << 0.5 * i + 0.5 << " y\n";
 				newPose[0.5 * i + 2.5].y = confs[i];
 				return newPose[0.5 * i + 0.5].y;
 		}
@@ -375,12 +382,10 @@ double& Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPo
 		switch(i) {
 			case 0:
 			case 2:
-				std::cout << 0.5 * i + 1 << " y\n";
 				newPose[0.5 * i + 3].y = confs[i];
 				return newPose[0.5 * i + 1].y;
 			case 1:
 			case 3:
-				std::cout << 0.5 * i + 0.5 << " x\n";
 				newPose[0.5 * i + 2.5].x = confs[i];
 				return newPose[0.5 * i + 0.5].x;
 		}

@@ -2,6 +2,7 @@
 #include "robotconfig.hpp"
 #include "16868C/controllers/PIDController.hpp"
 #include "16868C/subsystems/chassis/motionProfiling.hpp"
+#include "16868C/util/logger.hpp"
 #include "16868C/util/util.hpp"
 #include "routes.hpp"
 #include <algorithm>
@@ -24,15 +25,13 @@ void initialize() {
 }
 
 void disabled() {
-	#ifdef SKILLS
 	horiHang.retract();
-	#endif
 }
 
 void competition_initialize() {}
 
 void autonomous() {
-	int st = pros::millis();
+	uint st = pros::millis();
 
 	#ifndef SKILLS
 	// nearAWPBar();
@@ -41,12 +40,11 @@ void autonomous() {
 	// nearRush();
 	// nearDisrupt();
 	#endif
-	// skills();
 	#ifdef SKILLS
 	skills2();
 	#endif
 
-	// std::cout << "Auton took " << pros::millis() - st << " ms" << std::endl;
+	printDebug("Auton took %d ms\n", pros::millis() - st);
 }
 
 void opcontrol() {
@@ -63,6 +61,10 @@ void opcontrol() {
 	okapi::ControllerButton vertWingsTgl(okapi::ControllerDigital::Y);
 	okapi::ControllerButton horiHangTgl(okapi::ControllerDigital::X);
 
+	#ifdef SKILLS
+	okapi::ControllerButton skillsMacro(okapi::ControllerDigital::up);
+	#endif
+
 	int intakeDir = 0;
 	int kickerSpd = 110;
 	#ifndef SKILLS
@@ -72,12 +74,16 @@ void opcontrol() {
 	bool matchloading = true;
 	#endif
 	while (true) {
+		#ifdef WINSTON
 		// double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
 		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
 		// chassis.driveArcade(forward, turn);
+		#endif
+		#ifdef ANSON
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 		chassis.driveTank(left, right);
+		#endif
 
 		#ifdef WINSTON
 		if (intakeTgl.isPressed()) intakeDir = 1;
@@ -98,11 +104,10 @@ void opcontrol() {
 		if (frontWingsTgl.changedToPressed()) { leftWing.toggle(); rightWing.toggle(); }
 		if (vertWingsTgl.changedToPressed()) vertWings.toggle();
 
-		#ifndef SKILLS
 		if (horiHangTgl.changedToPressed()) horiHang.toggle();
-		#endif
+
 		#ifdef SKILLS
-		if (horiHangTgl.changedToPressed()) {
+		if (skillsMacro.changedToPressed()) {
 			matchloading = false;
 			intakeDir = -1;
 		}
