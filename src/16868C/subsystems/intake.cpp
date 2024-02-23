@@ -1,4 +1,5 @@
 #include "16868C/subsystems/intake.hpp"
+#include "16868C/util/logger.hpp"
 
 using namespace lib16868C;
 
@@ -27,8 +28,6 @@ void lib16868C::intakeSlewRate(void* param) {
 		intake->front.moveVoltage(frontVel);
 		intake->rear.moveVoltage(rearVel);
 
-		// std::cout << frontVolts << " " << intake->frontTarget << " " << frontVel << " " << rearVolts << " " << intake->rearTarget << " " << rearVel << "\n";
-		
 		pros::Task::delay_until(&time, 50);
 	}
 }
@@ -69,7 +68,7 @@ void Intake::intake(bool blocking) {
 			pros::delay(50);
 		}
 		stop();
-		std::cout << "[Intake Intake] Triball intaked at a distance of " << distSnsr.get() << " mm" << std::endl;
+		printDebug("[Intake Intake] Triball intaked at a distance of %f mm\n", distSnsr.get());
 	} else pros::Task intake([&] {
 		this->intake(true);
 	});
@@ -90,7 +89,7 @@ void Intake::outtake(bool openMouth, int delay, bool blocking) {
 			pros::delay(delay);
 			mouth.extend();
 			stop();
-			std::cout << "[Intake Outtake] Triball outtaked at a distance of " << distSnsr.get() << " mm" << std::endl;
+			printDebug("[Intake Outtake] Triball outtaked at a distance of %f mm\n", distSnsr.get());
 		} else pros::Task outtake([&] {
 			this->outtake(true, delay, true);
 		});

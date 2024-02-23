@@ -9,44 +9,48 @@ void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A)
 }
 
 void nearAWPBar() {
-	intake.moveVoltage(12000);
+	intake.moveVoltage(12000); // Ensure preload is in the robot
+	// Move in front of the matchload triball
 	chassis.moveDistance(7_in, 600_rpm, {0.12, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 800);
-	// chassis.turnAbsolute(3_deg, 200_rpm, {0.2, 0, 3}, 2, 3, 5, TurnWheel::BOTH, 500);
 	vertWings.extend();
 	pros::delay(1000);
-	// chassis.moveDistance(-10_in, 300_rpm, {0.3, 0, 10}, 1200, 3_deg, 300_rpm, {0.1, 0, 0.1}, 1200);
+	// Knock out the matchload triball
 	chassis.turnAbsolute(-45_deg, 300_rpm, {0.12, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 1000);
 	vertWings.retract();
 	pros::delay(1000);
+	// Turn back to let the matchload triball roll in front of the robot
 	chassis.turnAbsolute(0_deg, 300_rpm, {0.12, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 1000);
-	// chassis.moveDistance(3_in, 600_rpm, {0.3, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 1200);
+	// Push the matchload zone triball to the elevation bar
 	chassis.moveDistance(-6_in, 600_rpm, {0.3, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 1200);
-	// chassis.turnAbsolute(-20_deg, 600_rpm, {0.035, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 900);
 	chassis.turnAbsolute(-40_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 1000);
 	chassis.moveDistance(-35_in, 600_rpm, {0.12, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1300);
-	// chassis.moveDistance(-18_in, 600_rpm, {0.12, 0, 10}, 1200, -45_deg, 300_rpm, {0.1, 0, 0.1}, 1300);
+	// Move away from the elevation bar
 	chassis.moveDistance(10_in, 600_rpm, {0.12, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 900);
+	// Face the intake towards the elevation bar
 	chassis.turnAbsolute(135_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1200);
 	intake.moveVoltage(-12000);
+	// Touch the elevation bar slowly and accurately
 	chassis.moveDistance(5.5_in, 200_rpm, {0.6, 0, 10}, 1200, 135_deg, 300_rpm, {0.1, 0, 0.1}, 800);
 }
 
 void nearRush() {
+	// Intake one of the middle triball
 	intake.moveVoltage(12000);
 	chassis.moveDistance(42_in, 600_rpm, {0.15, 0, 10}, 1200, 15_deg, 150_rpm, {0.2, 0, 10}, 1500);
+	// Push both middle triballs over the low barrier
 	chassis.turnAbsolute(90_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	rightWing.extend();
 	intake.moveVoltage(-12000);
 	chassis.moveDistance(23_in, 600_rpm, {0.15, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	chassis.moveDistance(-20_in, 600_rpm, {0.15, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	rightWing.retract();
-	// chassis.moveDistance(-10_in, 600_rpm, {0.15, 0, 10}, 1200, 90_deg, 300_rpm, {0.01, 0, 0.1}, 1000);
-	// vertWings.extend();
 
+	// Move to the matchload bar
 	chassis.turnAbsolute(30_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	chassis.moveDistance(-43_in, 600_rpm, {0.15, 0, 10}, 1200, 30_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
 	chassis.turnAbsolute(-40_deg, 400_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 1000);
 	chassis.moveDistance(7_in, 600_rpm, {0.15, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	// Knock out the matchload zone triball
 	vertWings.extend();
 	pros::delay(1000);
 	chassis.moveDistance(-8_in, 300_rpm, {0.15, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
@@ -55,71 +59,101 @@ void nearRush() {
 	pros::delay(500);
 	chassis.moveDistance(-4_in, 600_rpm, {0.2, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 
+	// Push all the triballs under the elevation bar to our offensive zone
 	chassis.turnAbsolute(-90_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 1000);
-	chassis.moveDistance(-27_in, 600_rpm, {0.12, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 1300);
-	chassis.moveDistance(15_in, 600_rpm, {0.12, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 900);
-	chassis.turnAbsolute(90_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1200);
+	chassis.moveDistance(-31_in, 600_rpm, {0.12, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 1300);
+	chassis.moveDistance(5_in, 600_rpm, {0.12, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 900);
+}
+
+void nearDisrupt() {
+	// Keeps track of the beginning time of the autonomous period
+	uint st = pros::millis();
+
+	// Rushes for the middle triball
+	intake.moveVoltage(12000);
+	chassis.moveDistance(42_in, 600_rpm, {0.15, 0, 10}, 1200, 15_deg, 150_rpm, {0.2, 0, 10}, 1500);
+	chassis.turnAbsolute(90_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	// Pushes both middle triball over the barrier
+	rightWing.extend();
 	intake.moveVoltage(-12000);
-	chassis.moveDistance(16_in, 200_rpm, {0.6, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 800);
+	chassis.moveDistance(23_in, 600_rpm, {0.15, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	// Back up and wait in front of the goal
+	chassis.moveDistance(-20_in, 600_rpm, {0.15, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	rightWing.retract();
+	do pros::delay(100);
+	while (pros::millis() - st < 14000);
+
+	// Push any remaining triballs over the barrier
+	leftWing.extend();
+	rightWing.extend();
+	chassis.moveDistance(30_in, 600_rpm, {0.15, 0, 10}, 1200, 90_deg, 300_rpm, {0.1, 0, 0.1}, 2000);
 }
 
 void farAWPBar() {
 	inertial.set_rotation(-140);
+	
+	// Ensure preload is held securely in the intake
 	intake.moveVoltage(12000);
-	// pros::Task extractMatchload([&]() {
-	// 	vertWings.extend();
-	// 	pros::delay(400);
-	// 	vertWings.retract();
-	// });
+	// Knock out the matchload zone triball
 	vertWings.extend();
 	chassis.moveDistance(-10_in, 600_rpm, {0.13, 0, 10}, 1200, -140_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	intake.moveVoltage(0);
+	intake.moveVoltage(-12000);
 	vertWings.retract();
+	// Push the matchload zone and preload triball into the goal
 	chassis.turnAbsolute(-180_deg, 600_rpm, {0.035, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 0);
 	chassis.moveDistance(-15_in, 600_rpm, {0.12, 0, 10}, 1200, -180_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
 	
+	// Back up and line up with the elevation bar
 	chassis.moveDistance(15_in, 600_rpm, {0.14, 0, 10}, 1200, -180_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
 	chassis.turnAbsolute(-140_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	chassis.moveDistance(18_in, 600_rpm, {0.13, 0, 10}, 1200, -140_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	intake.moveVoltage(12000);
 	chassis.turnAbsolute(-100_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	// Drive into the elevation bar
 	chassis.moveDistance(25_in, 600_rpm, {0.15, 0, 10}, 1200, -100_deg, 300_rpm, {0.1, 0, 0.1}, 2000);
 	chassis.moveDistance(5.5_in, 200_rpm, {0.6, 0, 10}, 1200, -100_deg, 300_rpm, {0.1, 0, 0.1}, 800);
 }
 
 void farAWP() {
 	inertial.set_rotation(-90);
+	// Intake triball under the elevation bar
 	intake.moveVoltage(12000);
 	pros::delay(200);
 
+	// Line up to the matchload zone
 	chassis.moveDistance(-31_in, 600_rpm, {0.15, 0, 10}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
 	chassis.turnAbsolute(-140_deg, 400_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 1000);
 	
+	// Knock out the matchload zone triball
 	vertWings.extend();
 	chassis.moveDistance(-10_in, 600_rpm, {0.13, 0, 10}, 1200, -140_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	intake.moveVoltage(0);
 	vertWings.retract();
 	chassis.turnAbsolute(-180_deg, 600_rpm, {0.035, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 0);
 	chassis.turnAbsolute(-160_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 0);
-	// chassis.moveDistance(5_in, 600_rpm, {0.13, 0, 10}, 1200, -160_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	// pros::delay(200);
+	// Push the preload and matchload zone triballs into the goal
 	chassis.moveDistance(-20_in, 600_rpm, {0.2, 0, 10}, 1200, -180_deg, 150_rpm, {0.1, 0, 10}, 1500);
 
 	chassis.moveDistance(11_in, 600_rpm, {0.2, 0, 10}, 1200, -180_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
 	chassis.turnAbsolute(0_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	// Push the elevation zone triball into the goal
+	intake.moveVoltage(-12000);
 	chassis.moveDistance(15_in, 600_rpm, {0.2, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	chassis.moveDistance(-11_in, 600_rpm, {0.2, 0, 10}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	// Intake offensive zone triball
 	chassis.turnAbsolute(-70_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	intake.moveVoltage(12000);
 	chassis.moveDistance(46_in, 600_rpm, {0.14, 0, 10}, 1200, -70_deg, 300_rpm, {0.3, 0, 10}, 3000);
 	chassis.turnAbsolute(65_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	// pros::delay(500);
-	intake.moveVoltage(-11000);
+	// Outtake offensive zone triball in front of goal
+	intake.moveVoltage(-12000);
 	pros::delay(500);
 
 	chassis.turnAbsolute(-20_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	// Intake middle triball
 	intake.moveVoltage(12000);
 	chassis.moveDistance(20_in, 600_rpm, {0.13, 0, 10}, 1200, -20_deg, 300_rpm, {0.1, 0, 10}, 1000);
+	// Push all three triballs into the goal
 	chassis.turnAbsolute(90_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	leftWing.extend();
 	rightWing.extend();
@@ -138,13 +172,15 @@ void farRush() {
 }
 
 void skillsStart() {
-	chassis.moveDistance(-30_in, 600_rpm, {0.15, 0, 10}, 1200, -35_deg, 300_rpm, {0.08, 0, 10}, 1100);
-	chassis.moveDistance(12_in, 600_rpm, {0.15, 0, 10}, 1200, -35_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	chassis.turnAbsolute(63_deg, 600_rpm, {0.05, 0, 3.3}, 2, 1, 8, TurnWheel::BOTH, 2000);
-	chassis.moveDistance(-4_in, 600_rpm, {0.15, 0, 10}, 1200, 63_deg, 300_rpm, {0.2, 0, 10}, 1000);
+	inertial.set_rotation(-145);
+
+	chassis.moveDistance(-30_in, 600_rpm, {0.2, 0, 16}, 1500, -180_deg, 300_rpm, {0.08, 0, 10}, 1000);
+	chassis.moveDistance(16_in, 600_rpm, {0.3, 0, 16}, 1500, -160_deg, 300_rpm, {0.05, 0, 10}, 1000);
+	chassis.turnAbsolute(-75_deg, 600_rpm, {0.0544, 0, 6}, 2, 1.5, 6, TurnWheel::BOTH, 2000);
+	chassis.moveDistance(-2_in, 600_rpm, {0.4, 0, 16}, 1500, -75_deg, 300_rpm, {0.2, 0, 10}, 400);
 
 	vertWings.extend();
-	kicker.move(100);
+	kicker.move(130);
 	// kicker.fireCount(100, 44);
 }
 void skills() {
@@ -185,9 +221,9 @@ void skills() {
 	chassis.moveTank(12000, 12000);
 	int a = 0;
 	while (a < 3) {
-		if (inertial.get_roll() < -5 && a == 0) { a++; std::cout << "Upward: " << inertial.get_roll() << "\n";  }
-		else if (inertial.get_roll() > 2 && a == 1) { a++; std::cout << "Downard: " << inertial.get_roll() << "\n"; }
-		else if (std::abs(inertial.get_roll()) < 20 && a == 2) { a++; std::cout << "Flat: " << inertial.get_roll() << "\n"; }
+		// if (inertial.get_roll() < -5 && a == 0) { a++; std::cout << "Upward: " << inertial.get_roll() << "\n";  }
+		// else if (inertial.get_roll() > 2 && a == 1) { a++; std::cout << "Downard: " << inertial.get_roll() << "\n"; }
+		// else if (std::abs(inertial.get_roll()) < 20 && a == 2) { a++; std::cout << "Flat: " << inertial.get_roll() << "\n"; }
 
 		pros::delay(100);
 	}
@@ -258,109 +294,75 @@ void skills2() {
 	kicker.stop();
 	vertWings.retract();
 
-	chassis.moveDistance(40_in, 600_rpm, {0.15, 0, 10}, 1200, 100_deg, 150_rpm, {0.05, 0, 10}, 1500);
-	leftWing.extend();
+	chassis.moveDistance(32_in, 600_rpm, {0.2, 0, 16}, 1200, -145_deg, 600_rpm, {0.05, 0, 10}, 1000);
 	rightWing.extend();
-	chassis.moveDistance(45_in, 600_rpm, {0.16, 0, 10}, 1200, 140_deg, 400_rpm, {0.2, 0, 10}, 2500);
-	chassis.turnAbsolute(50_deg, 400_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::RIGHT, 1000);
-	chassis.moveDistance(-15_in, 600_rpm, {0.14, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
+	chassis.moveDistance(66_in, 600_rpm, {0.2, 0, 16}, 1200, -90_deg, 600_rpm, {0.05, 0, 10}, 1600);
 	intake.moveVoltage(-12000);
-	chassis.moveDistance(20_in, 600_rpm, {0.14, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	chassis.moveDistance(-40_in, 600_rpm, {0.14, 0, 10}, 1200, 100_deg, 400_rpm, {1, 0, 10}, 1000);
-	leftWing.retract();
-	rightWing.retract();
-	chassis.turnAbsolute(50_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-
-	/*
-	chassis.moveDistance(40_in, 600_rpm, {0.15, 0, 10}, 1200, 100_deg, 150_rpm, {0.05, 0, 10}, 1500);
-	chassis.turnAbsolute(50_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	leftWing.extend();
-	rightWing.extend();
-	intake.moveVoltage(-12000);
-	chassis.moveDistance(18_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	leftWing.retract();
+	chassis.moveDistance(50_in, 600_rpm, {0.5, 0, 16}, 1500, 0_deg, 200_rpm, {0.02, 0, 10}, 1600);
+	chassis.moveDistance(-10_in, 600_rpm, {0.2, 0, 16}, 1200, 0_deg, 300_rpm, {0.01, 0, 10}, 700);
+	chassis.moveDistance(15_in, 600_rpm, {0.2, 0, 16}, 1200, 0_deg, 300_rpm, {0.01, 0, 10}, 1000);
 	rightWing.retract();
 
-	chassis.moveDistance(-16_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	chassis.turnAbsolute(140_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	intake.moveVoltage(12000);
-	chassis.moveDistance(36_in, 600_rpm, {0.15, 0, 10}, 1200, 140_deg, 300_rpm, {0.1, 0, 10}, 2000);
-	chassis.turnAbsolute(50_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	chassis.turnAbsolute(75_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::RIGHT, 1200);
+	rightWing.extend();
+	leftWing.extend();
+	chassis.moveDistance(50_in, 600_rpm, {0.2, 0, 16}, 1200, 0_deg, 150_rpm, {0.01, 0, 10}, 1200);
+	rightWing.retract();
+	// pros::Task closeWing1([&]() {
+	// 	pros::delay(500);
+	// 	rightWing.retract();
+	// });
+	intake.moveVoltage(-12000);
+	chassis.turnAbsolute(-80_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	chassis.moveDistance(60_in, 600_rpm, {0.55, 0, 16}, 1500, -80_deg, 0_rpm, {0.15, 0, 10}, 2000);
+	leftWing.retract();
+	pros::delay(200);
+
+	chassis.moveDistance(-15_in, 600_rpm, {0.2, 0, 16}, 1200, -90_deg, 600_rpm, {0.01, 0, 10}, 1000);
+	chassis.turnAbsolute(-270_deg, 600_rpm, {0.2, 0, 16}, 2, 3, 5, TurnWheel::LEFT, 1000);
+	// chassis.turnAbsolute(0_deg, 600_rpm, {0.05, 0, 4.4}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	// leftWing.extend();
+	vertWings.extend();
+	intake.moveVoltage(-12000);
+	chassis.moveDistance(-50_in, 600_rpm, {0.4, 0, 16}, 1500, -270_deg, 600_rpm, {0.05, 0, 10}, 2000);
+	vertWings.retract();
+	// leftWing.retract();
+	// pros::delay(200);
+
+	chassis.moveDistance(25_in, 600_rpm, {0.2, 0, 16}, 1200, -270_deg, 600_rpm, {0.1, 0, 10}, 1000);
+	chassis.turnAbsolute(-100_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	leftWing.extend();
 	rightWing.extend();
 	intake.moveVoltage(-12000);
-	chassis.moveDistance(20_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 10}, 1000);
+	chassis.moveDistance(50_in, 600_rpm, {0.4, 0, 16}, 1500, -100_deg, 0_rpm, {0.05, 0, 10}, 2000);
 	leftWing.retract();
 	rightWing.retract();
-	chassis.moveDistance(-10_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 400_rpm, {0.1, 0, 10}, 1000);
-*/
-	chassis.moveTank(12000, 12000);
-	int a = 0;
-	while (a < 3) {
-		if (inertial.get_roll() < -5 && a == 0) { a++; std::cout << "Upward: " << inertial.get_roll() << "\n";  }
-		else if (inertial.get_roll() > 2 && a == 1) { a++; std::cout << "Downard: " << inertial.get_roll() << "\n"; }
-		else if (std::abs(inertial.get_roll()) < 15 && a == 2) { a++; std::cout << "Flat: " << inertial.get_roll() << "\n"; }
+	// pros::delay(200);
 
-		pros::delay(100);
-	}
-	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-	chassis.moveTank(0, 0);
-	pros::delay(500);
-	chassis.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
+	chassis.moveDistance(-27_in, 600_rpm, {0.2, 0, 16}, 1200, -90_deg, 600_rpm, {0.05, 0, 10}, 1000);
+	intake.moveVoltage(12000);
+	chassis.turnAbsolute(0_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	leftWing.extend();
+	rightWing.extend();
+	intake.moveVoltage(-12000);
+	// chassis.moveDistance(10_in, 600_rpm, {0.2, 0, 10}, 1200, -360_deg, 600_rpm, {0.05, 0, 10}, 1000);
+	chassis.moveDistance(50_in, 600_rpm, {0.2, 0, 16}, 1200, -90_deg, 500_rpm, {0.03, 0, 10}, 1500);
+	leftWing.retract();
+	rightWing.retract();
+	chassis.moveDistance(-5_in, 600_rpm, {0.2, 0, 16}, 1200, -450_deg, 300_rpm, {0.1, 0, 10}, 1000);
+	chassis.turnAbsolute(0_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);	
+	chassis.moveDistance(25_in, 600_rpm, {0.2, 0, 16}, 1200, 0_deg, 300_rpm, {0.1, 0, 10}, 1000);
+	chassis.turnAbsolute(-90_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	leftWing.extend();
+	chassis.moveDistance(50_in, 600_rpm, {0.5, 0, 16}, 1500, -180_deg, 300_rpm, {0.02, 0, 10}, 1800);
+	chassis.moveDistance(-10_in, 600_rpm, {0.2, 0, 16}, 1200, -180_deg, 600_rpm, {0.02, 0, 10}, 1500);
+	chassis.moveDistance(20_in, 600_rpm, {0.5, 0, 16}, 1200, -190_deg, 300_rpm, {0.1, 0, 10}, 1000);
+	leftWing.retract();
 
-	chassis.moveDistance(30_in, 400_rpm, {0.3, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	chassis.moveDistance(-30_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	// chassis.moveDistance(-10_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	// chassis.moveDistance(3_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 10}, 500);
-	chassis.turnAbsolute(-40_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	chassis.moveDistance(-32_in, 600_rpm, {0.15, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	// chassis.turnAbsolute(10_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, )
-	leftWing.extend();
-	rightWing.extend();
-	chassis.moveDistance(50_in, 600_rpm, {0.15, 0, 10}, 800, 50_deg, 380_rpm, {0.4, 0, 10}, 2100);
-	leftWing.retract();
-	rightWing.retract();
-	pros::delay(300);
-	chassis.moveDistance(-30_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	chassis.turnAbsolute(140_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	chassis.moveDistance(-40_in, 600_rpm, {0.16, 0, 10}, 1200, 140_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
-	leftWing.extend();
-	rightWing.extend();
-	chassis.moveDistance(50_in, 600_rpm, {0.15, 0, 10}, 800, 50_deg, 350_rpm, {0.4, 0, 10}, 2100);
-	leftWing.retract();
-	rightWing.retract();
-	pros::delay(300);
-
-	chassis.moveDistance(-30_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 200_rpm, {0.4, 0, 10}, 1500);
-	chassis.turnAbsolute(140_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	chassis.moveDistance(20_in, 600_rpm, {0.15, 0, 10}, 1200, 140_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	chassis.turnAbsolute(30_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	leftWing.extend();
-	rightWing.extend();
-	chassis.moveDistance(40_in, 600_rpm, {0.15, 0, 10}, 1200, 30_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
-	chassis.moveDistance(-10_in, 600_rpm, {0.15, 0, 10}, 1200, 30_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-
-	/*
-	chassis.moveDistance(-10_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	chassis.moveDistance(3_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 10}, 500);
-	leftWing.extend();
-	chassis.turnAbsolute(-40_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	// chassis.moveDistance(-15_in, 600_rpm, {0.15, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	rightWing.extend();
-	chassis.moveDistance(50_in, 600_rpm, {0.15, 0, 10}, 800, 50_deg, 380_rpm, {0.4, 0, 10}, 2100);
-	leftWing.retract();
-	rightWing.retract();
-	pros::delay(300);
-	chassis.moveDistance(-30_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	
-	chassis.turnAbsolute(-40_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	// chassis.moveDistance(-35_in, 600_rpm, {0.15, 0, 10}, 1200, 140_deg, 300_rpm, {0.1, 0, 0.1}, 2000);
-	leftWing.extend();
-	rightWing.extend();
-	chassis.moveDistance(50_in, 600_rpm, {0.15, 0, 10}, 800, 50_deg, 380_rpm, {0.4, 0, 10}, 2100);
-	leftWing.retract();
-	rightWing.retract();
-	pros::delay(300);
-	chassis.moveDistance(-30_in, 600_rpm, {0.15, 0, 10}, 1200, 50_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	*/
+	chassis.moveDistance(-50_in, 600_rpm, {0.2, 0, 16}, 1200, -90_deg, 600_rpm, {0.02, 0, 10}, 1200);
+	chassis.turnAbsolute(-270_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	horiHang.extend();
+	chassis.moveDistance(33_in, 600_rpm, {0.2, 0, 16}, 1200, -270_deg, 300_rpm, {0.02, 0, 10}, 1500);
+	horiHang.retract();
 }

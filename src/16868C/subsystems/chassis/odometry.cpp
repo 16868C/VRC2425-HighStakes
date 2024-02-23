@@ -1,11 +1,14 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
+#include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"
 #include <limits>
 
 using namespace lib16868C;
 using namespace okapi::literals;
 
-/** Distance Sensor **/
+/* -------------------------------------------------------------------------- */
+/*                               Distance Sensor                              */
+/* -------------------------------------------------------------------------- */
 DistanceSensor::DistanceSensor() {}
 DistanceSensor::DistanceSensor(okapi::DistanceSensor* snsr, okapi::QLength offset) : snsr(snsr) {
 	this->offset = offset.convert(okapi::inch);
@@ -20,7 +23,11 @@ double DistanceSensor::getConfidence() const {
 	return 0;
 }
 
-/** Odometry **/
+/* -------------------------------------------------------------------------- */
+/*                                  Odometry                                  */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------- Main Loop ------------------------------- */
 void Odometry::odomManager(void* param) {
 	std::array<double, 4> prev;
 	prev.fill(0);
@@ -59,6 +66,7 @@ void Odometry::odomManager(void* param) {
 	}
 }
 
+/* ------------------------------ Constructors ------------------------------ */
 Odometry::Odometry() {}
 Odometry::Odometry(std::array<TrackingWheel, 3> trackingWheels, std::array<DistanceSensor, 4> distanceSensors, Inertial* inertial) : inertial(inertial) {
 	leftEnc = trackingWheels[0];
@@ -92,6 +100,7 @@ Odometry::Odometry::Odometry(Odometry& odom) {
 	inertial = odom.inertial;
 }
 
+/* --------------------------- Initialize Methods --------------------------- */
 void Odometry::init() {
 	init({ 0_in, 0_in, 0_rad, 0 });
 }
@@ -108,6 +117,7 @@ void Odometry::init(Pose pose) {
 	odomTask = pros::c::task_create(odomManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odometry");
 }
 
+/* -------------------------- Pose Related Methods -------------------------- */
 Pose Odometry::getPose() {
 	if (!poseMutex.take(50)) {
 		std::cerr << "[Odometry::getPose] Mutex timeout - unable to read current pose" << std::endl;
@@ -175,7 +185,7 @@ void Odometry::update(Pose pose) {
 	poseMutex.give();
 }
 
-std::array<TrackingWheel, 3> Odometry::getEncoders() const {
+/* --------------------------- Getters and Setter --------------------------- */
 std::array<TrackingWheel*, 3> Odometry::getEncoders() const {
 	return trackingWheels;
 }
@@ -191,7 +201,7 @@ void Odometry::resetSensors() {
 	inertial->reset();
 }
 
-void Odometry::step(std::vector<double> deltas) {
+/* ---------------------------- Main calculations --------------------------- */
 void Odometry::step(std::array<double, 4> deltas) {
 	for (double d : deltas) {
 		if (std::abs(d) > MAX_DELTA) {
@@ -229,7 +239,7 @@ void Odometry::step(std::array<double, 4> deltas) {
 	update({globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()});
 }
 
-double& Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
+/* ----------------------------- Utility Methods ---------------------------- */
 double* Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
 	if (std::abs(a - 0) <= 15 || std::abs(a - M_PI) <= 15) {
 		switch(i) {

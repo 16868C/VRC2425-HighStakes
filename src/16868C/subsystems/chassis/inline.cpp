@@ -1,5 +1,6 @@
 #include "inline.hpp"
 #include "16868C/subsystems/chassis/motionProfiling.hpp"
+#include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
 
@@ -71,7 +72,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDG
 	while (dist.abs().convert(okapi::inch) - currDist > 0) {
 		t = pros::millis();
 		if (t - st > timeout && timeout > 0) {
-			std::cout << "[Inline Move Distance] Timeout: " << t - st << std::endl;
+			printDebug("[Inline Move Distance] Timeout: %d ms\n", t - st);
 			break;
 		}
 
@@ -94,7 +95,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDG
 	moveTank(0, 0);
 	double avgTicks = std::abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2.0);
 	currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
-	std::cout << "[Inline Move Distance] Finished with distance of " << currDist << "\" with a heading of " << inertial.get_rotation(AngleUnit::DEG) << " deg, taking " << pros::millis() - st << "ms" << std::endl;
+	printDebug("[Inline Move Distance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial.get_rotation(AngleUnit::DEG), pros::millis() - st);
 }
 
 void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains gains, double accelRate, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
@@ -107,7 +108,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	while (inMargin < numInMargin) {
 		t = pros::millis();
 		if (t - st > timeout && timeout > 0) {
-			std::cout << "[Inline Turn Absolute] Timeout: " << t - st << std::endl;
+			printDebug("[Inline Turn Absolute] Timeout: %d\n", t - st);
 			break;
 		}
 
@@ -141,7 +142,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	moveTank(0, 0);
-	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial.get_rotation(AngleUnit::DEG) << " deg, taking " << pros::millis() - st << "ms" << std::endl;
+	printDebug("[Inline Turn Absolute] Finished with heading of %f deg, taking %d ms\n", inertial.get_rotation(AngleUnit::DEG), pros::millis() - st);
 }
 
 void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, TurnDirection turnDir, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
@@ -199,7 +200,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDG
 
 void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward, bool stopMtrs, int timeout) {
 	if (!odom) {
-		// std::cerr << "[Inline::moveToPoint] No odometry class was provided, unable to use moveToPoint" << std::endl;
+		printError("[Inline Move to Point] No Odometry class was provided, unable to call moveToPoint\n");
 		return;
 	}
 

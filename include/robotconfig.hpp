@@ -19,23 +19,23 @@ using namespace okapi::literals;
 extern okapi::Controller master;
 
 // Ports
-const int LEFT_FRONT = -13;
-const int LEFT_REAR = -12;
-const int LEFT_TOP = 14;
-const int RIGHT_FRONT = 19;
-const int RIGHT_REAR = 20;
-const int RIGHT_TOP = -18;
-const int KICKER = 2;
-const int INTAKE = 7;
-const int INERTIAL = 17;
+const int LEFT_FRONT = -15;
+const int LEFT_MIDDLE = -14;
+const int LEFT_REAR = -13;
+const int RIGHT_FRONT = 16;
+const int RIGHT_MIDDLE = 17;
+const int RIGHT_REAR = 18;
+const int KICKER = -1;
+const int INTAKE = 19;
+const int INERTIAL = 20;
 const int MIDDLE_ROT = 6;
 const int BACK_DIST = 15;
 const int LEFT_DIST = 1;
 const int RIGHT_DIST = 5;
-const char HORI_HANG = 'A';
-const char LEFT_WING = 'C';
-const char RIGHT_WING = 'B';
-const char VERT_WINGS = 'D';
+const char HORI_HANG = 'E';
+const char LEFT_WING = 'F';
+const char RIGHT_WING = 'G';
+const char VERT_WINGS = 'H';
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;
@@ -43,11 +43,11 @@ const double GEAR_RATIO = 3/4.0;
 
 // Motors
 extern lib16868C::Motor leftFront;
+extern lib16868C::Motor leftMiddle;
 extern lib16868C::Motor leftRear;
-extern lib16868C::Motor leftTop;
 extern lib16868C::Motor rightFront;
+extern lib16868C::Motor rightMiddle;
 extern lib16868C::Motor rightRear;
-extern lib16868C::Motor rightTop;
 extern lib16868C::MotorGroup leftDrive;
 extern lib16868C::MotorGroup rightDrive;
 extern lib16868C::Motor intake;
