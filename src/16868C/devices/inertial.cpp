@@ -23,7 +23,7 @@ void Inertial::calibrate() {
 	pros::delay(500);
 	double h2 = get_rotation(AngleUnit::DEG);
 	if (std::abs(h1 - h2) > DRIFT_THRESHOLD) {
-		printError("[Inertial] Inertial Drift Detected: %.4f deg difference in 500 ms\n", std::abs(h1 - h2));
+		printError("[Inertial] Inertial Drift Detected: %f deg difference in 500 ms\n", std::abs(h1 - h2));
 		pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 500ms", std::abs(h1 - h2));
 	}
 	printDebug("[Inertial] Calibration time: %d ms\n", pros::millis() - st);

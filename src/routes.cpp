@@ -90,7 +90,7 @@ void nearDisrupt() {
 }
 
 void farAWPBar() {
-	inertial.set_rotation(-140);
+	inertial.set_rotation(-140_deg);
 	
 	// Ensure preload is held securely in the intake
 	intake.moveVoltage(12000);
@@ -115,7 +115,7 @@ void farAWPBar() {
 }
 
 void farAWP() {
-	inertial.set_rotation(-90);
+	inertial.set_rotation(-90_deg);
 	// Intake triball under the elevation bar
 	intake.moveVoltage(12000);
 	pros::delay(200);
@@ -172,7 +172,7 @@ void farRush() {
 }
 
 void skillsStart() {
-	inertial.set_rotation(-145);
+	inertial.set_rotation(-145_deg);
 
 	chassis.moveDistance(-30_in, 600_rpm, {0.2, 0, 16}, 1500, -180_deg, 300_rpm, {0.08, 0, 10}, 1000);
 	chassis.moveDistance(16_in, 600_rpm, {0.3, 0, 16}, 1500, -160_deg, 300_rpm, {0.05, 0, 10}, 1000);
