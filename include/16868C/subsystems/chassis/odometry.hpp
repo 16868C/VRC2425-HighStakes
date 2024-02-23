@@ -45,14 +45,14 @@ class Odometry {
 		void update(bool front, bool right, bool rear, bool left);
 		void update(Pose pose);
 
-		std::array<TrackingWheel, 3> getEncoders() const;
-		std::array<DistanceSensor, 4> getDistanceSensors() const;
+		std::array<TrackingWheel*, 3> getEncoders() const;
+		std::array<DistanceSensor*, 4> getDistanceSensors() const;
 		Inertial* getInertial() const;
 		
 		void resetSensors();
 
 	private:
-		double& getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose1, std::array<int, 4> confs);
+		double* getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose1, std::array<int, 4> confs);
 
 		Pose pose { 0_in, 0_in, 0_deg, 0 };
 		pros::Mutex poseMutex;
@@ -61,13 +61,13 @@ class Odometry {
 		TrackingWheel leftEnc;
 		TrackingWheel rightEnc;
 		TrackingWheel middleEnc;
-		std::array<TrackingWheel, 3> trackingWheels = { leftEnc, rightEnc, middleEnc };
+		std::array<TrackingWheel*, 3> trackingWheels = { &leftEnc, &rightEnc, &middleEnc };
 
 		DistanceSensor frontDist;
 		DistanceSensor rightDist;
 		DistanceSensor rearDist;
 		DistanceSensor leftDist;
-		std::array<DistanceSensor, 4> distanceSensors = { frontDist, rightDist, rearDist, leftDist };
+		std::array<DistanceSensor*, 4> distanceSensors = { &frontDist, &rightDist, &rearDist, &leftDist };
 
 		Inertial* inertial { nullptr };
 
@@ -79,9 +79,9 @@ class Odometry {
 		const int MIN_CONFIDENCE = 9;
 
 		Point p_00 { 0, 0 };
-		Point p_10 { fieldWidth, 0 };
-		Point p_01 { 0, fieldWidth };
-		Point p_11 { fieldWidth, fieldWidth };
+		Point p_10 { FIELD_WIDTH, 0 };
+		Point p_01 { 0, FIELD_WIDTH };
+		Point p_11 { FIELD_WIDTH, FIELD_WIDTH };
 		LineSegment north {p_10, p_11};
 		LineSegment south {p_00, p_01};
 		LineSegment east {p_00, p_10};
@@ -94,6 +94,6 @@ class Odometry {
 			std::make_pair(M_PI_2 * 3, [](int i) -> bool { return i == 0 || i == 1; })
 		};
 
-		void step(std::vector<double> deltas);
+		void step(std::array<double, 4> deltas);
 };
 } // namespace lib16868C

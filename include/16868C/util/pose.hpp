@@ -6,12 +6,6 @@
 namespace lib16868C {
 class Pose {
 	public:
-		Point& pos = _pos;
-		double& x = _pos.x;
-		double& y = _pos.y;
-		double& theta = _theta;
-		uint& time = _time;
-
 		Pose();
 		Pose(okapi::QLength x, okapi::QLength y);
 		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, uint time);
@@ -21,6 +15,18 @@ class Pose {
 		okapi::QLength distTo(Pose p);
 		okapi::QAngle angleTo(Point p);
 		okapi::QAngle angleTo(Pose p);
+
+		const Point* pos();
+		const double* x();
+		const double* y();
+		const double* theta();
+		const uint* time();
+
+		void setPos(Point pos);
+		void setX(double x);
+		void setY(double y);
+		void setTheta(double theta);
+		void setTime(double time);
 
 		std::string toStr();
 

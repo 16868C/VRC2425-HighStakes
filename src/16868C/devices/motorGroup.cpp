@@ -45,7 +45,9 @@ double MotorGroup::getVelocity() {
 	return getActualVelocity();
 }
 double MotorGroup::getTemperature() {
-	return mtrs[0].getTemperature();
+	double mx = 0;
+	for (auto& m : mtrs) mx = std::max(mx, m.getTemperature());
+	return mx;
 }
 
 void MotorGroup::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {
