@@ -1,7 +1,5 @@
 #pragma once
 
-#include "okapi/api.hpp"
-#include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/devices/inertial.hpp"
 #include "16868C/devices/motor.hpp"
 #include "16868C/devices/motorGroup.hpp"
@@ -9,8 +7,6 @@
 #include "16868C/devices/rotation.hpp"
 #include "16868C/subsystems/chassis/inline.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
-#include "16868C/subsystems/catapult.hpp"
-#include "16868C/subsystems/intake.hpp"
 #include "16868C/subsystems/kicker.hpp"
 
 using namespace okapi::literals;

@@ -1,5 +1,4 @@
 #pragma once
-#include "api.h"
 #include "16868C/devices/motor.hpp"
 
 namespace lib16868C {

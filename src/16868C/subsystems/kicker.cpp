@@ -23,6 +23,8 @@ void Kicker::kickerControl(void* param) {
 			case KickerCmd::STOP:
 				kicker->tgtVel = 0;
 				break;
+			default:
+				break;
 		}
 
 		if (kicker->cmd != KickerCmd::HOLD)

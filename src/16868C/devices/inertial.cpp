@@ -1,7 +1,6 @@
 #include "inertial.hpp"
 #include "16868C/util/logger.hpp"
 #include "16868C/util/util.hpp"
-#include <limits>
 
 using namespace lib16868C;
 
