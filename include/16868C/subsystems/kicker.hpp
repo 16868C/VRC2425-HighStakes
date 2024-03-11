@@ -6,6 +6,7 @@ namespace lib16868C {
 enum class KickerCmd {
 	MOVE,
 	FIRE,
+	HOLD,
 	STOP
 };
 
@@ -15,6 +16,7 @@ class Kicker {
 
 	void move(double vel);
 	void fireCount(double vel, int count);
+	void holdAt(double pos, double vel);
 	void stop();
 
 	int getCount() const;

@@ -25,7 +25,8 @@ void Kicker::kickerControl(void* param) {
 				break;
 		}
 
-		kicker->mtr.moveVelocity(kicker->tgtVel);
+		if (kicker->cmd != KickerCmd::HOLD)
+			kicker->mtr.moveVelocity(kicker->tgtVel);
 
 		pros::Task::delay_until(&time, 20);
 	}
@@ -38,15 +39,23 @@ Kicker::Kicker(Motor& mtr) : mtr(mtr) {
 
 void Kicker::move(double vel) {
 	tgtVel = vel;
+	mtr.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	cmd = KickerCmd::MOVE;
 }
 void Kicker::fireCount(double vel, int count) {
+	mtr.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	tgtVel = vel;
 	fireCnt = count;
 	cmd = KickerCmd::FIRE;
 }
+void Kicker::holdAt(double pos, double vel) {
+	mtr.setBrakeMode(okapi::AbstractMotor::brakeMode::hold);
+	mtr.moveRelative(pos, vel);
+	cmd = KickerCmd::HOLD;
+}
 void Kicker::stop() {
 	tgtVel = 0;
+	mtr.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	cmd = KickerCmd::STOP;
 }
 

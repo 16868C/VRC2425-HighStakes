@@ -5,6 +5,7 @@
 
 using namespace lib16868C;
 
+/* ------------------------------ Constructors ------------------------------ */
 PIDController::PIDController(PIDGains gains, double outputMax, double outputMin, double maxIntegral, double integralRange, bool resetIntegralOnCross, std::function<bool()> settleCond) {
 	this->gains = gains;
 	this->outputMax = outputMax;
@@ -28,6 +29,7 @@ PIDController::PIDController(const PIDController& pidController) {
 	this->prevTime = pidController.prevTime;
 }
 
+/* ----------------------------- Setter Methods ----------------------------- */
 void PIDController::setGains(PIDGains gains) {
 	this->gains = gains;
 }
@@ -45,6 +47,7 @@ void PIDController::setSettleCondition(std::function<bool()> settleCond) {
 	this->settleCond = settleCond;
 }
 
+/* -------------------------- Main Calculate Method ------------------------- */
 double PIDController::calculate(double error) {
 	uint32_t currTime = pros::millis();
 	double dT = currTime - prevTime;

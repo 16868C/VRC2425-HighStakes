@@ -12,6 +12,7 @@ void Inertial::calibrate() {
 	bool resetSuccess = true;
 	do {
 		if (!resetSuccess) {
+			// Inertial failed to reset
 			printError("[Inertial] Inertial Reset Failed\n");
 			pros::lcd::print(0, "Inertial Reset Failed");
 		}
@@ -23,6 +24,7 @@ void Inertial::calibrate() {
 	pros::delay(500);
 	double h2 = get_rotation(AngleUnit::DEG);
 	if (std::abs(h1 - h2) > DRIFT_THRESHOLD) {
+		// Inertial reading has changed too much in 500 ms
 		printError("[Inertial] Inertial Drift Detected: %f deg difference in 500 ms\n", std::abs(h1 - h2));
 		pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 500ms", std::abs(h1 - h2));
 	}
@@ -32,7 +34,7 @@ void Inertial::calibrate() {
 double Inertial::get_rotation(AngleUnit unit) const {
 double a = pros::Imu::get_rotation();
 	if (std::isinf(a)) {
-		printError("[Inertial] Rotation of Infinity\n");
+		printError("[Inertial] Reading of Infinity\n");
 		while (std::isinf(a)) {
       a = pros::Imu::get_rotation();
       pros::delay(20);

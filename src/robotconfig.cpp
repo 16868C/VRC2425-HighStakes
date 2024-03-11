@@ -16,7 +16,7 @@ lib16868C::Motor intake(INTAKE, okapi::AbstractMotor::gearset::blue);
 lib16868C::Motor kickerMtr(KICKER, okapi::AbstractMotor::gearset::green);
 
 // Pneumatics
-lib16868C::Pneumatic horiHang(HORI_HANG, true);
+lib16868C::Pneumatic horiHang(HORI_HANG, false);
 lib16868C::Pneumatic leftWing(LEFT_WING, false);
 lib16868C::Pneumatic rightWing(RIGHT_WING);
 lib16868C::Pneumatic vertWings(VERT_WINGS);
