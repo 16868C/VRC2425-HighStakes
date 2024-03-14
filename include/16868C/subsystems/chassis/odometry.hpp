@@ -1,17 +1,9 @@
 #pragma once
-#include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/devices/inertial.hpp"
-#include "16868C/devices/rotation.hpp"
-#include "16868C/devices/opticalEncoder.hpp"
 #include "16868C/devices/trackingWheel.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/pose.hpp"
-#include "16868C/util/util.hpp"
-#include "api.h"
 #include <array>
-#include <functional>
-#include <memory>
-#include <utility>
 
 using namespace okapi::literals;
 
@@ -52,8 +44,6 @@ class Odometry {
 		void resetSensors();
 
 	private:
-		double* getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose1, std::array<int, 4> confs);
-
 		Pose pose { 0_in, 0_in, 0_deg, 0 };
 		pros::Mutex poseMutex;
 		Pose prevPose { 0_in, 0_in, 0_deg, 0 };
@@ -67,7 +57,7 @@ class Odometry {
 		DistanceSensor rightDist;
 		DistanceSensor rearDist;
 		DistanceSensor leftDist;
-		std::array<DistanceSensor*, 4> distanceSensors = { &frontDist, &rightDist, &rearDist, &leftDist };
+		std::array<DistanceSensor*, 4> distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
 
 		Inertial* inertial { nullptr };
 
@@ -86,13 +76,7 @@ class Odometry {
 		LineSegment south {p_00, p_01};
 		LineSegment east {p_00, p_10};
 		LineSegment west {p_01, p_11};
-		std::map<double, LineSegment> walls {{0.0, north}, {M_PI_2, east}, {M_PI, south}, {M_PI_2 * 3, west}};
-		std::map<double, std::function<bool(int)>> oppWall {
-			std::make_pair(0.0, [](int i) -> bool { return i == 0 || i == 3; }),
-			std::make_pair(M_PI_2, [](int i) -> bool { return i == 2 || i == 3; }),
-			std::make_pair(M_PI, [](int i) -> bool { return i == 2 || i == 1; }),
-			std::make_pair(M_PI_2 * 3, [](int i) -> bool { return i == 0 || i == 1; })
-		};
+		std::map<double, LineSegment> walls {{0.0, east}, {M_PI_2, north}, {M_PI, west}, {M_PI_2 * 3, south}};
 
 		void step(std::array<double, 4> deltas);
 };

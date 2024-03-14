@@ -1,5 +1,7 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/util/math.hpp"
+#include "16868C/util/util.hpp"
+#include <iostream>
 
 using namespace lib16868C;
 using namespace okapi::literals;
@@ -131,48 +133,53 @@ Pose Odometry::getState() {
 	return getPose();
 }
 
-void Odometry::update(bool front, bool right, bool back, bool left) {
-	std::array<Pose, 5> newPose;
-
-	Pose curPose = getPose();
+void Odometry::update(bool front, bool right, bool rear, bool left) {
+	std::array<bool, 4> snsrUse = {front, right, rear, left};
 
 	double theta = ReduceAngle::radPi2(inertial->get_rotation(AngleUnit::RAD));
-	if (std::abs(theta) > M_PI / 12.0 && std::abs(theta) < M_PI * 5 / 12.0) return; // Not perpendicular to wall
+	if (std::abs(theta) > M_PI / 12.0 && std::abs(theta) < M_PI * 5 / 12.0) { // Not perpendicular to wall
+
+	}
 	theta = ReduceAngle::rad2Pi(inertial->get_rotation(AngleUnit::RAD));
-	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5; // Avoid tan(90) and tan(270)
+	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5; // Avoid tan(90) and tan(270) (Divide by zero error)
+	
+	double dir = round(theta / M_PI_2) * M_PI_2;
+	if (dir == 2 * M_PI) dir = 0;
 
-	std::array<double, 4> distReads;
-	for (int i = 0; i < 4; i++) distReads[i] = distanceSensors[i]->getDist();
-	std::array<int, 4> distConf;
-	for (int i = 0; i < 4; i++) distConf[i] = distanceSensors[i]->getConfidence();
-	std::array<bool, 4> useSnsr {front, right, back, left};
+	// Determine which distance sensor corresponds to which direction
+	std::array<DistanceSensor*, 4> dirDists;
+	double j = dir / M_PI_2;
+	for (int i = 0; i < 4; i++, j += M_PI_2) {
+		if (j == 2 * M_PI) j = 0;
 
-	for (int i = 0; i < 4; i++) {
-		if (std::isnan(distReads[i]) || !useSnsr[i]) continue; // Not using the sensor
-		if (distReads[i] > FIELD_WIDTH || distReads[i] < 0) continue; // Read error
-		if (distConf[i] < MIN_CONFIDENCE) continue; // Confidence too low
+		double snsrDir = ReduceAngle::rad2Pi(theta + j * M_PI_2);
+		if (snsrDir == 2 * M_PI) snsrDir = 0;
+		Line dist(tan(snsrDir), *getPose().pos());
 
-		double distTheta = theta + i * M_PI_2;
-		Line dist(std::tan(distTheta), *curPose.pos());
-		double distToWall = distReads[i] + distanceSensors[i]->offset, newPos = distToWall;
-		for (double a = 0; a <= 2 * M_PI; a += M_PI_2) {
-			if (a == 0 && std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) && std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0)) continue; // Not within 15 deg of an axis
-			else if (a != 0 && (std::abs(distTheta) < ReduceAngle::rad2Pi(a - M_PI / 12.0) || std::abs(distTheta) > ReduceAngle::rad2Pi(a + M_PI / 12.0))) continue; // Not within 15 deg of an axis
-
-			if (walls[a].isInsideSegment(walls[a].getIntersection(dist))) { // Distance sensor is reading distance to correct wall
-				distToWall *= std::abs(std::sin(distTheta + a + M_PI_2));
-				newPos = distToWall;
-				
-				*getDistUpdateCoord(distTheta, i, newPose, distConf) = newPos;
-			}
+		// Do not use sensor reading (does not actually read the distance to the correct wall)
+		if (walls[snsrDir].isInsideSegment(walls[snsrDir].getIntersection(dist))) {
+			std::cerr << "[Odometry::update] Incorrect wall reading - Did not use the distance sensor in the direction of " << dir << "\n";
+			dirDists[i] = nullptr;
+			continue;
 		}
+		if (!snsrUse[j])
+			dirDists[i] = nullptr;
+		else 
+			dirDists[i] = distanceSensors[j];
 	}
 
-	newPose[0].setX(*newPose[3].x() > *newPose[4].x() ? *newPose[1].x() : *newPose[2].x());
-	newPose[0].setY(*newPose[3].y() > *newPose[4].y() ? *newPose[1].y() : *newPose[2].y());
-	newPose[0].setTheta(inertial->get_rotation(AngleUnit::RAD));
-	if (std::isnan(*newPose[0].x()) || std::isnan(*newPose[0].y())) return;
-	update(newPose[0]);
+	// Calculate the robot's position from each side of the robot
+	std::pair<double, double> x1, x2, y1, y2;
+	if (dirDists[0]) x1 = {dirDists[0]->getDist() * std::abs(std::cos(theta)), dirDists[0]->getConfidence()};
+	if (dirDists[2]) x2 = {dirDists[2]->getDist() * std::abs(std::cos(theta)), dirDists[2]->getConfidence()};
+	if (dirDists[1]) y1 = {dirDists[1]->getDist() * std::abs(std::sin(theta)), dirDists[1]->getConfidence()};
+	if (dirDists[3]) y2 = {dirDists[3]->getDist() * std::abs(std::sin(theta)), dirDists[3]->getConfidence()};
+
+	// Use the most accurate readings
+	Pose newPose(x1.first * okapi::millimeter, y1.first * okapi::millimeter, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
+	if (x2.second > x1.second) newPose.setX(x2.first);
+	if (y2.second > y1.second) newPose.setY(y2.first);
+	update(newPose);
 }
 void Odometry::update(Pose pose) {
 	if (!poseMutex.take(50)) {
@@ -235,32 +242,4 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double globalY = *pose.y() + globalDeltaY;
 	double globalTheta = inertial->get_rotation(AngleUnit::RAD);
 	update({globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()});
-}
-
-/* ----------------------------- Utility Methods ---------------------------- */
-double* Odometry::getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose, std::array<int, 4> confs) {
-	if (std::abs(a - 0) <= 15 || std::abs(a - M_PI) <= 15) {
-		switch(i) {
-			case 0:
-			case 2:
-				newPose[0.5 * i + 3].setX(confs[i]);
-				return (double*) newPose[0.5 * i + 1].x();
-			case 1:
-			case 3:
-				newPose[0.5 * i + 2.5].setY(confs[i]);
-				return (double*) newPose[0.5 * i + 0.5].y();
-		}
-	} else {
-		switch(i) {
-			case 0:
-			case 2:
-				newPose[0.5 * i + 3].setY(confs[i]);
-				return (double*) newPose[0.5 * i + 1].y();
-			case 1:
-			case 3:
-				newPose[0.5 * i + 2.5].setX(confs[i]);
-				return (double*) newPose[0.5 * i + 0.5].x();
-		}
-	}
-	return (double*) newPose[0].x();
 }
