@@ -15,60 +15,48 @@ using namespace okapi::literals;
 extern okapi::Controller master;
 
 // Ports
-const int LEFT_FRONT = -15;
-const int LEFT_MIDDLE = -14;
-const int LEFT_REAR = -13;
-const int RIGHT_FRONT = 16;
-const int RIGHT_MIDDLE = 17;
-const int RIGHT_REAR = 18;
-const int KICKER = -1;
-const int INTAKE = 10;
-const int INERTIAL = 20;
-const int MIDDLE_ROT = 6;
-const int BACK_DIST = 15;
-const int LEFT_DIST = 1;
-const int RIGHT_DIST = 5;
-const char HORI_HANG = 'E';
-const char LEFT_WING = 'F';
-const char RIGHT_WING = 'G';
-const char VERT_WINGS = 'H';
+const int LEFT_FRONT = 11;
+const int LEFT_WEAK = 12;
+const int LEFT_MIDDLE = 13;
+const int LEFT_REAR = -14;
+const int RIGHT_FRONT = -20;
+const int RIGHT_WEAK = -18;
+const int RIGHT_MIDDLE = -17;
+const int RIGHT_REAR = 16;
+const int INTAKE = 1;
+const int INERTIAL = 10;
+const char LEFT_WING = 'A';
+const char RIGHT_WING = 'B';
+const char INTAKE_RAISER = 'C';
 
 // Robot Constants
-const okapi::QLength WHEEL_DIAM = 3.25_in;
-const double GEAR_RATIO = 3/4.0;
+const okapi::QLength WHEEL_DIAM = 2.75_in;
+const double GEAR_RATIO = 3/3.0;
 
 // Motors
 extern lib16868C::Motor leftFront;
+extern lib16868C::Motor leftWeak;
 extern lib16868C::Motor leftMiddle;
 extern lib16868C::Motor leftRear;
 extern lib16868C::Motor rightFront;
+extern lib16868C::Motor rightWeak;
 extern lib16868C::Motor rightMiddle;
 extern lib16868C::Motor rightRear;
 extern lib16868C::MotorGroup leftDrive;
 extern lib16868C::MotorGroup rightDrive;
 extern lib16868C::Motor intake;
-extern lib16868C::Motor kickerMtr;
 
 // Pneumatics
-extern lib16868C::Pneumatic horiHang;
+// extern lib16868C::Pneumatic horiHang;
 extern lib16868C::Pneumatic leftWing;
 extern lib16868C::Pneumatic rightWing;
-extern lib16868C::Pneumatic vertWings;
+extern lib16868C::Pneumatic intakeRaiser;
+// extern lib16868C::Pneumatic winchPTO;
+// extern lib16868C::Pneumatic vertWings;
 
 // Sensors
 extern lib16868C::Inertial inertial;
-extern lib16868C::Rotation middleRot;
-extern lib16868C::TrackingWheel leftEnc;
-extern lib16868C::TrackingWheel rightEnc;
-extern lib16868C::TrackingWheel middleEnc;
-extern okapi::DistanceSensor rightDistance;
-extern okapi::DistanceSensor backDistance;
-extern okapi::DistanceSensor leftDistance;
-extern lib16868C::DistanceSensor rightDist;
-extern lib16868C::DistanceSensor backDist;
-extern lib16868C::DistanceSensor leftDist;
 
 // Subsystems
-extern lib16868C::Odometry odometry;
+// extern lib16868C::Odometry odometry;
 extern lib16868C::Inline chassis;
-extern lib16868C::Kicker kicker;

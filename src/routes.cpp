@@ -3,7 +3,7 @@
 #include "16868C/util/logger.hpp"
 
 using namespace lib16868C;
-
+/*
 void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A) {
 	while (!master.getDigital(btn)) pros::delay(10);
 }
@@ -356,4 +356,4 @@ void skills2() {
 	chassis.turnAbsolute(-270_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
 	chassis.moveDistance(50_in, 600_rpm, {0.2, 0, 16}, 1200, -270_deg, 600_rpm, {0.01, 0, 10}, 3000);
 	horiHang.retract();
-}
+}*/
