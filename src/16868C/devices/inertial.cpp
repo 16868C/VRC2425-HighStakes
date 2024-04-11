@@ -1,4 +1,5 @@
 #include "inertial.hpp"
+#include "pros/llemu.hpp"
 #include "16868C/util/logger.hpp"
 #include "16868C/util/util.hpp"
 

@@ -1,7 +1,5 @@
 #pragma once
-#include "api.h"
-#include "okapi/api.hpp"
-#include "16868C/controllers/pidController.hpp"
+#include "okapi/impl/device/motor/motorGroup.hpp"
 #include "16868C/devices/rotation.hpp"
 
 namespace lib16868C {

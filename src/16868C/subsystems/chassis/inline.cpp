@@ -1,4 +1,5 @@
 #include "inline.hpp"
+#include "okapi/api/units/QAngularSpeed.hpp"
 #include "16868C/subsystems/chassis/motionProfiling.hpp"
 #include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"

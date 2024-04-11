@@ -1,5 +1,6 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/util/math.hpp"
+#include "16868C/util/util.hpp"
 
 using namespace lib16868C;
 using namespace okapi::literals;

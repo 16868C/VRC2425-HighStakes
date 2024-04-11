@@ -1,4 +1,6 @@
 #include "16868C/subsystems/chassis/motionProfiling.hpp"
+#include "16868C/util/util.hpp"
+#include <cmath>
 
 using namespace lib16868C;
 
@@ -51,7 +53,7 @@ MotionProfile MotionProfiling::generateTrapezoidal(double dist, MotionLimit moti
 	double maxDist = trapezoidalDist - 2 * accelDist;
 
 	if (maxDist < 0) {
-		accelTime = sqrt(fabs(dist) / motionLimit.maxAccel);
+		accelTime = sqrt(std::abs(dist) / motionLimit.maxAccel);
 		accelDist = 0.5 * motionLimit.maxAccel * accelTime * accelTime;
 		trapezoidalDist = 2 * accelDist;
 		maxDist = 0;

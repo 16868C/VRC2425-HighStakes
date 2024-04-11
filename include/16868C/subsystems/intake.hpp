@@ -1,7 +1,7 @@
 #pragma once
-#include "okapi/api.hpp"
+#include "okapi/impl/device/distanceSensor.hpp"
+#include "okapi/impl/device/motor/motor.hpp"
 #include "16868C/devices/pneumatic.hpp"
-#include "16868C/util/util.hpp"
 
 namespace lib16868C {
 enum class IntakeState {

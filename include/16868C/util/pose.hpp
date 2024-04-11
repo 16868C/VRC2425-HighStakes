@@ -1,5 +1,6 @@
 #pragma once
-#include "okapi/api.hpp"
+#include "okapi/api/units/QAngle.hpp"
+#include "okapi/api/units/QLength.hpp"
 #include "16868C/util/math.hpp"
 #include <string>
 

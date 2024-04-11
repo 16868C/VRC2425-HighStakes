@@ -1,5 +1,6 @@
 #include "16868C/subsystems/intake.hpp"
 #include "16868C/util/logger.hpp"
+#include "16868C/util/util.hpp"
 
 using namespace lib16868C;
 

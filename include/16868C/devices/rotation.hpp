@@ -1,5 +1,5 @@
 #pragma once
-#include "api.h"
+#include "pros/rotation.hpp"
 #include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/util/math.hpp"
 
@@ -27,7 +27,7 @@ class Rotation : private pros::Rotation, public AbstractEncoder {
 		 * 
 		 * @return double 
 		 */
-		double getVelocity();
+		double getVelocity() override;
 	
 	private:
 		double prevTicks = 0;

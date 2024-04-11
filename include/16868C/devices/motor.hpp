@@ -1,5 +1,5 @@
 #pragma once
-#include "okapi/api.hpp"
+#include "okapi/impl/device/motor/motor.hpp"
 #include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/util/math.hpp"
 

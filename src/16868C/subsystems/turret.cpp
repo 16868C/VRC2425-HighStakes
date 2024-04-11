@@ -1,6 +1,5 @@
 #include "turret.hpp"
 #include "16868C/controllers/pidController.hpp"
-#include "16868C/util/util.hpp"
 
 using namespace lib16868C;
 

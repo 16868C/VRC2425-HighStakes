@@ -1,8 +1,6 @@
 #pragma once
-#include "okapi/api.hpp"
 #include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/devices/motor.hpp"
-#include "16868C/util/math.hpp"
 
 namespace lib16868C {
 class MotorGroup : public AbstractEncoder {

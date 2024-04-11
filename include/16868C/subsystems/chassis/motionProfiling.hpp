@@ -1,5 +1,4 @@
 #pragma once
-#include "16868C/util/util.hpp"
 #include <vector>
 
 namespace lib16868C {

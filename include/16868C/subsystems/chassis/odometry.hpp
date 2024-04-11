@@ -1,17 +1,11 @@
 #pragma once
-#include "16868C/devices/abstractEncoder.hpp"
+#include "okapi/impl/device/distanceSensor.hpp"
 #include "16868C/devices/inertial.hpp"
-#include "16868C/devices/rotation.hpp"
-#include "16868C/devices/opticalEncoder.hpp"
 #include "16868C/devices/trackingWheel.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/pose.hpp"
-#include "16868C/util/util.hpp"
-#include "api.h"
 #include <array>
-#include <functional>
-#include <memory>
-#include <utility>
+#include <map>
 
 using namespace okapi::literals;
 

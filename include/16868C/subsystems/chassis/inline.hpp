@@ -1,10 +1,9 @@
 #pragma once
-#include "okapi/api.hpp"
+#include "okapi/api/units/QAngularSpeed.hpp"
 #include "16868C/controllers/pidController.hpp"
 #include "16868C/devices/inertial.hpp"
 #include "16868C/devices/motorGroup.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
-#include "16868C/util/math.hpp"
 #include "16868C/util/pose.hpp"
 
 namespace lib16868C {
