@@ -21,7 +21,7 @@ enum class TurnDirection {
 
 class Inline {
 	public:
-		Inline(MotorGroup& left, MotorGroup& right, Inertial& inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio = 1.0);
+		Inline(MotorGroup& left, MotorGroup& right, Inertial* inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio = 1.0);
 
 		void moveTank(double left, double right, double slewRate = 0);
 		void moveArcade(double forward, double turn, double slewRate = 0);
@@ -42,7 +42,7 @@ class Inline {
 
 	private:
 		MotorGroup& leftMtrs, rightMtrs;
-		Inertial& inertial;
+		Inertial* inertial { nullptr };
 		Odometry* odom { nullptr };
 		okapi::QLength wheelDiam;
 		double gearRatio;
