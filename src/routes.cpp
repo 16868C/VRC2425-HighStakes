@@ -3,7 +3,7 @@
 #include "16868C/util/logger.hpp"
 
 using namespace lib16868C;
-/*
+
 void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A) {
 	while (!master.getDigital(btn)) pros::delay(10);
 }
@@ -12,11 +12,11 @@ void nearAWPBar() {
 	intake.moveVoltage(12000); // Ensure preload is in the robot
 	// Move in front of the matchload triball
 	chassis.moveDistance(8_in, 600_rpm, {0.2, 0, 16}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 800);
-	vertWings.extend();
+	leftWing.extend();
 	pros::delay(1000);
 	// Knock out the matchload triball
 	chassis.turnAbsolute(-45_deg, 300_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::LEFT, 1000);
-	vertWings.retract();
+	leftWing.retract();
 	pros::delay(1000);
 	// Turn back to let the matchload triball roll in front of the robot
 	chassis.turnAbsolute(0_deg, 300_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::LEFT, 1000);
@@ -51,10 +51,10 @@ void nearRush() {
 	chassis.turnAbsolute(-40_deg, 400_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 1000);
 	chassis.moveDistance(7_in, 600_rpm, {0.15, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	// Knock out the matchload zone triball
-	vertWings.extend();
+	leftWing.extend();
 	pros::delay(1000);
 	chassis.moveDistance(-8_in, 300_rpm, {0.15, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	vertWings.retract();
+	leftWing.retract();
 	chassis.moveDistance(3_in, 600_rpm, {0.15, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	pros::delay(500);
 	chassis.moveDistance(-4_in, 600_rpm, {0.2, 0, 10}, 1200, -40_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
@@ -92,10 +92,10 @@ void nearDisrupt() {
 void nearBowlAWP() {
 	inertial.set_rotation(130_deg);
 	
-	vertWings.extend();
+	leftWing.extend();
 	pros::delay(200);
 	chassis.turnAbsolute(70_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::RIGHT, 1000);
-	vertWings.retract();
+	leftWing.retract();
 	pros::delay(500);
 	chassis.turnAbsolute(10_deg, 400_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::RIGHT, 1000);
 	
@@ -140,10 +140,10 @@ void nearBowlRush() {
 	chassis.moveDistance(-50_in, 600_rpm, {0.2, 0, 16}, 1200, -180_deg, 300_rpm, {0.1, 0, 10}, 1000);
 	
 	chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 16}, 1200, -225_deg, 225_rpm, {0.1, 0, 10}, 1000);
-	vertWings.extend();
+	leftWing.extend();
 	pros::delay(200);
 	chassis.turnAbsolute(-300_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	vertWings.retract();
+	leftWing.retract();
 	pros::delay(500);
 	chassis.turnAbsolute(-250_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::RIGHT, 1000);
 	intake.moveVoltage(-12000);
@@ -157,10 +157,10 @@ void farAWPBar() {
 	// Ensure preload is held securely in the intake
 	intake.moveVoltage(12000);
 	// Knock out the matchload zone triball
-	vertWings.extend();
+	leftWing.extend();
 	chassis.moveDistance(-10_in, 600_rpm, {0.13, 0, 10}, 1200, -140_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
 	intake.moveVoltage(-12000);
-	vertWings.retract();
+	leftWing.retract();
 	// Push the matchload zone and preload triball into the goal
 	chassis.turnAbsolute(-180_deg, 600_rpm, {0.035, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 0);
 	chassis.moveDistance(-15_in, 600_rpm, {0.12, 0, 10}, 1200, -180_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
@@ -180,50 +180,13 @@ void farAWP() {
 	inertial.set_rotation(-90_deg);
 	// Intake triball under the elevation bar
 	intake.moveVoltage(12000);
-	pros::delay(200);
+	chassis.moveDistance(5_in, 600_rpm, {0.2, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 0);
 
-	// Line up to the matchload zone
-	chassis.moveDistance(-31_in, 600_rpm, {0.2, 0, 16}, 1200, -90_deg, 300_rpm, {0.1, 0, 0.1}, 1500);
-	chassis.turnAbsolute(-140_deg, 400_rpm, {0.06, 0, 5.5}, 2, 3, 5, TurnWheel::LEFT, 1000);
-	
-	// Knock out the matchload zone triball
-	vertWings.extend();
-	chassis.moveDistance(-10_in, 600_rpm, {0.22, 0, 16}, 1200, -140_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	intake.moveVoltage(0);
-	vertWings.retract();
-	chassis.turnAbsolute(-180_deg, 600_rpm, {0.055, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 0);
-	chassis.turnAbsolute(-160_deg, 600_rpm, {0.055, 0, 2}, 2, 3, 5, TurnWheel::LEFT, 0);
-	// Push the preload and matchload zone triballs into the goal
-	chassis.moveDistance(-20_in, 600_rpm, {0.25, 0, 16}, 1200, -180_deg, 150_rpm, {0.1, 0, 10}, 800);
-
-	chassis.moveDistance(11_in, 600_rpm, {0.22, 0, 16}, 1200, -180_deg, 300_rpm, {0.1, 0, 0.1}, 500);
-	chassis.turnAbsolute(0_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	// Push the elevation zone triball into the goal
-	intake.moveVoltage(-12000);
-	chassis.moveDistance(14_in, 600_rpm, {0.25, 0, 16}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 500);
-	chassis.moveDistance(-11_in, 600_rpm, {0.3, 0, 16}, 1200, 0_deg, 300_rpm, {0.1, 0, 0.1}, 1000);
-	// Intake offensive zone triball
-	chassis.turnAbsolute(-70_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	intake.moveVoltage(12000);
-	chassis.moveDistance(47_in, 600_rpm, {0.2, 0, 17}, 1200, -70_deg, 300_rpm, {0.1, 0, 10}, 1500);
-	chassis.turnAbsolute(65_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	// Outtake offensive zone triball in front of goal
-	intake.moveVoltage(-12000);
-	pros::delay(500);
-
-	chassis.turnAbsolute(-20_deg, 600_rpm, {0.06, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
-	// Intake middle triball
-	intake.moveVoltage(12000);
-	chassis.moveDistance(21_in, 600_rpm, {0.21, 0, 16}, 1200, -20_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	// Push all three triballs into the goal
-	chassis.turnAbsolute(90_deg, 600_rpm, {0.055, 0, 5.5}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	chassis.moveDistance(-34_in, 600_rpm, {0.08, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	chassis.turnAbsolute(-135_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 0);
 	leftWing.extend();
-	rightWing.extend();
-	intake.moveVoltage(-12000);
-	chassis.moveDistance(30_in, 600_rpm, {0.2, 0, 16}, 1200, 90_deg, 300_rpm, {0.1, 0, 10}, 1000);
-	leftWing.retract();
-	rightWing.retract();
-	chassis.moveDistance(-10_in, 600_rpm, {0.2, 0, 16}, 1200, 90_deg, 300_rpm, {0.1, 0, 10}, 1000);
+	chassis.moveDistance(-10_in, 600_rpm, {0.08, 0, 4}, 2400, -135_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	chassis.turnAbsolute(-180_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 0);
 }
 
 void farRush() {
@@ -232,7 +195,7 @@ void farRush() {
 	
 	chassis.turnAbsolute(90_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
 }
-
+/*
 static double heading;
 void skillsStart() {
 	inertial.set_rotation(-145_deg);

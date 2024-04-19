@@ -26,18 +26,18 @@ void competition_initialize() {}
 void autonomous() {
 	uint st = pros::millis();
 
-	chassis.turnAbsolute(90_deg, 600_rpm, {0.094, 0, 8}, 3, 3, 5, TurnWheel::BOTH, 0);
-	// chassis.moveDistance(24_in, 600_rpm, {0.07, 0, 4}, 2400, 0_deg, 300_rpm, {0.03, 0, 0.5}, 0);
+	// chassis.turnAbsolute(90_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 0);
+	// chassis.moveDistance(-72_in, 600_rpm, {0.07, 0, 4}, 2400, 0_deg, 300_rpm, {0.035, 0, 0.6}, 0);
 
-	pros::delay(5000);
-	double avgTicks = std::abs((leftDrive.getPosition() + rightDrive.getPosition()) / 2.0);
-	double currDist = avgTicks / 300.0 * (WHEEL_DIAM * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
-	printDebug("[Inline Move Distance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial.get_rotation(AngleUnit::DEG), pros::millis() - st);
+	// pros::delay(5000);
+	// double avgTicks = std::abs((leftDrive.getPosition() + rightDrive.getPosition()) / 2.0);
+	// double currDist = avgTicks / 300.0 * (WHEEL_DIAM * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
+	// printDebug("[Inline Move Distance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial.get_rotation(AngleUnit::DEG), pros::millis() - st);
 
 
 	#ifndef SKILLS
 	// nearAWPBar();
-	// farAWP();
+	farAWP();
 	// farAWPBar();
 	// nearRush();
 	// nearDisrupt();
@@ -55,14 +55,6 @@ void opcontrol() {
 	#ifdef SKILLS
 	skillsStart();
 	#endif
-
-	
-	// while (true) {
-	// 	double avgTicks = std::abs((leftDrive.getPosition() + rightDrive.getPosition()) / 2.0);
-	// 	double currDist = avgTicks / leftDrive.getTPR() * (WHEEL_DIAM * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
-	// 	std::cout << currDist << "\n";
-	// 	pros::delay(50);
-	// }
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
