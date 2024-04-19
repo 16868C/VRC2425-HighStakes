@@ -17,14 +17,15 @@ const int LEFT_WEAK = 12;
 const int LEFT_MIDDLE = 13;
 const int LEFT_REAR = -14;
 const int RIGHT_FRONT = -20;
-const int RIGHT_WEAK = -18;
-const int RIGHT_MIDDLE = -17;
-const int RIGHT_REAR = 16;
-const int INTAKE = 1;
-const int INERTIAL = 10;
+const int RIGHT_WEAK = -19;
+const int RIGHT_MIDDLE = -18;
+const int RIGHT_REAR = 17;
+const int INTAKE = 2;
+const int INERTIAL = 1;
 const char LEFT_WING = 'A';
-const char RIGHT_WING = 'B';
-const char INTAKE_RAISER = 'C';
+const char RIGHT_WING = 'C';
+const char INTAKE_RAISER = 'B';
+const char HANG_PTO = 'D';
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 2.75_in;
@@ -48,7 +49,7 @@ extern lib16868C::Motor intake;
 extern lib16868C::Pneumatic leftWing;
 extern lib16868C::Pneumatic rightWing;
 extern lib16868C::Pneumatic intakeRaiser;
-// extern lib16868C::Pneumatic winchPTO;
+extern lib16868C::Pneumatic hangPTO;
 // extern lib16868C::Pneumatic vertWings;
 
 // Sensors

@@ -21,7 +21,7 @@ lib16868C::Motor intake(INTAKE, okapi::AbstractMotor::gearset::blue);
 lib16868C::Pneumatic leftWing(LEFT_WING, false);
 lib16868C::Pneumatic rightWing(RIGHT_WING);
 lib16868C::Pneumatic intakeRaiser(INTAKE_RAISER);
-// lib16868C::Pneumatic winchPTO(WINCH_PTO);
+lib16868C::Pneumatic hangPTO(HANG_PTO);
 
 // Sensors
 lib16868C::Inertial inertial(INERTIAL);
