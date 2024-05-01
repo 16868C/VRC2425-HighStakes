@@ -36,13 +36,11 @@ void autonomous() {
 
 
 	#ifndef SKILLS
-	// nearAWPBar();
-	farAWP();
-	// farAWPBar();
-	// nearRush();
-	// nearDisrupt();
-	// nearBowlAWP();
-	// nearBowlRush();
+	// far6Ball();
+	// far5Ball();
+	farRushMid();
+	// closeAWPSafe();
+	// closeRushMid();
 	#endif
 	#ifdef SKILLS
 	skills2();
@@ -56,25 +54,26 @@ void opcontrol() {
 	skillsStart();
 	#endif
 
+	intakeRaiser.extend();
+
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
-	okapi::ControllerButton kickerTgl(okapi::ControllerDigital::left);
 	okapi::ControllerButton leftWingTgl(okapi::ControllerDigital::L2);
 	okapi::ControllerButton rightWingTgl(okapi::ControllerDigital::R2);
 	okapi::ControllerButton frontWingsTgl(okapi::ControllerDigital::A);
-	okapi::ControllerButton winchPtoTgl(okapi::ControllerDigital::Y);
-	okapi::ControllerButton horiHangTgl(okapi::ControllerDigital::X);
+	// okapi::ControllerButton hangPTOTgl(okapi::ControllerDigital::up);
+	okapi::ControllerButton hangReleaseTgl(okapi::ControllerDigital::down);
 	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::B);
-	okapi::ControllerButton switchDrive(okapi::ControllerDigital::right);
-	okapi::ControllerButton intakeSlow(okapi::ControllerDigital::left);
+	okapi::ControllerButton switchDrive(okapi::ControllerDigital::left);
 
 	#ifdef SKILLS
 	okapi::ControllerButton skillsMacro(okapi::ControllerDigital::up);
 	#endif
 
 	double intakeDir = 0;
-	int kickerSpd = 200;
+	// double turnMod = 1;
 	bool drive = false;
+
 	#ifndef SKILLS
 	bool matchloading = false;
 	#endif
@@ -84,22 +83,21 @@ void opcontrol() {
 	while (true) {
 		if (drive) {
 			// Drivetrain -> Split Arcade
-		double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
-		double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
-		chassis.driveArcade(forward, turn);
+			double forward = master.getAnalog(okapi::ControllerAnalog::leftY);
+			double turn = pow(master.getAnalog(okapi::ControllerAnalog::rightX), 1);
+			chassis.driveArcade(forward, turn);
 		} else {
 			// Drivetrain -> Tank Drive
 			double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 			double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 			chassis.driveTank(left, right);
 		}
-		std::cout << leftDrive.getTemperature() << " " << rightDrive.getTemperature() << "\n";
+		pros::lcd::print(1, "%.2f %.2f", leftDrive.getTemperature(), rightDrive.getTemperature());
 
 		#ifdef WINSTON
 		// Intake: L1 -> Intake, R1 -> Outtake, Release to stop
 		if (intakeTgl.isPressed()) intakeDir = 1;
 		else if (outtakeTgl.isPressed()) intakeDir = -1;
-		else if (intakeSlow.isPressed()) intakeDir = -0.5;
 		else intakeDir = 0;
 		#endif
 		#ifdef ANSON
@@ -114,12 +112,16 @@ void opcontrol() {
 		if (rightWingTgl.changedToPressed()) rightWing.toggle();
 		if (frontWingsTgl.changedToPressed()) { leftWing.toggle(); rightWing.toggle(); }
 		
-		// if (winchPtoTgl.changedToPressed()) winchPTO.toggle();
+		// if (hangPTOTgl.changedToPressed()) {
+		// 	hangPTO.toggle();
+		// 	// turnMod = 1;
+		// }
+		if (hangReleaseTgl.changedToPressed()) {
+			park.toggle();
+			// turnMod = 0.5;
+		}
 
 		if (intakeRaiserTgl.changedToPressed()) intakeRaiser.toggle();
-
-		// // Horizontal Hang: X (Toggle)
-		// if (horiHangTgl.changedToPressed()) horiHang.toggle();
 
 		if (switchDrive.changedToPressed()) drive = !drive;
 

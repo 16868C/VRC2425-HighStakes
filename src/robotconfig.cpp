@@ -1,4 +1,5 @@
 #include "robotconfig.hpp"
+#include "16868C/devices/pneumatic.hpp"
 
 okapi::Controller master(okapi::ControllerId::master);
 
@@ -20,8 +21,8 @@ lib16868C::Motor intake(INTAKE, okapi::AbstractMotor::gearset::blue);
 // lib16868C::Pneumatic horiHang(HORI_HANG, false);
 lib16868C::Pneumatic leftWing(LEFT_WING, false);
 lib16868C::Pneumatic rightWing(RIGHT_WING);
-lib16868C::Pneumatic intakeRaiser(INTAKE_RAISER);
-lib16868C::Pneumatic hangPTO(HANG_PTO);
+lib16868C::Pneumatic intakeRaiser(INTAKE_RAISER, true);
+lib16868C::Pneumatic park(PARK);
 
 // Sensors
 lib16868C::Inertial inertial(INERTIAL);

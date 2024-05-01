@@ -176,24 +176,207 @@ void farAWPBar() {
 	chassis.moveDistance(5.5_in, 200_rpm, {0.6, 0, 10}, 1200, -100_deg, 300_rpm, {0.1, 0, 0.1}, 800);
 }
 
-void farAWP() {
+void far6Ball() {
 	inertial.set_rotation(-90_deg);
 	// Intake triball under the elevation bar
-	intake.moveVoltage(12000);
-	chassis.moveDistance(5_in, 600_rpm, {0.2, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	intake.moveVoltage(8000);
+	chassis.moveDistance(3_in, 600_rpm, {0.2, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 400);
 
-	chassis.moveDistance(-34_in, 600_rpm, {0.08, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 0);
-	chassis.turnAbsolute(-135_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 0);
+	chassis.moveDistance(-34_in, 600_rpm, {0.07, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 1000);
+	chassis.turnAbsolute(-135_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 600);
 	leftWing.extend();
-	chassis.moveDistance(-10_in, 600_rpm, {0.08, 0, 4}, 2400, -135_deg, 300_rpm, {0.035, 0, 0.6}, 0);
-	chassis.turnAbsolute(-180_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 0);
+	chassis.moveDistance(-10_in, 600_rpm, {0.08, 0, 4}, 2400, -135_deg, 300_rpm, {0.035, 0, 0.6}, 600);
+	chassis.turnAbsolute(-190_deg, 400_rpm, {0.1, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 900);
+	
+	leftWing.retract();
+	chassis.turnAbsolute(-150_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 500);
+	chassis.moveDistance(-21_in, 600_rpm, {0.1, 0, 4}, 3000, -180_deg, 300_rpm, {0.02, 0, 0.6}, 1000);
+	chassis.moveDistance(15_in, 600_rpm, {0.09, 0, 4}, 2400, -145_deg, 300_rpm, {0.035, 0, 0.6}, 800);
+	chassis.turnAbsolute(0_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 800);
+
+	intake.moveVoltage(-12000);
+	pros::delay(600);
+	chassis.moveDistance(13_in, 600_rpm, {1, 0, 4}, 3000, 0_deg, 300_rpm, {0.032, 0, 0.6}, 600);
+	chassis.moveDistance(-12_in, 600_rpm, {0.085, 0, 4}, 2400, 0_deg, 300_rpm, {0.035, 0, 0.6}, 700);
+
+	chassis.turnAbsolute(-69_deg, 400_rpm, {0.05, 0, 3}, 3, 3, 5, TurnWheel::BOTH, 700);
+	intake.moveVoltage(12000);
+	chassis.moveDistance(43_in, 600_rpm, {0.4, 0, 5}, 2400, -69_deg, 300_rpm, {0.035, 0, 0.6}, 1100);
+	pros::delay(200);
+	chassis.turnAbsolute(60_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 750);
+	intake.moveVoltage(-12000);
+	pros::delay(200);
+	chassis.moveDistance(3_in, 600_rpm, {0.8, 0, 5}, 3000, 60_deg, 300_rpm, {0.035, 0, 0.6}, 350);
+	pros::delay(300);
+	
+	chassis.turnAbsolute(-44_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 600);
+	intake.moveVoltage(12000);
+	chassis.moveDistance(16_in, 300_rpm, {0.5, 0, 5}, 800, -44_deg, 300_rpm, {0.035, 0, 0.6}, 850);
+	
+	chassis.turnAbsolute(90_deg, 400_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 650);
+	intake.moveVoltage(-12000);
+	leftWing.extend();
+	rightWing.extend();
+	chassis.moveDistance(32_in, 600_rpm, {0.8, 0, 5}, 2400, 90_deg, 300_rpm, {0.035, 0, 0.6}, 900);
+	pros::delay(300);
+	leftWing.retract();
+	rightWing.retract();
+	// chassis.moveDistance(-22_in, 600_rpm, {0.8, 0, 4}, 2400, 90_deg, 300_rpm, {0.035, 0, 0.6}, 900);
+	chassis.turnAbsolute(0_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 950);
 }
 
-void farRush() {
-	intake.moveVoltage(12000);
-	chassis.moveDistance(42_in, 600_rpm, {0.15, 0, 10}, 1200, -15_deg, 150_rpm, {0.2, 0, 10}, 1500);
+void far5Ball() {
+	inertial.set_rotation(40_deg);
+	// Intake triball under the elevation bar
+	// intake.moveVoltage(8000);
+	// chassis.moveDistance(3_in, 600_rpm, {0.2, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 400);
+
+	// chassis.moveDistance(-34_in, 600_rpm, {0.07, 0, 4}, 2400, -90_deg, 300_rpm, {0.035, 0, 0.6}, 1000);
+	// chassis.turnAbsolute(-135_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 600);
+	intakeRaiser.retract();
+	rightWing.extend();
+	chassis.moveDistance(8_in, 600_rpm, {0.08, 0, 4}, 2400, 40_deg, 300_rpm, {0.035, 0, 0.6}, 600);
+	chassis.turnAbsolute(10_deg, 600_rpm, {0.1, 0, 9}, 6, 3, 5, TurnWheel::RIGHT, 900);
 	
-	chassis.turnAbsolute(90_deg, 600_rpm, {0.03, 0, 2}, 2, 3, 5, TurnWheel::BOTH, 1000);
+	rightWing.retract();
+	chassis.turnAbsolute(40_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::RIGHT, 500);
+	intake.moveVoltage(-12000);
+	chassis.moveDistance(24_in, 600_rpm, {0.1, 0, 4}, 3000, 0_deg, 300_rpm, {0.03, 0, 0.6}, 1000);
+	chassis.moveDistance(-10_in, 600_rpm, {0.09, 0, 4}, 2400, 0_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	// chassis.turnAbsolute(0_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 800);
+
+	// intake.moveVoltage(-12000);
+	// pros::delay(600);
+	chassis.moveDistance(6_in, 600_rpm, {1, 0, 4}, 3000, 0_deg, 300_rpm, {0.032, 0, 0.6}, 600);
+	chassis.moveDistance(-8_in, 600_rpm, {0.085, 0, 4}, 2400, 0_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+
+	chassis.turnAbsolute(-71_deg, 400_rpm, {0.05, 0, 3}, 3, 3, 5, TurnWheel::BOTH, 700);
+	intakeRaiser.extend();
+	intake.moveVoltage(12000);
+	chassis.moveDistance(43_in, 400_rpm, {0.4, 0, 5}, 2000, -71_deg, 300_rpm, {0.035, 0, 0.6}, 1100);
+	pros::delay(200);
+	chassis.turnAbsolute(75_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 1000);
+	pros::delay(200);
+	intake.moveVoltage(-10000);
+	pros::delay(100);
+	chassis.moveDistance(3_in, 600_rpm, {0.8, 0, 5}, 3000, 60_deg, 300_rpm, {0.035, 0, 0.6}, 350);
+	pros::delay(300);
+	
+	chassis.turnAbsolute(-44_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 600);
+	intake.moveVoltage(12000);
+	chassis.moveDistance(16_in, 300_rpm, {0.5, 0, 5}, 800, -44_deg, 300_rpm, {0.035, 0, 0.6}, 850);
+	
+	chassis.turnAbsolute(90_deg, 400_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 650);
+	intake.moveVoltage(-12000);
+	leftWing.extend();
+	rightWing.extend();
+	chassis.moveDistance(32_in, 600_rpm, {0.8, 0, 5}, 2400, 90_deg, 300_rpm, {0.035, 0, 0.6}, 900);
+	pros::delay(300);
+	leftWing.retract();
+	rightWing.retract();
+	// chassis.moveDistance(-22_in, 600_rpm, {0.8, 0, 4}, 2400, 90_deg, 300_rpm, {0.035, 0, 0.6}, 900);
+	chassis.turnAbsolute(0_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 950);
+}
+
+void farRushMid() {
+	inertial.set_rotation(0_deg);
+
+	intake.moveVoltage(12000);
+	pros::Task flickPreload([&](){
+		rightWing.extend();
+		pros::delay(200);
+		rightWing.retract();
+	});
+
+	chassis.moveDistance(45_in, 600_rpm, {0.8, 0, 6}, 3000, -9_deg, 300_rpm, {0.09, 0, 0.6}, 0);
+	chassis.moveDistance(-29_in, 600_rpm, {0.8, 0, 5}, 2400, -30_deg, 300_rpm, {0.03, 0, 0.6}, 0);
+	chassis.turnAbsolute(48_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 0);
+	intake.moveVoltage(-12000);
+	pros::delay(500);
+	
+	chassis.turnAbsolute(-66_deg, 400_rpm, {0.0434, 0, 4}, 2, 3, 5, TurnWheel::BOTH, 0);
+	intake.moveVoltage(12000);
+	chassis.moveDistance(31_in, 600_rpm, {0.5, 0, 7}, 2400, -66_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	chassis.moveDistance(-32.5_in, 600_rpm, {0.8, 0, 5}, 2400, -40_deg, 300_rpm, {0.01, 0, 0.6}, 0);
+	
+	chassis.turnAbsolute(45_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 0);
+	intake.moveVoltage(-12000);
+	leftWing.extend();
+	chassis.moveDistance(31_in, 600_rpm, {0.1, 0, 4}, 2400, 0_deg, 300_rpm, {0.012, 0, 0.6}, 1000);
+	leftWing.retract();
+
+	chassis.moveDistance(-25_in, 400_rpm, {0.5, 0, 6}, 1200, 45_deg, 300_rpm, {0.015, 0, 0.6}, 0);
+	rightWing.extend();
+	chassis.turnAbsolute(-20_deg, 250_rpm, {0.1, 0, 9}, 2, 3, 5, TurnWheel::RIGHT, 0);
+	rightWing.retract();
+
+	intake.moveVoltage(12000);
+	chassis.turnAbsolute(-44.5_deg, 400_rpm, {0.05, 0, 3}, 2, 2, 5, TurnWheel::LEFT, 0);
+	chassis.moveDistance(58_in, 600_rpm, {0.8, 0, 5}, 2400, -44.5_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+
+	chassis.moveDistance(-24_in, 600_rpm, {0.8, 0, 5}, 2400, -33_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	chassis.turnAbsolute(-180_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 0);
+	
+	chassis.moveDistance(13_in, 600_rpm, {0.8, 0, 5}, 2400, -180_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	chassis.turnAbsolute(-315_deg, 400_rpm, {0.1, 0, 9}, 4, 3, 5, TurnWheel::RIGHT, 0);
+	intake.moveVoltage(-12000);
+	leftWing.extend();
+	chassis.moveDistance(40_in, 600_rpm, {0.8, 0, 5}, 2400, -360_deg, 300_rpm, {0.006, 0, 0.6}, 900);
+	chassis.moveDistance(-10_in, 600_rpm, {0.8, 0, 5}, 2400, -360_deg, 300_rpm, {0.02, 0, 0.6}, 0);
+	leftWing.retract();
+	chassis.turnAbsolute(-405_deg, 600_rpm, {0.09, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 0);
+}
+
+void closeAWPSafe() {
+	inertial.set_rotation(-90_deg);
+
+	// rightWing.extend();
+	// pros::delay(200);
+	// rightWing.retract();
+
+	// chassis.moveDistance(8_in, 400_rpm, {0.7, 0, 4}, 1800, -90_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+	chassis.turnAbsolute(-45_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::LEFT, 600);
+	leftWing.extend();
+	chassis.turnAbsolute(-120_deg, 400_rpm, {0.1, 0, 9}, 2, 3, 5, TurnWheel::LEFT, 900);
+
+	chassis.turnAbsolute(-60_deg, 300_rpm, {0.1, 0, 9}, 2, 3, 5, TurnWheel::LEFT, 900);
+	leftWing.retract();
+	chassis.moveDistance(-33_in, 600_rpm, {0.8, 0, 9}, 2400, -90_deg, 350_rpm, {0.045, 0, 0.6}, 0);
+	intakeRaiser.retract();
+	chassis.moveDistance(4_in, 300_rpm, {0.8, 0, 5}, 600, -90_deg, 300_rpm, {0.03, 0, 0.6}, 0);
+	intake.moveVoltage(-12000);
+	chassis.turnAbsolute(90_deg, 300_rpm, {0.15, 0, 9}, 2, 3, 5, TurnWheel::BOTH, 0);
+	chassis.moveDistance(9_in, 200_rpm, {0.6, 0, 10}, 600, 90_deg, 300_rpm, {0.035, 0, 0.6}, 0);
+}
+
+void closeRushMid() {
+	inertial.set_rotation(0_deg);
+
+	intake.moveVoltage(12000);
+
+	chassis.moveDistance(41.5_in, 600_rpm, {0.8, 0, 6}, 3000, 8_deg, 300_rpm, {0.09, 0, 0.6}, 0);
+	chassis.moveDistance(-20_in, 600_rpm, {0.8, 0, 5}, 2400, 30_deg, 300_rpm, {0.03, 0, 0.6}, 0);
+	chassis.turnAbsolute(150_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 0);	
+	intake.moveVoltage(-12000);
+	pros::delay(500);
+
+	chassis.turnAbsolute(41_deg, 600_rpm, {0.095, 0, 9}, 5, 3, 5, TurnWheel::BOTH, 0);
+	intake.moveVoltage(12000);
+	chassis.moveDistance(45_in, 200_rpm, {0.8, 0, 8}, 1300, 41_deg, 300_rpm, {0.03, 0, 0.6}, 0);
+	chassis.moveDistance(-50_in, 400_rpm, {0.6, 0, 8}, 2400, 50_deg, 300_rpm, {0.03, 0, 0.6}, 0);
+	
+	chassis.turnAbsolute(135_deg, 600_rpm, {0.07, 0, 8}, 5, 3, 5, TurnWheel::BOTH, 0);
+	rightWing.extend();
+	chassis.moveDistance(3_in, 600_rpm, {0.8, 0, 6}, 2400, 135_deg, 300_rpm, {0.03, 0, 0.6}, 0);
+	chassis.turnAbsolute(90_deg, 600_rpm, {0.06, 0, 9}, 6, 3, 5, TurnWheel::RIGHT, 0);
+	rightWing.retract();
+	chassis.turnAbsolute(135_deg, 600_rpm, {0.06, 0, 9}, 5, 3, 5, TurnWheel::RIGHT, 0);
+
+	intake.moveVoltage(-12000);
+	leftWing.extend();
+	chassis.moveDistance(36_in, 600_rpm, {0.7, 0, 8}, 2400, 90_deg, 300_rpm, {0.025, 0, 0.6}, 0);
+	leftWing.retract();
+	chassis.moveDistance(-22_in, 200_rpm, {0.7, 0, 6}, 1000, 90_deg, 300_rpm, {0.025, 0, 0.6}, 0);
 }
 /*
 static double heading;
