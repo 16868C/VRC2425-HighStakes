@@ -3,6 +3,7 @@
 #include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
+#include "okapi/api/util/mathUtil.hpp"
 
 using namespace lib16868C;
 
@@ -52,7 +53,7 @@ void Inline::driveArcade(double forward, double turn, double deadzone) {
 }
 
 void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDGains distGains, double maxAccelRPM, okapi::QAngle heading, okapi::QAngularSpeed turnRPM, PIDGains headingGains, int timeout) {
-	leftMtrs.tarePosition();
+leftMtrs.tarePosition();
 	rightMtrs.tarePosition();
 
 	double maxVel = maxRPM.convert(okapi::rpm) * (wheelDiam * okapi::pi).convert(okapi::inch) / 60.0 / gearRatio;
@@ -205,7 +206,7 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 	}
 
 	PIDController distPID(distGains, 0, 0);
-	PIDController headingPID(headingGains, 1, -1);
+	PIDController headingPID(headingGains, 0, 0);
 
 	Pose pose = odom->getPose();
 
@@ -224,17 +225,20 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 		double distLeft = pose.distTo(target).convert(okapi::inch);
 		double heading = pose.angleTo(target).convert(okapi::radian);
 		if(backward) heading = std::min(heading - 180, heading + 180);
+		// printDebug("%f %f\n", *pose.x(), *pose.y());
 
 		double distCtrl = distPID.calculate(distLeft);
-		double headingCtrl = headingPID.calculate(heading, inertial.get_rotation(AngleUnit::RAD));
+		double headingErr = heading - inertial.get_rotation(AngleUnit::RAD);
+		double headingCtrl = headingPID.calculate(headingErr);
 
-		double headingDeadzone = M_PI_2 - std::atan2(distLeft, endRadius.convert(okapi::inch));
+		double headingDeadzone = M_PI_2 - std::atan2(0.5 * distLeft, endRadius.convert(okapi::inch));
 		if (std::abs(heading) < std::abs(headingDeadzone)) headingCtrl = 0;
 
 		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		moveArcade(volts * distCtrl * dir * std::abs(std::cos(heading - inertial.get_rotation(AngleUnit::RAD))), volts * headingCtrl, 4000);
+		printDebug("%f, %f, %f, %f, %f, %f, %f\n", *pose.x(), *pose.y(),  inertial.get_rotation(AngleUnit::DEG), heading * okapi::radianToDegree, headingCtrl, volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl);
+		moveArcade(volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl, 6000);
 
-		pros::delay(20);
+		pros::delay(50);
 	}
 
 	if (stopMtrs) moveTank(0, 0);

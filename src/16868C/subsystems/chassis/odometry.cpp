@@ -1,6 +1,7 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
+#include "16868C/util/logger.hpp"
 #include <iostream>
 
 using namespace lib16868C;
@@ -33,7 +34,7 @@ void Odometry::odomManager(void* param) {
 	prev.fill(0);
 
 	Odometry* odom = static_cast<Odometry*>(param);
-
+	
 	uint32_t time = pros::millis();
 	while (true) {
 		// Distance and theta
@@ -52,6 +53,7 @@ void Odometry::odomManager(void* param) {
 		Pose pose = odom->getPose();
 		pros::lcd::print(0, "X: %.2f, Y: %.2f", *pose.x(), *pose.y());
 		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(*pose.theta()), *pose.theta());
+		// printDebug("%s\n", pose.toStr());
 
 		std::array<TrackingWheel*, 3> encs = odom->trackingWheels;
 		std::array<DistanceSensor*, 4> dists = odom->distanceSensors;
@@ -106,7 +108,7 @@ void Odometry::init() {
 }
 void Odometry::init(Pose pose) {
 	// Resetting sensors
-	pros::delay(100); // Just in case the sensors have not been initialized yet
+	pros::delay(500); // Just in case the sensors have not been initialized yet
 	for (int i = 0; i < 3; i++) trackingWheels[i]->reset();
 	inertial->calibrate();
 
