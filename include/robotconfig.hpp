@@ -7,7 +7,6 @@
 #include "16868C/devices/rotation.hpp"
 #include "16868C/subsystems/chassis/inline.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
-#include "16868C/subsystems/kicker.hpp"
 
 using namespace okapi::literals;
 
@@ -15,23 +14,18 @@ using namespace okapi::literals;
 extern okapi::Controller master;
 
 // Ports
-const int LEFT_FRONT = -15;
-const int LEFT_MIDDLE = -14;
-const int LEFT_REAR = -13;
-const int RIGHT_FRONT = 16;
-const int RIGHT_MIDDLE = 17;
-const int RIGHT_REAR = 18;
-const int KICKER = -1;
-const int INTAKE = 10;
-const int INERTIAL = 20;
-const int MIDDLE_ROT = 6;
+const int LEFT_FRONT = -20;
+const int LEFT_MIDDLE = -18;
+const int LEFT_REAR = -10;
+const int RIGHT_FRONT = 12;
+const int RIGHT_MIDDLE = 11;
+const int RIGHT_REAR = 1;
+const int INERTIAL = 3;
+const int VERT_ROT = -5;
+const int HORT_ROT = -4;
 const int BACK_DIST = 15;
 const int LEFT_DIST = 1;
 const int RIGHT_DIST = 5;
-const char HORI_HANG = 'E';
-const char LEFT_WING = 'F';
-const char RIGHT_WING = 'G';
-const char VERT_WINGS = 'H';
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;
@@ -46,21 +40,15 @@ extern lib16868C::Motor rightMiddle;
 extern lib16868C::Motor rightRear;
 extern lib16868C::MotorGroup leftDrive;
 extern lib16868C::MotorGroup rightDrive;
-extern lib16868C::Motor intake;
-extern lib16868C::Motor kickerMtr;
 
 // Pneumatics
-extern lib16868C::Pneumatic horiHang;
-extern lib16868C::Pneumatic leftWing;
-extern lib16868C::Pneumatic rightWing;
-extern lib16868C::Pneumatic vertWings;
 
 // Sensors
 extern lib16868C::Inertial inertial;
-extern lib16868C::Rotation middleRot;
-extern lib16868C::TrackingWheel leftEnc;
-extern lib16868C::TrackingWheel rightEnc;
-extern lib16868C::TrackingWheel middleEnc;
+extern lib16868C::Rotation vertRot;
+extern lib16868C::Rotation hortRot;
+extern lib16868C::TrackingWheel vertEnc;
+extern lib16868C::TrackingWheel hortEnc;
 extern okapi::DistanceSensor rightDistance;
 extern okapi::DistanceSensor backDistance;
 extern okapi::DistanceSensor leftDistance;
@@ -71,4 +59,3 @@ extern lib16868C::DistanceSensor leftDist;
 // Subsystems
 extern lib16868C::Odometry odometry;
 extern lib16868C::Inline chassis;
-extern lib16868C::Kicker kicker;
