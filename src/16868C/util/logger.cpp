@@ -5,6 +5,8 @@ using namespace lib16868C;
 
 Logger::Logger(const std::string file, std::initializer_list<std::string> cols, uint writeInterval) {
 	fileName = file;
+	if (std::find(file.begin(), file.end(), ".csv") == file.end())
+		fileName += ".csv";
 
 	fileOut = std::ofstream(file);
 	fileOut << "time,";
