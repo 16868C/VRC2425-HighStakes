@@ -1,4 +1,5 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
+#include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
 
@@ -119,7 +120,7 @@ void Odometry::init(Pose pose) {
 /* -------------------------- Pose Related Methods -------------------------- */
 Pose Odometry::getPose() {
 	if (!poseMutex.take(50)) {
-		std::cerr << "[Odometry::getPose] Mutex timeout - unable to read current pose" << std::endl;
+		printError("[Odometry::getPose] Mutex timeout - unable to read current pose\n");
 		return prevPose;
 	}
 
@@ -177,7 +178,7 @@ void Odometry::update(bool front, bool right, bool back, bool left) {
 }
 void Odometry::update(Pose pose) {
 	if (!poseMutex.take(50)) {
-		std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
+		printError("[Odometry::update] Mutex timout - unable to update pose\n");
 		return;
 	}
 	this->pose = pose;
@@ -204,7 +205,7 @@ void Odometry::resetSensors() {
 void Odometry::step(std::array<double, 4> deltas) {
 	for (double d : deltas) {
 		if (std::abs(d) > MAX_DELTA) {
-			std::cerr << "Odometry delta too large: " << d << "\n";
+			printError("Odometry delta too large: %f\n", d);
 			return;
 		}
 	}

@@ -12,9 +12,10 @@ template<typename T> T const* Argument(std::basic_string<T> const& value) {
 	return value.c_str();
 }
 
-template<typename ... Args> void printDebug(const char* fmt, Args ... args) {
+template<typename ... Args> void print(const char* fmt, Args ... args) {
 	#ifdef DEBUG
 	printf(fmt, Argument(args) ...);
+	fflush(stdout);
 	#endif
 }
 template<typename ... Args> void printError(const char* fmt, Args ... args) {

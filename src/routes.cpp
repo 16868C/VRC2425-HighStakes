@@ -389,7 +389,7 @@ void skillsStart() {
 	chassis.moveDistance(12_in, 600_rpm, {0.3, 0, 16}, 1500, -160_deg, 300_rpm, {0.05, 0, 10}, 1000);
 	chassis.turnAbsolute(-72_deg, 600_rpm, {0.055, 0, 6.1}, 2, 1.5, 6, TurnWheel::BOTH, 2000);
 	// chassis.moveDistance(-2_in, 600_rpm, {0.4, 0, 16}, 1500, -75_deg, 300_rpm, {0.2, 0, 10}, 400);
-	printDebug("%f\n", inertial.get_rotation(AngleUnit::DEG));
+	print("%f\n", inertial.get_rotation(AngleUnit::DEG));
 	heading = inertial.get_rotation(AngleUnit::DEG);
 
 	vertWings.extend();
@@ -407,7 +407,7 @@ void skills2() {
 
 	pros::delay(22000);
 	kicker.stop();
-	printDebug("%f\n", inertial.get_rotation(AngleUnit::DEG));
+	print("%f\n", inertial.get_rotation(AngleUnit::DEG));
 	inertial.set_rotation(heading * okapi::degree);
 	vertWings.retract();
 	kicker.holdAt(200, 200);

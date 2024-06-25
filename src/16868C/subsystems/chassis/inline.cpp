@@ -73,7 +73,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDG
 	while (dist.abs().convert(okapi::inch) - currDist > 0) {
 		t = pros::millis();
 		if (t - st > timeout && timeout > 0) {
-			printDebug("[Inline Move Distance] Timeout: %d ms\n", t - st);
+			print("[Inline Move Distance] Timeout: %d ms\n", t - st);
 			break;
 		}
 
@@ -95,7 +95,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDG
 	moveTank(0, 0);
 	double avgTicks = std::abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2.0);
 	currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
-	printDebug("[Inline Move Distance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial->get_rotation(AngleUnit::DEG), pros::millis() - st);
+	print("[Inline Move Distance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial->get_rotation(AngleUnit::DEG), pros::millis() - st);
 }
 
 void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains gains, double accelRate, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
@@ -108,7 +108,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	while (inMargin < numInMargin) {
 		t = pros::millis();
 		if (t - st > timeout && timeout > 0) {
-			printDebug("[Inline Turn Absolute] Timeout: %d\n", t - st);
+			print("[Inline Turn Absolute] Timeout: %d ms\n", t - st);
 			break;
 		}
 
@@ -142,7 +142,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	moveTank(0, 0);
-	printDebug("[Inline Turn Absolute] Finished with heading of %f deg, taking %d ms\n", inertial->get_rotation(AngleUnit::DEG), pros::millis() - st);
+	print("[Inline Turn Absolute] Finished with heading of %f deg, taking %d ms\n", inertial->get_rotation(AngleUnit::DEG), pros::millis() - st);
 }
 
 void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, TurnDirection turnDir, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
@@ -163,7 +163,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDG
 	while (inMargin < numInMargin) {
 		t = pros::millis();
 		if (t - st > timeout && timeout > 0) {
-			std::cout << "[Inline Turn Absolute] Timeout: " << t - st << std::endl;
+			print("[Inline Turn Absolute] Timeout: %d ms\n", t - st);
 			break;
 		}
 
@@ -195,7 +195,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDG
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	moveTank(0, 0);
-	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial->get_rotation(AngleUnit::DEG) << " deg, taking " << pros::millis() - st << "ms" << std::endl;
+	print("[Inline Turn Absolute] Finished with heading of %f deg, taking %d ms\n", inertial->get_rotation(AngleUnit::DEG), pros::millis() - st);
 }
 
 void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward, bool stopMtrs, int timeout) {
@@ -216,7 +216,7 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 	while (pose.distTo(target) >= endRadius) {
 		t = pros::millis();
 		if (t - st > timeout && timeout > 0) {
-			std::cout << "[Inline Move to Point] Timeout: " << t - st << std::endl;
+			print("[Inline Move to Point] Timeout: %d ms\n", t - st);
 			break;
 		}
 
@@ -238,7 +238,7 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 	}
 
 	if (stopMtrs) moveTank(0, 0);
-	std::cout << "[Inline Move to Point] Finished with pose of " << odom->getPose().toStr() << ", taking " << pros::millis() - st << "ms" << std::endl;
+	print("[Inline Move to Point] Finished with pose of %s, taking %d ms\n", odom->getPose().toStr(), pros::millis() - st);
 }
 
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {

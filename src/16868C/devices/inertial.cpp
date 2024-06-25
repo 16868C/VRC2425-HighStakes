@@ -28,7 +28,7 @@ void Inertial::calibrate() {
 		printError("[Inertial] Inertial Drift Detected: %f deg difference in 500 ms\n", std::abs(h1 - h2));
 		pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 500ms", std::abs(h1 - h2));
 	}
-	printDebug("[Inertial] Calibration time: %d ms\n", pros::millis() - st);
+	print("[Inertial] Calibration time: %d ms\n", pros::millis() - st);
 }
 
 double Inertial::get_rotation(AngleUnit unit) const {

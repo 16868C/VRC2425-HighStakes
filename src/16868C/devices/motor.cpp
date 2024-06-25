@@ -1,4 +1,5 @@
 #include "motor.hpp"
+#include "16868C/util/logger.hpp"
 
 using namespace lib16868C;
 
@@ -19,7 +20,7 @@ double Motor::getPosition() {
 	double ticks = okapi::Motor::getPosition();
 	
 	if (std::isinf(ticks)) {
-		std::cerr << "[Motor] Position of Infinity" << std::endl;
+		printError("[Motor] Position of Infinity\n");
 		while (std::isinf(ticks)) { ticks = okapi::Motor::getPosition(); pros::delay(20); }
 	}
 

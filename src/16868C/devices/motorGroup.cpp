@@ -1,14 +1,15 @@
 #include "motorGroup.hpp"
+#include "16868C/util/logger.hpp"
 
 using namespace lib16868C;
 
 MotorGroup::MotorGroup(std::initializer_list<Motor> mtrs) : mtrs(mtrs) {
-	if (mtrs.size() == 0) std::cerr << "[MotorGroup] No motors in group" << std::endl;
+	if (mtrs.size() == 0) printError("[MotorGroup] No motors in group\n");
 
 	tpr = this->mtrs[0].getTPR();
 }
 MotorGroup::MotorGroup(std::vector<Motor> mtrs) : mtrs(mtrs) {
-	if (mtrs.size() == 0) std::cerr << "[MotorGroup] No motors in group" << std::endl;
+	if (mtrs.size() == 0) printError("[MotorGroup] No motors in group\n");
 
 	tpr = this->mtrs[0].getTPR();
 }

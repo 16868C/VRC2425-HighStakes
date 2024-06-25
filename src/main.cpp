@@ -32,7 +32,7 @@ void autonomous() {
 	// pros::delay(5000);
 	// double avgTicks = std::abs((leftDrive.getPosition() + rightDrive.getPosition()) / 2.0);
 	// double currDist = avgTicks / 300.0 * (WHEEL_DIAM * okapi::pi).convert(okapi::inch) * GEAR_RATIO;
-	// printDebug("[Inline Move Distance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial.get_rotation(AngleUnit::DEG), pros::millis() - st);
+	// print("[Inline Move Distance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial.get_rotation(AngleUnit::DEG), pros::millis() - st);
 
 
 	#ifndef SKILLS
@@ -46,7 +46,7 @@ void autonomous() {
 	skills2();
 	#endif
 
-	printDebug("Auton took %d ms\n", pros::millis() - st);
+	print("Auton took %d ms\n", pros::millis() - st);
 }
 
 void opcontrol() {
