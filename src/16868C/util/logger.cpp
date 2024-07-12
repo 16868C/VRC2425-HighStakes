@@ -1,14 +1,33 @@
 #include "logger.hpp"
 #include <algorithm>
+#include <initializer_list>
 
 using namespace lib16868C;
 
-Logger::Logger(const std::string file, std::initializer_list<std::string> cols, uint writeInterval) {
+Logger::Logger(const std::string file) {
 	fileName = file;
-	if (std::find(file.begin(), file.end(), ".csv") == file.end())
-		fileName += ".csv";
+	if (file.find_last_of( ".") == file.size()) // No extension specified
+		fileExt = ".txt";
+	fileExt = file.substr(file.find_last_of("."));
 
-	fileOut = std::ofstream(file);
+	fileOut = std::ofstream("/usd/" + file);
+}
+Logger::~Logger() {
+	fileOut.flush();
+	fileOut.close();
+}
+
+std::string Logger::getFileName() {
+	return fileName;
+}
+std::string Logger::getFileExt() {
+	return fileExt;
+}
+std::ofstream& Logger::getFileOutput() {
+	return fileOut;
+}
+
+CSVLogger::CSVLogger(std::string file, std::initializer_list<std::string> cols, uint writeInterval) : Logger(file.find_last_of(".") == file.size() ? file + ".csv" : file) {
 	fileOut << "time,";
 	for (std::string c : cols) {
 		// Headers
@@ -25,21 +44,18 @@ Logger::Logger(const std::string file, std::initializer_list<std::string> cols, 
 
 	writeTask = pros::Task(writeThread, this, TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT, ("Logger::" + fileName).c_str());
 }
-Logger::~Logger() {
-	fileOut.flush();
-	fileOut.close();
-
+CSVLogger::~CSVLogger() {
 	writeTask.remove();
 	writeTask = NULL;
 }
 
-void Logger::setData(std::string col, std::string value) {
+void CSVLogger::setData(std::string col, std::string value) {
 	if (!dataMutex.take(100)) {
-		printError("[Logger::%s] Mutex timeout - unable to update data", fileName);
+		printError("[CSVLogger::%s] Mutex timeout - unable to update data", fileName);
 		return;
 	}
 	if (!contains(data, col)) {
-		printError("[Logger::%s] Column %s not found - was not initialized in constructor", fileName, col);
+		printError("[CSVLogger::%s] Column %s not found - was not initialized in constructor", fileName, col);
 		return;
 	}
 
@@ -47,13 +63,13 @@ void Logger::setData(std::string col, std::string value) {
 	
 	dataMutex.give();
 }
-std::string Logger::getData(std::string col) {
+std::string CSVLogger::getData(std::string col) {
 	if (!dataMutex.take(100)) {
-		printError("[Logger::%s] Mutex timeout - unable to update data", fileName);
+		printError("[CSVLogger::%s] Mutex timeout - unable to update data", fileName);
 		return NULL;
 	}
 	if (!contains(data, col)) {
-		printError("[Logger::%s] Column %s could not be found, was not initialized in constructor", fileName, col);
+		printError("[CSVLogger::%s] Column %s could not be found, was not initialized in constructor", fileName, col);
 		return NULL;
 	}
 
@@ -61,9 +77,13 @@ std::string Logger::getData(std::string col) {
 	dataMutex.give();
 	return ret;
 }
-std::vector<std::pair<std::string, std::string>>* Logger::getAllData() {
+std::vector<std::pair<std::string, std::string>>* CSVLogger::getAllData() {
+	if (fileExt != ".csv") {
+		printError("[CSVLogger::%s] Incompatible file type - getAllData() cannot be called on a non-CSV file.", fileName);
+		return NULL;
+	}
 	if (!dataMutex.take(100)) {
-		printError("[Logger::%s] Mutex timeout - unable to update data", fileName);
+		printError("[CSVLogger::%s] Mutex timeout - unable to update data", fileName);
 		return nullptr;
 	}
 
@@ -72,27 +92,20 @@ std::vector<std::pair<std::string, std::string>>* Logger::getAllData() {
 	return ret;
 }
 
-std::string Logger::getFileName() {
-	return fileName;
-}
-std::ofstream& Logger::getFileOutput() {
-	return fileOut;
-}
-
-void Logger::setWriteInterval(uint writeInterval) {
+void CSVLogger::setWriteInterval(uint writeInterval) {
 	this->writeInterval = writeInterval;
 }
-uint Logger::getWriteInterval() {
+uint CSVLogger::getWriteInterval() {
 	return writeInterval;
 }
 
-void Logger::writeThread(void* params) {
-	Logger* logger = (Logger*) params;
+void CSVLogger::writeThread(void* params) {
+	CSVLogger* logger = (CSVLogger*) params;
 
 	uint32_t time = pros::millis();
 	while (true) {
 		if (!logger->dataMutex.take(100)) {
-			printError("[Logger::%s] Mutex timeout - unable to update data", logger->fileName);
+			printError("[CSVLogger::%s] Mutex timeout - unable to update data", logger->fileName);
 			return;
 		}
 
@@ -101,6 +114,7 @@ void Logger::writeThread(void* params) {
 		for (auto it = logger->data.begin(); it != logger->data.end(); it++) {
 			logger->fileOut << it->second << ",";
 		}
+		logger->fileOut << "\n";
 		logger->fileOut.flush();
 
 		logger->dataMutex.give();
@@ -109,10 +123,10 @@ void Logger::writeThread(void* params) {
 	}
 }
 
-std::vector<std::pair<std::string, std::string>>::iterator find(std::vector<std::pair<std::string, std::string>> v, std::string key) {
+std::vector<std::pair<std::string, std::string>>::iterator CSVLogger::find(std::vector<std::pair<std::string, std::string>> v, std::string key) {
 	return std::find_if(v.begin(), v.end(),
 					[&key](const std::pair<std::string, std::string>& e) { return e.first == key; });
 }
-bool contains(const std::vector<std::pair<std::string, std::string>> v, std::string key) {
+bool CSVLogger::contains(const std::vector<std::pair<std::string, std::string>> v, std::string key) {
 	return find(v, key) != v.end();
 }
