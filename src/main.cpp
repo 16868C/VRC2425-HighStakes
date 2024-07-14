@@ -1,4 +1,5 @@
 #include "main.h"
+#include "16868C/util/pose.hpp"
 #include "robotconfig.hpp"
 #include "16868C/util/logger.hpp"
 
@@ -7,9 +8,10 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	odometry.init();
+	// odometry.init();
+	odometry.init(Pose(12_in, 24_in, 180_deg));
 	// inertial.reset(true);
-	chassis.coast();
+	// chassis.coast();
 }
 
 void disabled() {}
@@ -23,7 +25,9 @@ void autonomous() {
 }
 
 void opcontrol() {
-	chassis.moveToPoint({24_in, 24_in}, 200_rpm, {0.1, 0, 0.1}, {1, 0, 0.1}, 3_in, false, true, 0);
+	odometry.update(true, true, true, true);
+	std::cout << odometry.getPose().toStr() << "\n";
+	// chassis.moveToPoint({24_in, 24_in}, 200_rpm, {0.1, 0, 0.1}, {1, 0, 0.1}, 3_in, false, true, 0);
 
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);

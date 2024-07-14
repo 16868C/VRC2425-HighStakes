@@ -3,6 +3,8 @@
 #include "16868C/devices/trackingWheel.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/pose.hpp"
+#include "okapi/api/units/QAngle.hpp"
+#include "okapi/api/units/QLength.hpp"
 #include <array>
 
 using namespace okapi::literals;
@@ -35,6 +37,8 @@ class Odometry {
 		Pose getState();
 
 		void update(bool front, bool right, bool rear, bool left);
+		void update(okapi::QLength x, okapi::QLength y);
+		void update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta);
 		void update(Pose pose);
 
 		std::array<TrackingWheel*, 3> getEncoders() const;
@@ -44,24 +48,24 @@ class Odometry {
 		void resetSensors();
 
 	private:
-		Pose pose { 0_in, 0_in, 0_deg, 0 };
+		Pose pose = { 0_in, 0_in, 0_deg, 0 };
 		pros::Mutex poseMutex;
 		Pose prevPose { 0_in, 0_in, 0_deg, 0 };
 
 		TrackingWheel leftEnc;
 		TrackingWheel rightEnc;
 		TrackingWheel middleEnc;
-		std::array<TrackingWheel*, 3> trackingWheels = { &leftEnc, &rightEnc, &middleEnc };
+		std::array<TrackingWheel*, 3> trackingWheels = { nullptr, nullptr, nullptr };
 
 		DistanceSensor frontDist;
 		DistanceSensor rightDist;
 		DistanceSensor rearDist;
 		DistanceSensor leftDist;
-		std::array<DistanceSensor*, 4> distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
+		std::array<DistanceSensor*, 4> distanceSensors = { nullptr, nullptr, nullptr, nullptr };
 
 		Inertial* inertial { nullptr };
 
-		pros::task_t odomTask;
+		pros::Task odomTask = pros::Task(odomManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odometry");
 		static void odomManager(void* param);
 
 		const double MAX_DELTA = (10_in).convert(okapi::inch);

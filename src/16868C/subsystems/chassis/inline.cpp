@@ -235,7 +235,7 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 		if (std::abs(heading) < std::abs(headingDeadzone)) headingCtrl = 0;
 
 		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		printDebug("%f, %f, %f, %f, %f, %f, %f\n", *pose.x(), *pose.y(),  inertial.get_rotation(AngleUnit::DEG), heading * okapi::radianToDegree, headingCtrl, volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl);
+		printDebug("%f, %f, %f, %f, %f, %f, %f\n", pose.x, pose.y,  inertial.get_rotation(AngleUnit::DEG), heading * okapi::radianToDegree, headingCtrl, volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl);
 		moveArcade(volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl, 6000);
 
 		pros::delay(50);

@@ -23,9 +23,10 @@ const int RIGHT_REAR = 1;
 const int INERTIAL = 3;
 const int VERT_ROT = -5;
 const int HORT_ROT = -4;
-const int BACK_DIST = 15;
-const int LEFT_DIST = 1;
-const int RIGHT_DIST = 5;
+const int FRONT_DIST = 16;
+const int BACK_DIST = 19;
+const int LEFT_DIST = 2;
+const int RIGHT_DIST = 8;
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;
@@ -49,9 +50,11 @@ extern lib16868C::Rotation vertRot;
 extern lib16868C::Rotation hortRot;
 extern lib16868C::TrackingWheel vertEnc;
 extern lib16868C::TrackingWheel hortEnc;
+extern okapi::DistanceSensor frontDistance;
 extern okapi::DistanceSensor rightDistance;
 extern okapi::DistanceSensor backDistance;
 extern okapi::DistanceSensor leftDistance;
+extern lib16868C::DistanceSensor frontDist;
 extern lib16868C::DistanceSensor rightDist;
 extern lib16868C::DistanceSensor backDist;
 extern lib16868C::DistanceSensor leftDist;
