@@ -15,7 +15,6 @@ double ema(double input, double prev, double a) {
 /** Point **/
 Point::Point() : Point(0, 0) {}
 Point::Point(double x, double y) : x(x), y(y) {}
-Point::Point(const Point& p) : Point(p.x, p.y) {}
 
 double Point::distTo(Point p) {
 	return std::hypot(p.x - x, p.y - y);
@@ -26,12 +25,6 @@ double Point::angleTo(Point p) {
 
 std::string Point::toStr() {
 	return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
-}
-
-Point& Point::operator=(const Point& p) {
-	x = p.x;
-	y = p.y;
-	return *this;
 }
 
 /** Line **/

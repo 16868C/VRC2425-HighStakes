@@ -42,14 +42,11 @@ class Point {
 
 	Point();
 	Point(double x, double y);
-	Point(const Point& p);
 
 	double distTo(Point p);
 	double angleTo(Point p);
 
 	std::string toStr();
-
-	Point& operator=(const Point& p);
 };
 
 class Line {

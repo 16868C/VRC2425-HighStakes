@@ -16,7 +16,7 @@ lib16868C::Pose::Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta)
 lib16868C::Pose::Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, uint time)
 	: Pose(x.convert(okapi::inch), y.convert(okapi::inch), theta.convert(okapi::radian), time) {}
 
-lib16868C::Pose::Pose(const Pose& p) : Pose(p.pos, p.theta, p.time) {}
+// lib16868C::Pose::Pose(const Pose& p) : Pose(p.pos, p.theta, p.time) {}
 
 okapi::QLength lib16868C::Pose::distTo(Point p) {
 	return pos.distTo(p) * okapi::inch;
@@ -35,9 +35,9 @@ std::string lib16868C::Pose::toStr() {
 	return "{" + pos.toStr() + ", theta: " + std::to_string(theta) + ", time: " + std::to_string(time) + "}";
 }
 
-Pose& lib16868C::Pose::operator=(const Pose& p) {
-	pos = p.pos;
-	theta = p.theta;
-	time = p.time;
-	return *this;
-}
+// Pose& lib16868C::Pose::operator=(const Pose& p) {
+// 	pos = p.pos;
+// 	theta = p.theta;
+// 	time = p.time;
+// 	return *this;
+// }

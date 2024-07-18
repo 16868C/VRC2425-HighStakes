@@ -140,9 +140,12 @@ void Odometry::init(Pose pose) {
 
 /* -------------------------- Pose Related Methods -------------------------- */
 Pose Odometry::getPose() {
-	if (!poseMutex.take(50)) {
-		std::cerr << "[Odometry::getPose] Mutex timeout - unable to read current pose" << std::endl;
-		return prevPose;
+	// if (!poseMutex.take(50)) {
+	// 	std::cerr << "[Odometry::getPose] Mutex timeout - unable to read current pose" << std::endl;
+	// 	return prevPose;
+	// }
+	while (!poseMutex.take(5)) {
+		pros::delay(1);
 	}
 
 	Pose pos = pose;
@@ -159,30 +162,31 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 	std::array<bool, 4> snsrUse = {front, right, rear, left};
 
 	double theta = ReduceAngle::radPi2(inertial->get_rotation(AngleUnit::RAD));
-	std::cout << theta << " ";
+	// std::cout << theta << " ";
 	if (std::abs(theta) > M_PI / 12.0 && std::abs(theta) < M_PI * 5 / 12.0) { // Not perpendicular to wall
 		return;
 	}
 	theta = ReduceAngle::rad2Pi(inertial->get_rotation(AngleUnit::RAD));
-	std::cout << theta << " ";
+	// std::cout << theta << " ";
 	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5; // Avoid tan(90) and tan(270) (Divide by zero error)
 	
-	double dir = round(theta / M_PI_2) * M_PI_2;
-	std::cout << dir << "\n";
-	if (dir == 2 * M_PI) dir = 0;
+	double dir = round(theta / M_PI_2);
+	// std::cout << dir << "\n";
+	if (dir == 4) dir = 0;
 
 	// Determine which distance sensor corresponds to which direction
-	std::array<DistanceSensor*, 4> dirDists;
-	double j = dir;
-	for (int i = 0; i < 4; i++, j += M_PI_2) {
-		if (j == 2 * M_PI) j = 0;
+	std::array<DistanceSensor*, 4> dirDists { nullptr, nullptr, nullptr, nullptr };
+	int j = dir;
+	for (int i = 0; i < 4; i++, j++) {
+		if (j == 4) j = 0;
 
-		double snsrDir = ReduceAngle::rad2Pi(theta + j);
+		double snsrDir = ReduceAngle::rad2Pi(theta + j * M_PI_2);
 		if (snsrDir == 2 * M_PI) snsrDir = 0;
 		Line dist(tan(snsrDir), getPose().pos);
+		std::cout << i << "\n";
 
 		// Do not use sensor reading (does not actually read the distance to the correct wall)
-		if (walls[snsrDir].isInsideSegment(walls[snsrDir].getIntersection(dist))) {
+		if (walls[j].isInsideSegment(walls[j].getIntersection(dist))) {
 			std::cerr << "[Odometry::update] Incorrect wall reading - Did not use the distance sensor in the direction of " << dir << "\n";
 			dirDists[i] = nullptr;
 			continue;
@@ -207,30 +211,31 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 	update(newPose);
 }
 void Odometry::update(okapi::QLength x, okapi::QLength y) {
-	if (!poseMutex.take(50)) {
-		std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
-		return;
+	// if (!poseMutex.take(50)) {
+	// 	std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
+	// 	return;
+	// }
+	while (!poseMutex.take(5)) {
+		pros::delay(1);
 	}
 	pose.pos = {x.convert(okapi::inch), y.convert(okapi::inch)};
 	poseMutex.give();
 }
 void Odometry::update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta) {
 	inertial->set_rotation(theta);
-	if (!poseMutex.take(50)) {
-		std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
-		return;
+	// if (!poseMutex.take(50)) {
+	// 	std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
+	// 	return;
+	// }
+	while (!poseMutex.take(5)) {
+		pros::delay(1);
 	}
-	std::cout << pose.toStr() << "\n";
-	// this->pose = Pose(x, y, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
-	// pose.pos() = {x.convert(okapi::inch), y.convert(okapi::inch)};
-	// pose.x() = (5_in).convert(okapi::inch);
-	this->pose.pos.x = 5;
-	std::cout << pose.pos.x << "\n";
+	this->pose = Pose(x, y, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
 	std::cout << x.convert(okapi::inch) << " " << y.convert(okapi::inch) << "\n";
 	poseMutex.give();
 }
 void Odometry::update(Pose pose) {
-	update(5_in, 5_in, pose.theta * okapi::radian);
+	update(pose.pos.x * okapi::inch, pose.pos.y * okapi::inch, pose.theta * okapi::radian);
 }
 
 /* --------------------------- Getters and Setter --------------------------- */

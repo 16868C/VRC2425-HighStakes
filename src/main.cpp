@@ -2,6 +2,7 @@
 #include "16868C/util/pose.hpp"
 #include "robotconfig.hpp"
 #include "16868C/util/logger.hpp"
+#include <type_traits>
 
 using namespace lib16868C;
 
@@ -25,6 +26,8 @@ void autonomous() {
 }
 
 void opcontrol() {
+	std::cout << rightDist.getDist() << "\n";
+	// std::cout << std::is_trivially_copyable<Pose>() << "\n";
 	odometry.update(true, true, true, true);
 	std::cout << odometry.getPose().toStr() << "\n";
 	// chassis.moveToPoint({24_in, 24_in}, 200_rpm, {0.1, 0, 0.1}, {1, 0, 0.1}, 3_in, false, true, 0);

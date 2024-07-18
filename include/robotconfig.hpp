@@ -25,8 +25,8 @@ const int VERT_ROT = -5;
 const int HORT_ROT = -4;
 const int FRONT_DIST = 16;
 const int BACK_DIST = 19;
-const int LEFT_DIST = 2;
-const int RIGHT_DIST = 8;
+const int LEFT_DIST = 8;
+const int RIGHT_DIST = 2;
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;

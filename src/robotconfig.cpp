@@ -34,6 +34,6 @@ lib16868C::DistanceSensor leftDist(&leftDistance, 2.5_in);
 // Subsystems
 lib16868C::Odometry odometry(
 	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
-	std::array<lib16868C::DistanceSensor, 4>{{frontDist, backDist, leftDist, rightDist}},
+	std::array<lib16868C::DistanceSensor, 4>{{{}, rightDist, {}, leftDist}},
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
