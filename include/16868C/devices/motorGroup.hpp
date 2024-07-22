@@ -10,6 +10,7 @@ class MotorGroup : public AbstractEncoder {
 
 	void moveVoltage(double volts);
 	void moveVelocity(double vel);
+	void moveAbsolute(double pos, double vel);
 
 	double getPosition();
 	double get() override;
