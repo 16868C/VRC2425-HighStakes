@@ -1,4 +1,5 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
+#include "16868C/devices/inertial.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
 #include "16868C/util/logger.hpp"
@@ -54,7 +55,7 @@ void Odometry::odomManager(void* param) {
 		Pose pose = odom->getPose();
 		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.pos.x, pose.pos.y);
 		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(pose.theta), pose.theta);
-		// printDebug("%s\n", pose.toStr());
+		// printDebug("%f, %f, %f\n", pose.theta, odom->inertial->get_rotation(AngleUnit::RAD), Util::radToDeg(pose.theta));
 
 		std::array<TrackingWheel*, 3> encs = odom->trackingWheels;
 		std::array<DistanceSensor*, 4> dists = odom->distanceSensors;
@@ -65,7 +66,7 @@ void Odometry::odomManager(void* param) {
 
 		prev = curr;
 
-		pros::Task::delay_until(&time, 10);
+		pros::Task::delay_until(&time, 100);
 	}
 }
 
@@ -129,13 +130,20 @@ void Odometry::init(Pose pose) {
 	// Resetting sensors
 	pros::delay(500); // Just in case the sensors have not been initialized yet
 	for (int i = 0; i < 3; i++) trackingWheels[i]->reset();
-	inertial->calibrate();
+	// inertial->calibrate();
+	// uint st = pros::millis();
+	// inertial->reset(true);
+	// while (inertial->is_calibrating()) {
+	// 	pros::delay(10);
+	// 	std::cout << "waiting\n";
+	// }
+	// std::cout << pros::millis() - st << "\n";
 
 	// Resetting pose
 	update(pose);
 
 	// Starting task
-	// odomTask.resume();
+	odomTask.resume();
 }
 
 /* -------------------------- Pose Related Methods -------------------------- */
@@ -158,20 +166,16 @@ Pose Odometry::getState() {
 }
 
 void Odometry::update(bool front, bool right, bool rear, bool left) {
-	std::cout << "updating\n";
 	std::array<bool, 4> snsrUse = {front, right, rear, left};
 
 	double theta = ReduceAngle::radPi2(inertial->get_rotation(AngleUnit::RAD));
-	// std::cout << theta << " ";
 	if (std::abs(theta) > M_PI / 12.0 && std::abs(theta) < M_PI * 5 / 12.0) { // Not perpendicular to wall
 		return;
 	}
 	theta = ReduceAngle::rad2Pi(inertial->get_rotation(AngleUnit::RAD));
-	// std::cout << theta << " ";
 	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5; // Avoid tan(90) and tan(270) (Divide by zero error)
 	
 	double dir = round(theta / M_PI_2);
-	// std::cout << dir << "\n";
 	if (dir == 4) dir = 0;
 
 	// Determine which distance sensor corresponds to which direction
@@ -183,7 +187,7 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 		double snsrDir = ReduceAngle::rad2Pi(theta + j * M_PI_2);
 		if (snsrDir == 2 * M_PI) snsrDir = 0;
 		Line dist(tan(snsrDir), getPose().pos);
-		std::cout << i << "\n";
+		// std::cout << i << "\n";
 
 		// Do not use sensor reading (does not actually read the distance to the correct wall)
 		if (walls[j].isInsideSegment(walls[j].getIntersection(dist))) {
@@ -203,6 +207,7 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 	if (dirDists[2]) x2 = {dirDists[2]->getDist() * std::abs(std::cos(theta)), dirDists[2]->getConfidence()};
 	if (dirDists[1]) y1 = {dirDists[1]->getDist() * std::abs(std::sin(theta)), dirDists[1]->getConfidence()};
 	if (dirDists[3]) y2 = {dirDists[3]->getDist() * std::abs(std::sin(theta)), dirDists[3]->getConfidence()};
+	std::cout << x1.first << " " << x2.first << " " << y1.first << " " << y2.first << "\n";
 
 	// Use the most accurate readings
 	Pose newPose(x1.first * okapi::millimeter, y1.first * okapi::millimeter, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
@@ -231,7 +236,7 @@ void Odometry::update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta) {
 		pros::delay(1);
 	}
 	this->pose = Pose(x, y, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
-	std::cout << x.convert(okapi::inch) << " " << y.convert(okapi::inch) << "\n";
+	// std::cout << x.convert(okapi::inch) << " " << y.convert(okapi::inch) << "\n";
 	poseMutex.give();
 }
 void Odometry::update(Pose pose) {
@@ -279,8 +284,8 @@ void Odometry::step(std::array<double, 4> deltas) {
 
 	// Adding the x and y components of each of the local offsets to calculate the global offsets
 	double avgA = pose.theta + (deltaA / 2.0);
-	double globalDeltaX = localOffsetX * -sin(avgA) + localOffsetY * sin(avgA);
-	double globalDeltaY = localOffsetX * cos(avgA) + localOffsetY * cos(avgA);
+	double globalDeltaX = localOffsetX * cos(avgA) + localOffsetY * cos(avgA);
+	double globalDeltaY = localOffsetX * -sin(avgA) + localOffsetY * sin(avgA);
 
 	if (std::isnan(globalDeltaX)) globalDeltaX = 0;
 	if (std::isnan(globalDeltaY)) globalDeltaY = 0;

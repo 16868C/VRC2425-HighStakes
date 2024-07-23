@@ -27,7 +27,7 @@ class Inertial : public pros::Imu {
 		 * @param unit The unit type that the heading is in (degree, radian)
 		 * @return double The heading of the robot in the specified units
 		 */
-		double get_rotation(AngleUnit unit) const;
+		double get_rotation(AngleUnit unit);
 		/**
 		 * @brief Set the absolute heading of the robot
 		 * 

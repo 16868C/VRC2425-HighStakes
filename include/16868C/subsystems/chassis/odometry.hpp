@@ -6,7 +6,6 @@
 #include "okapi/api/units/QAngle.hpp"
 #include "okapi/api/units/QLength.hpp"
 #include <array>
-#include <atomic>
 
 using namespace okapi::literals;
 
@@ -81,7 +80,7 @@ class Odometry {
 		LineSegment south {p_00, p_01};
 		LineSegment east {p_00, p_10};
 		LineSegment west {p_01, p_11};
-		std::map<double, LineSegment> walls {{0.0, east}, {M_PI_2, north}, {M_PI, west}, {3 * M_PI_2, south}};
+		std::array<LineSegment, 4> walls { east, north, west, south };
 
 		void step(std::array<double, 4> deltas);
 };

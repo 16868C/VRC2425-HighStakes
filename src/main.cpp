@@ -9,9 +9,15 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	// odometry.init();
-	odometry.init(Pose(12_in, 24_in, 180_deg));
-	// inertial.reset(true);
+	uint st = pros::millis();
+	inertial.reset(true);
+	while (inertial.is_calibrating()) {
+		pros::delay(10);
+		std::cout << "waiting\n";
+	}
+	std::cout << pros::millis() - st << "\n";
+	odometry.init();
+	// odometry.init(Pose(0_in, 0_in, 0_deg));
 	// chassis.coast();
 }
 
@@ -26,11 +32,14 @@ void autonomous() {
 }
 
 void opcontrol() {
-	std::cout << rightDist.getDist() << "\n";
-	// std::cout << std::is_trivially_copyable<Pose>() << "\n";
-	odometry.update(true, true, true, true);
-	std::cout << odometry.getPose().toStr() << "\n";
-	// chassis.moveToPoint({24_in, 24_in}, 200_rpm, {0.1, 0, 0.1}, {1, 0, 0.1}, 3_in, false, true, 0);
+	// odometry.update(true, true, true, true);
+	// std::cout << odometry.getPose().toStr() << "\n";
+	// chassis.moveToPoint({24_in, 48_in}, 100_rpm, {0.1, 0, 0.1}, {1, 0, 0.1}, 3_in, false, true, 0);
+
+	while (true) {
+		// printDebug("%f\n", inertial.get_rotation(AngleUnit::DEG));
+		pros::delay(50);
+	}
 
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);

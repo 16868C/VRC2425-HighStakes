@@ -231,11 +231,11 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 		double headingErr = heading - inertial.get_rotation(AngleUnit::RAD);
 		double headingCtrl = headingPID.calculate(headingErr);
 
-		double headingDeadzone = M_PI_2 - std::atan2(0.5 * distLeft, endRadius.convert(okapi::inch));
-		if (std::abs(heading) < std::abs(headingDeadzone)) headingCtrl = 0;
+		// double headingDeadzone = M_PI_2 - std::atan2(0.5 * distLeft, endRadius.convert(okapi::inch));
+		// if (std::abs(heading) < std::abs(headingDeadzone)) headingCtrl = 0;
 
 		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		printDebug("%f, %f, %f, %f, %f, %f, %f\n", pose.pos.x, pose.pos.y,  inertial.get_rotation(AngleUnit::DEG), heading * okapi::radianToDegree, headingCtrl, volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl);
+		printDebug("%d, %f, %f, %f, %f, %f, %f, %f, %f\n", pros::millis() - st, pose.pos.x, pose.pos.y, inertial.get_rotation(AngleUnit::DEG), heading * okapi::radianToDegree, headingErr, headingCtrl, volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl);
 		moveArcade(volts * distCtrl * dir * std::abs(std::cos(headingErr)), volts * headingCtrl, 6000);
 
 		pros::delay(50);

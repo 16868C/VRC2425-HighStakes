@@ -1,6 +1,7 @@
 #include "inertial.hpp"
 #include "16868C/util/logger.hpp"
 #include "16868C/util/util.hpp"
+#include <cmath>
 
 using namespace lib16868C;
 
@@ -15,7 +16,9 @@ void Inertial::calibrate() {
 			printError("[Inertial] Inertial Reset Failed\n");
 			pros::lcd::print(0, "Inertial Reset Failed");
 		}
-		resetSuccess = reset(true) - 1;
+		resetSuccess = reset(true);
+		// std::cout << resetSuccess << "\n";
+		resetSuccess = resetSuccess == 1;
 		pros::delay(10);
 	} while (!resetSuccess);
 
@@ -30,18 +33,19 @@ void Inertial::calibrate() {
 	printDebug("[Inertial] Calibration time: %d ms\n", pros::millis() - st);
 }
 
-double Inertial::get_rotation(AngleUnit unit) const {
-double a = pros::Imu::get_rotation();
+double Inertial::get_rotation(AngleUnit unit) {
+	double a = pros::Imu::get_rotation();
+	// std::cout << pros::Imu::get_rotation() << "\n";
 	if (std::isinf(a)) {
 		printError("[Inertial] Reading of Infinity\n");
 		while (std::isinf(a)) {
-      a = pros::Imu::get_rotation();
-      pros::delay(20);
-    }
+			a = pros::Imu::get_rotation();
+			pros::delay(20);
+		}
 	}
 
 	if (unit == AngleUnit::RAD) a = Util::degToRad(a);
-	return a;
+	return -a;
 }
 void Inertial::set_rotation(okapi::QAngle heading) {
 	pros::Imu::set_rotation(heading.convert(okapi::degree));
