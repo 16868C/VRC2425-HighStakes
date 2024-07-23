@@ -26,6 +26,13 @@ void autonomous() {
 }
 
 void opcontrol() {
+	arm.moveVoltage(-12000);
+	pros::delay(500);
+	arm.moveVoltage(0);
+	pros::delay(100);
+	arm.resetZero();
+	arm.moveAbsolute(0, 200);
+
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
@@ -66,10 +73,10 @@ void opcontrol() {
 			arm.moveAbsolute(0, 200);
 		}
 		if (shift.isPressed() && armWallStake.changedToPressed()) {
-			arm.moveAbsolute(955, 200);
+			arm.moveAbsolute(1150, 200);
 		}
 		if (shift.isPressed() && armAllianceStake.changedToPressed()) {
-			arm.moveAbsolute(510, 200);
+			arm.moveAbsolute(600, 200);
 		}
 		if (shift.isPressed() && armDescoreStake.changedToPressed()) {
 			arm.moveAbsolute(750, 200);
