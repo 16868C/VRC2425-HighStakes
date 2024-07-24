@@ -130,14 +130,7 @@ void Odometry::init(Pose pose) {
 	// Resetting sensors
 	pros::delay(500); // Just in case the sensors have not been initialized yet
 	for (int i = 0; i < 3; i++) trackingWheels[i]->reset();
-	// inertial->calibrate();
-	// uint st = pros::millis();
-	// inertial->reset(true);
-	// while (inertial->is_calibrating()) {
-	// 	pros::delay(10);
-	// 	std::cout << "waiting\n";
-	// }
-	// std::cout << pros::millis() - st << "\n";
+	inertial->calibrate();
 
 	// Resetting pose
 	update(pose);
@@ -235,7 +228,7 @@ void Odometry::update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta) {
 	while (!poseMutex.take(5)) {
 		pros::delay(1);
 	}
-	this->pose = Pose(x, y, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
+	this->pose = Pose(x, y, theta, pros::millis());
 	// std::cout << x.convert(okapi::inch) << " " << y.convert(okapi::inch) << "\n";
 	poseMutex.give();
 }

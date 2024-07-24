@@ -1,4 +1,5 @@
 #include "main.h"
+#include "16868C/devices/inertial.hpp"
 #include "16868C/util/pose.hpp"
 #include "robotconfig.hpp"
 #include "16868C/util/logger.hpp"
@@ -9,15 +10,9 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	uint st = pros::millis();
-	inertial.reset(true);
-	while (inertial.is_calibrating()) {
-		pros::delay(10);
-		std::cout << "waiting\n";
-	}
-	std::cout << pros::millis() - st << "\n";
 	odometry.init();
 	// odometry.init(Pose(0_in, 0_in, 0_deg));
+	// inertial.reset(true);
 	// chassis.coast();
 }
 
