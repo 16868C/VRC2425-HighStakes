@@ -58,7 +58,7 @@ void opcontrol() {
 		// Intake: L1 -> Intake, R1 -> Outtake, Press again to stop
 		if (!shift.isPressed() && intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
 		else if (!shift.isPressed() && outtakeTgl.changedToPressed()) intakeDir = intakeDir == -1 ? 0 : -1;
-		intake.moveVoltage(intakeDir * 12000);
+		intake.moveVoltage(intakeDir * 10000);
 
 		if (!shift.isPressed() && clampTgl.changedToPressed()) {
 			clamp.toggle();
