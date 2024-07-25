@@ -6,6 +6,7 @@
 #include "16868C/devices/motorGroup.hpp"
 #include "16868C/devices/pneumatic.hpp"
 #include "16868C/subsystems/chassis/inline.hpp"
+#include "16868C/subsystems/chassis/odometry.hpp"
 #include "okapi/impl/device/opticalSensor.hpp"
 
 using namespace okapi::literals;

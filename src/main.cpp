@@ -1,21 +1,22 @@
 #include "main.h"
+#include "16868C/devices/inertial.hpp"
+#include "16868C/util/pose.hpp"
 #include "robotconfig.hpp"
 #include "16868C/util/logger.hpp"
-#include "routes.hpp"
+#include <type_traits>
 
 using namespace lib16868C;
 
 void initialize() {
 	pros::lcd::initialize();
 
-	// odometry.init();
-	inertial.reset(true);
-	chassis.coast();
+	odometry.init();
+	// odometry.init(Pose(0_in, 0_in, 0_deg));
+	// inertial.reset(true);
+	// chassis.coast();
 }
 
-void disabled() {
-	
-}
+void disabled() {}
 
 void competition_initialize() {}
 

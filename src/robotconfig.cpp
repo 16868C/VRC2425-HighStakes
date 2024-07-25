@@ -1,4 +1,6 @@
 #include "robotconfig.hpp"
+#include "16868C/devices/trackingWheel.hpp"
+#include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/devices/pneumatic.hpp"
 #include "okapi/api/device/motor/abstractMotor.hpp"
 

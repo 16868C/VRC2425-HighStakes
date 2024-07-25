@@ -4,8 +4,9 @@
 #include "16868C/devices/trackingWheel.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/pose.hpp"
+#include "okapi/api/units/QAngle.hpp"
+#include "okapi/api/units/QLength.hpp"
 #include <array>
-#include <map>
 
 using namespace okapi::literals;
 
@@ -37,6 +38,8 @@ class Odometry {
 		Pose getState();
 
 		void update(bool front, bool right, bool rear, bool left);
+		void update(okapi::QLength x, okapi::QLength y);
+		void update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta);
 		void update(Pose pose);
 
 		std::array<TrackingWheel*, 3> getEncoders() const;
@@ -46,8 +49,6 @@ class Odometry {
 		void resetSensors();
 
 	private:
-		double* getDistUpdateCoord(double a, int i, std::array<Pose, 5>& newPose1, std::array<int, 4> confs);
-
 		Pose pose { 0_in, 0_in, 0_deg, 0 };
 		pros::Mutex poseMutex;
 		Pose prevPose { 0_in, 0_in, 0_deg, 0 };
@@ -55,17 +56,17 @@ class Odometry {
 		TrackingWheel leftEnc;
 		TrackingWheel rightEnc;
 		TrackingWheel middleEnc;
-		std::array<TrackingWheel*, 3> trackingWheels = { &leftEnc, &rightEnc, &middleEnc };
+		std::array<TrackingWheel*, 3> trackingWheels = { nullptr, nullptr, nullptr };
 
 		DistanceSensor frontDist;
 		DistanceSensor rightDist;
 		DistanceSensor rearDist;
 		DistanceSensor leftDist;
-		std::array<DistanceSensor*, 4> distanceSensors = { &frontDist, &rightDist, &rearDist, &leftDist };
+		std::array<DistanceSensor*, 4> distanceSensors = { nullptr, nullptr, nullptr, nullptr };
 
 		Inertial* inertial { nullptr };
 
-		pros::task_t odomTask;
+		pros::Task odomTask = pros::Task(odomManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Odometry");
 		static void odomManager(void* param);
 
 		const double MAX_DELTA = (10_in).convert(okapi::inch);
@@ -80,13 +81,7 @@ class Odometry {
 		LineSegment south {p_00, p_01};
 		LineSegment east {p_00, p_10};
 		LineSegment west {p_01, p_11};
-		std::map<double, LineSegment> walls {{0.0, north}, {M_PI_2, east}, {M_PI, south}, {M_PI_2 * 3, west}};
-		std::map<double, std::function<bool(int)>> oppWall {
-			std::make_pair(0.0, [](int i) -> bool { return i == 0 || i == 3; }),
-			std::make_pair(M_PI_2, [](int i) -> bool { return i == 2 || i == 3; }),
-			std::make_pair(M_PI, [](int i) -> bool { return i == 2 || i == 1; }),
-			std::make_pair(M_PI_2 * 3, [](int i) -> bool { return i == 0 || i == 1; })
-		};
+		std::array<LineSegment, 4> walls { east, north, west, south };
 
 		void step(std::array<double, 4> deltas);
 };
