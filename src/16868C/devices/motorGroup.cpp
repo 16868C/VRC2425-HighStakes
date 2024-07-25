@@ -19,6 +19,9 @@ void MotorGroup::moveVoltage(double volts) {
 void MotorGroup::moveVelocity(double vel) {
 	for (Motor& mtr : mtrs) mtr.moveVelocity(vel);
 }
+void MotorGroup::moveAbsolute(double pos, double vel) {
+	for (Motor& mtr : mtrs) mtr.moveAbsolute(pos, vel);
+}
 
 double MotorGroup::getPosition() {
 	return mtrs[0].getPosition();

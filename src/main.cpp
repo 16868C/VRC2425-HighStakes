@@ -27,17 +27,62 @@ void autonomous() {
 }
 
 void opcontrol() {
-	// odometry.update(true, true, true, true);
-	// std::cout << odometry.getPose().toStr() << "\n";
-	chassis.moveToPoint({48_in, -24_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 5_in, false, 0);
-	chassis.moveToPoint({65_in, -72_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 5_in, false, 0);
-	chassis.moveToPoint({48_in, -80_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 5_in, true, 0);
-	chassis.moveToPoint({0_in, -24_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 3_in, 0);
+	arm.moveVoltage(-12000);
+	pros::delay(500);
+	arm.moveVoltage(0);
+	pros::delay(100);
+	arm.resetZero();
+	arm.moveAbsolute(0, 200);
+
+	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
+
+	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
+	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
+	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
+	okapi::ControllerButton tiltTgl(okapi::ControllerDigital::right);
+	okapi::ControllerButton hangRelease(okapi::ControllerDigital::Y);
+
+	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
+	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
+	okapi::ControllerButton armAllianceStake(okapi::ControllerDigital::right);
+	okapi::ControllerButton armDescoreStake(okapi::ControllerDigital::Y);
+
+	int intakeDir = 0;
 
 	while (true) {
+		// Drivetrain -> Tank Drive
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 		chassis.driveTank(left, right);
+		pros::lcd::print(1, "%.2f %.2f", leftDrive.getTemperature(), rightDrive.getTemperature());
+
+		// Intake: L1 -> Intake, R1 -> Outtake, Press again to stop
+		if (!shift.isPressed() && intakeTgl.changedToPressed()) intakeDir = intakeDir == 1 ? 0 : 1;
+		else if (!shift.isPressed() && outtakeTgl.changedToPressed()) intakeDir = intakeDir == -1 ? 0 : -1;
+		intake.moveVoltage(intakeDir * 10000);
+
+		if (!shift.isPressed() && clampTgl.changedToPressed()) {
+			clamp.toggle();
+			if (clamp.getState()) tilter.retract();
+			else tilter.extend();
+		}
+		if (!shift.isPressed() && tiltTgl.changedToPressed()) {
+			tilter.toggle();
+		}
+
+		if (shift.isPressed() && armIdle.changedToPressed()) {
+			arm.moveAbsolute(0, 200);
+		}
+		if (shift.isPressed() && armWallStake.changedToPressed()) {
+			arm.moveAbsolute(1150, 200);
+		}
+		if (shift.isPressed() && armAllianceStake.changedToPressed()) {
+			arm.moveAbsolute(600, 200);
+		}
+		if (shift.isPressed() && armDescoreStake.changedToPressed()) {
+			arm.moveAbsolute(750, 200);
+		}
+		pros::lcd::print(0, "%f", arm.getPosition());
 
 		pros::delay(50);
 	}

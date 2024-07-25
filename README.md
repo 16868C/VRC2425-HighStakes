@@ -1,7 +1,3 @@
-# Rushdown-OverUnder
+# Rushdown - High Stakes
 
-Lib16868C created for VRC 2023-2024 Season "Over Under"
-
-## Included Features
-
-- TBA later
+Lib16868C created for VRC 2024-2025 Season "High Stakes"

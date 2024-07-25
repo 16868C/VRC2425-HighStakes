@@ -1,5 +1,5 @@
 #pragma once
-#include "okapi/api.hpp"
+#include "okapi/impl/device/motor/motor.hpp"
 
 namespace lib16868C {
 enum class TargetMode {

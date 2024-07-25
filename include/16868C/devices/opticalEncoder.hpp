@@ -1,7 +1,7 @@
 #pragma once
+#include "okapi/impl/device/rotarysensor/adiEncoder.hpp"
 #include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/util/math.hpp"
-#include "okapi/api.hpp"
 
 namespace lib16868C {
 class OpticalEncoder : private okapi::ADIEncoder, public AbstractEncoder {

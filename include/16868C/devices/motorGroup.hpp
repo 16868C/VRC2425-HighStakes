@@ -1,8 +1,6 @@
 #pragma once
-#include "okapi/api.hpp"
 #include "16868C/devices/abstractEncoder.hpp"
 #include "16868C/devices/motor.hpp"
-#include "16868C/util/math.hpp"
 
 namespace lib16868C {
 class MotorGroup : public AbstractEncoder {
@@ -12,6 +10,7 @@ class MotorGroup : public AbstractEncoder {
 
 	void moveVoltage(double volts);
 	void moveVelocity(double vel);
+	void moveAbsolute(double pos, double vel);
 
 	double getPosition();
 	double get() override;

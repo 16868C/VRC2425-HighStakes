@@ -1,10 +1,9 @@
 #pragma once
-#include "okapi/api.hpp"
+#include "okapi/api/units/QAngularSpeed.hpp"
 #include "16868C/controllers/pidController.hpp"
 #include "16868C/devices/inertial.hpp"
 #include "16868C/devices/motorGroup.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
-#include "16868C/util/math.hpp"
 #include "16868C/util/pose.hpp"
 
 namespace lib16868C {
@@ -21,7 +20,7 @@ enum class TurnDirection {
 
 class Inline {
 	public:
-		Inline(MotorGroup& left, MotorGroup& right, Inertial& inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio = 1.0);
+		Inline(MotorGroup& left, MotorGroup& right, Inertial* inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio = 1.0);
 
 		void moveTank(double left, double right, double slewRate = 0);
 		void moveArcade(double forward, double turn, double slewRate = 0);
@@ -42,7 +41,7 @@ class Inline {
 
 	private:
 		MotorGroup& leftMtrs, rightMtrs;
-		Inertial& inertial;
+		Inertial* inertial { nullptr };
 		Odometry* odom { nullptr };
 		okapi::QLength wheelDiam;
 		double gearRatio;

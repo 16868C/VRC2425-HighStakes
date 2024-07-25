@@ -10,7 +10,7 @@ PIDController::PIDController(PIDGains gains, double outputMax, double outputMin,
 	this->outputMax = outputMax;
 	this->outputMin = outputMin;
 	this->maxIntegral = std::abs(maxIntegral);
-	this->integralRange = std::fabs(integralRange);
+	this->integralRange = std::abs(integralRange);
 	this->resetIntegralOnCross = resetIntegralOnCross;
 	this->output = 0;
 	this->settleCond = settleCond;

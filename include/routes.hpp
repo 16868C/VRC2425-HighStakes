@@ -1,15 +1,11 @@
 #pragma once
 
-void farAWP();
-void farAWPBar();
-void farRush();
+void far6Ball();
+void far5Ball();
+void farRushMid();
 
-void nearAWP();
-void nearAWPBar();
-void nearRush();
-void nearBowlAWP();
-void nearBowlRush();
-void nearDisrupt();
+void closeAWPSafe();
+void closeRushMid();
 
 void skills();
 void skills2();

@@ -1,4 +1,5 @@
 #pragma once
+#include "okapi/impl/device/distanceSensor.hpp"
 #include "16868C/devices/inertial.hpp"
 #include "16868C/devices/trackingWheel.hpp"
 #include "16868C/util/math.hpp"

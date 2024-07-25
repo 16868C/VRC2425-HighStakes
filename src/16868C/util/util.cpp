@@ -1,4 +1,5 @@
 #include "16868C/util/util.hpp"
+#include <cmath>
 
 using namespace lib16868C;
 
