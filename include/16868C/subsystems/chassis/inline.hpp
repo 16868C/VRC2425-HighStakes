@@ -33,7 +33,7 @@ class Inline {
 		void turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, double accelRate = 1.03, double errorMargin = 1, int numInMargin = 5, TurnWheel turnWheel = TurnWheel::BOTH, int timeout = 0);
 
 		void turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, TurnDirection turnDir = TurnDirection::SHORTEST, double errorMargin = 3, int numInMargin = 5, TurnWheel turnWheel = TurnWheel::BOTH, int timeout = 0);
-		void moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward = false, bool stopMtrs = false, int timeout = 0);
+		void moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward = false, int timeout = 0);
 
 		void setBrakeMode(okapi::AbstractMotor::brakeMode mode);
 		void coast();

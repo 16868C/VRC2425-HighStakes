@@ -29,12 +29,10 @@ void autonomous() {
 void opcontrol() {
 	// odometry.update(true, true, true, true);
 	// std::cout << odometry.getPose().toStr() << "\n";
-	// chassis.moveToPoint({24_in, 48_in}, 100_rpm, {0.1, 0, 0.1}, {1, 0, 0.1}, 3_in, false, true, 0);
-
-	while (true) {
-		// printDebug("%f\n", inertial.get_rotation(AngleUnit::DEG));
-		pros::delay(50);
-	}
+	chassis.moveToPoint({48_in, -24_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 5_in, false, 0);
+	chassis.moveToPoint({65_in, -72_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 5_in, false, 0);
+	chassis.moveToPoint({48_in, -80_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 5_in, true, 0);
+	chassis.moveToPoint({0_in, -24_in}, 600_rpm, {0.02, 0, 0.1}, {1, 0, 0.1}, 3_in, 0);
 
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);

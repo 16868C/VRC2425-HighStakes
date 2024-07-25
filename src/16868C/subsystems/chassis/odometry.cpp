@@ -60,13 +60,13 @@ void Odometry::odomManager(void* param) {
 		std::array<TrackingWheel*, 3> encs = odom->trackingWheels;
 		std::array<DistanceSensor*, 4> dists = odom->distanceSensors;
 		if (encs[1]->getType() != TrackingWheelType::INVALID) pros::lcd::print(2, "Left: %.2f, Right: %.2f", encs[0]->getDist(), encs[1]->getDist());
-		else pros::lcd::print(2, "Forward: %.2f", encs[1]->getDist());
+		else pros::lcd::print(2, "Forward: %.2f", encs[0]->getDist());
 		if (odom->inertial) pros::lcd::print(3, "Middle: %.2f, Theta: %.2f", encs[2]->getDist(), odom->inertial->get_rotation(AngleUnit::DEG));
 		else pros::lcd::print(3, "Middle: %.2f", encs[2]->getDist());
 
 		prev = curr;
 
-		pros::Task::delay_until(&time, 100);
+		pros::Task::delay_until(&time, 50);
 	}
 }
 
@@ -249,7 +249,7 @@ Inertial* Odometry::getInertial() const {
 
 void Odometry::resetSensors() {
 	for (int i = 0; i < 3; i++) trackingWheels[i]->reset();
-	inertial->reset();
+	inertial->reset(true);
 }
 
 /* ---------------------------- Main calculations --------------------------- */
@@ -271,14 +271,17 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double localOffsetX = deltaM;
 	double localOffsetY = deltaL;
 	if (deltaA != 0) {
-		localOffsetX = 2 * std::sin(deltaA / 2.0) * (deltaM / deltaA - trackingWheels[2]->getOffset());
-		localOffsetY = 2 * std::sin(deltaA / 2.0) * (deltaL / deltaA - trackingWheels[0]->getOffset());
+		// std::cout << deltaM / deltaA + trackingWheels[2]->getOffset() << " " << deltaL / deltaA + trackingWheels[0]->getOffset() << "\n";
+		localOffsetX = 2 * std::sin(deltaA / 2.0) * (deltaM / deltaA + trackingWheels[2]->getOffset());
+		localOffsetY = 2 * std::sin(deltaA / 2.0) * (deltaL / deltaA + trackingWheels[0]->getOffset());
 	}
 
 	// Adding the x and y components of each of the local offsets to calculate the global offsets
 	double avgA = pose.theta + (deltaA / 2.0);
-	double globalDeltaX = localOffsetX * cos(avgA) + localOffsetY * cos(avgA);
-	double globalDeltaY = localOffsetX * -sin(avgA) + localOffsetY * sin(avgA);
+	// double globalDeltaX = localOffsetX * cos(avgA) + localOffsetY * cos(avgA);
+	// double globalDeltaY = localOffsetX * -sin(avgA) + localOffsetY * sin(avgA);
+	double globalDeltaX = localOffsetX * sin(avgA) + localOffsetY * cos(avgA);
+	double globalDeltaY = localOffsetX * cos(avgA) + localOffsetY * sin(avgA);
 
 	if (std::isnan(globalDeltaX)) globalDeltaX = 0;
 	if (std::isnan(globalDeltaY)) globalDeltaY = 0;
