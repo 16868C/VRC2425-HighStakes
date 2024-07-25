@@ -41,8 +41,8 @@ void opcontrol() {
 	okapi::ControllerButton tiltTgl(okapi::ControllerDigital::right);
 	okapi::ControllerButton hangRelease(okapi::ControllerDigital::Y);
 
-	okapi::ControllerButton armIdle(okapi::ControllerDigital::L1);
-	okapi::ControllerButton armWallStake(okapi::ControllerDigital::R1);
+	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
+	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
 	okapi::ControllerButton armAllianceStake(okapi::ControllerDigital::right);
 	okapi::ControllerButton armDescoreStake(okapi::ControllerDigital::Y);
 
