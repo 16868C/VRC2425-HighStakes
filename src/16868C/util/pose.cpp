@@ -1,4 +1,5 @@
 #include "pose.hpp"
+#include "util.hpp"
 
 using namespace lib16868C;
 
@@ -32,7 +33,7 @@ okapi::QAngle lib16868C::Pose::angleTo(Pose p) {
 }
 
 std::string lib16868C::Pose::toStr() {
-	return "{" + pos.toStr() + ", theta: " + std::to_string(theta) + ", time: " + std::to_string(time) + "}";
+	return "{" + pos.toStr() + ", theta: " + std::to_string(Util::radToDeg(theta)) + ", time: " + std::to_string(time) + "}";
 }
 
 // Pose& lib16868C::Pose::operator=(const Pose& p) {

@@ -31,9 +31,14 @@ lib16868C::Inertial inertial(INERTIAL);
 okapi::DistanceSensor hookDist(HOOK_DISTANCE_SNSR);
 okapi::OpticalSensor ringDetect(RING_OPTICAL_SNSR);
 
+lib16868C::Rotation vertRot(VERT_ENC);
+lib16868C::Rotation hortRot(HORT_ENC);
+lib16868C::TrackingWheel vertEnc(&vertRot, 2_in, 0.5_in);
+lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 3.75_in);
+
 // Subsystems
-// lib16868C::Odometry odometry(
-// 	std::array<lib16868C::TrackingWheel, 3>{leftEnc, rightEnc, middleEnc},
-// 	std::array<lib16868C::DistanceSensor, 4>{{{}, backDist, leftDist, rightDist}},
-// 	&inertial);
-lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, nullptr, WHEEL_DIAM, GEAR_RATIO);
+lib16868C::Odometry odometry(
+	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
+	std::array<lib16868C::DistanceSensor, 4>{{{}, {}, {}, {}}},
+	&inertial);
+lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);

@@ -201,7 +201,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDG
 	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial->get_rotation(AngleUnit::DEG) << " deg, taking " << pros::millis() - st << "ms" << std::endl;
 }
 
-void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward, int timeout) {
+void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward, bool stopMtrs, int timeout) {
 	if (!odom) {
 		printError("[Inline Move to Point] No Odometry class was provided, unable to call moveToPoint\n");
 		return;
@@ -230,20 +230,20 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 		// printDebug("%f %f\n", *pose.x(), *pose.y());
 
 		double distCtrl = distPID.calculate(distLeft);
-		double headingErr = heading - inertial.get_rotation(AngleUnit::RAD);
+		double headingErr = heading - inertial->get_rotation(AngleUnit::RAD);
 		double headingCtrl = headingPID.calculate(headingErr);
 
 		double turnDeadzone = M_PI_2 - std::atan2(distLeft, (endRadius * 0.8).convert(okapi::inch));
 		if (std::abs(heading) < std::abs(turnDeadzone)) headingCtrl = 0;
 
 		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		printDebug("%d, %f, %f, %f, %f, %f, %f, %f, %f\n", pros::millis() - st, pose.pos.x, pose.pos.y, inertial.get_rotation(AngleUnit::DEG), heading * okapi::radianToDegree, headingErr, headingCtrl, volts * distCtrl * dir * std::abs(std::cos(headingErr)), -volts * headingCtrl);
+		// printDebug("%d, %f, %f, %f, %f, %f, %f, %f, %f\n", pros::millis() - st, pose.pos.x, pose.pos.y, inertial->get_rotation(AngleUnit::DEG), heading * okapi::radianToDegree, headingErr, headingCtrl, volts * distCtrl * dir * std::abs(std::cos(headingErr)), -volts * headingCtrl);
 		moveArcade(volts * distCtrl * dir * std::abs(std::cos(headingErr)), -volts * headingCtrl, 6000);
 
 		pros::delay(50);
 	}
 
-	// if (stopMtrs) moveTank(0, 0);
+	if (stopMtrs) moveTank(0, 0);
 	std::cout << "[Inline Move to Point] Finished with pose of " << odom->getPose().toStr() << ", taking " << pros::millis() - st << "ms" << std::endl;
 }
 

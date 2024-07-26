@@ -31,6 +31,9 @@ const int INERTIAL = 14;
 const int HOOK_DISTANCE_SNSR = 13;
 const int RING_OPTICAL_SNSR = 15;
 
+const int VERT_ENC = 12;
+const int HORT_ENC = 11;
+
 const char MOGO_CLAMP = 'A';
 const char MOGO_TILTER = 'B';
 
@@ -65,6 +68,11 @@ extern lib16868C::Inertial inertial;
 extern okapi::DistanceSensor hookDist;
 extern okapi::OpticalSensor ringDetect;
 
+extern lib16868C::Rotation vertRot;
+extern lib16868C::Rotation hortRot;
+extern lib16868C::TrackingWheel vertEnc;
+extern lib16868C::TrackingWheel hortEnc;
+
 // Subsystems
-// extern lib16868C::Odometry odometry;
+extern lib16868C::Odometry odometry;
 extern lib16868C::Inline chassis;
