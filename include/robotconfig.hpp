@@ -7,7 +7,10 @@
 #include "16868C/devices/pneumatic.hpp"
 #include "16868C/subsystems/chassis/inline.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
+#include "16868C/subsystems/intake.hpp"
+#include "16868C/subsystems/arm.hpp"
 #include "okapi/impl/device/opticalSensor.hpp"
+#include "pros/adi.hpp"
 
 using namespace okapi::literals;
 
@@ -29,7 +32,7 @@ const int ARM_RIGHT = 9;
 
 const int INERTIAL = 14;
 const int HOOK_DISTANCE_SNSR = 13;
-const int RING_OPTICAL_SNSR = 15;
+const int RING_OPTICAL_SNSR = 16;
 
 const int VERT_ENC = 12;
 const int HORT_ENC = 11;
@@ -37,27 +40,27 @@ const int HORT_ENC = 11;
 const char MOGO_CLAMP = 'A';
 const char MOGO_TILTER = 'B';
 
+const char AUTON_SELECTOR = 'C';
+
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;
-const double GEAR_RATIO = 3/5.0;
+const double GEAR_RATIO = 3/4.0;
 
 // Motors
 extern lib16868C::Motor leftFront;
-extern lib16868C::Motor leftWeak;
 extern lib16868C::Motor leftMiddle;
 extern lib16868C::Motor leftRear;
 extern lib16868C::Motor rightFront;
-extern lib16868C::Motor rightWeak;
 extern lib16868C::Motor rightMiddle;
 extern lib16868C::Motor rightRear;
 extern lib16868C::MotorGroup leftDrive;
 extern lib16868C::MotorGroup rightDrive;
 
-extern lib16868C::Motor intake;
+extern lib16868C::Motor intakeMtr;
 
 extern lib16868C::Motor armLeft;
 extern lib16868C::Motor armRight;
-extern lib16868C::MotorGroup arm;
+extern lib16868C::MotorGroup armMtrs;
 
 // Pneumatics
 extern lib16868C::Pneumatic clamp;
@@ -68,6 +71,8 @@ extern lib16868C::Inertial inertial;
 extern okapi::DistanceSensor hookDist;
 extern okapi::OpticalSensor ringDetect;
 
+extern pros::ADIPotentiometer autonSelector;
+
 extern lib16868C::Rotation vertRot;
 extern lib16868C::Rotation hortRot;
 extern lib16868C::TrackingWheel vertEnc;
@@ -76,3 +81,6 @@ extern lib16868C::TrackingWheel hortEnc;
 // Subsystems
 extern lib16868C::Odometry odometry;
 extern lib16868C::Inline chassis;
+
+extern lib16868C::Intake intake;
+extern lib16868C::Arm arm;

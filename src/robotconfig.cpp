@@ -3,6 +3,7 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/devices/pneumatic.hpp"
 #include "okapi/api/device/motor/abstractMotor.hpp"
+#include "pros/adi.hpp"
 
 okapi::Controller master(okapi::ControllerId::master);
 
@@ -16,11 +17,11 @@ lib16868C::Motor rightRear(RIGHT_REAR, okapi::AbstractMotor::gearset::blue);
 lib16868C::MotorGroup leftDrive({leftFront, leftMiddle, leftRear});
 lib16868C::MotorGroup rightDrive({rightFront, rightMiddle, rightRear});
 
-lib16868C::Motor intake(INTAKE, okapi::AbstractMotor::gearset::blue);
+lib16868C::Motor intakeMtr(INTAKE, okapi::AbstractMotor::gearset::blue);
 
 lib16868C::Motor armLeft(ARM_LEFT, okapi::AbstractMotor::gearset::green);
 lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
-lib16868C::MotorGroup arm({armLeft, armRight});
+lib16868C::MotorGroup armMtrs({armLeft, armRight});
 
 // Pneumatics
 lib16868C::Pneumatic clamp(MOGO_CLAMP);
@@ -30,6 +31,8 @@ lib16868C::Pneumatic tilter(MOGO_TILTER);
 lib16868C::Inertial inertial(INERTIAL);
 okapi::DistanceSensor hookDist(HOOK_DISTANCE_SNSR);
 okapi::OpticalSensor ringDetect(RING_OPTICAL_SNSR);
+
+pros::ADIPotentiometer autonSelector(AUTON_SELECTOR);
 
 lib16868C::Rotation vertRot(VERT_ENC);
 lib16868C::Rotation hortRot(HORT_ENC);
@@ -42,3 +45,6 @@ lib16868C::Odometry odometry(
 	std::array<lib16868C::DistanceSensor, 4>{{{}, {}, {}, {}}},
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
+
+lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
+lib16868C::Arm arm(armMtrs);
