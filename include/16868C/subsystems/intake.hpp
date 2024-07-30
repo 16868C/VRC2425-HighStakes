@@ -1,50 +1,55 @@
 #pragma once
 #include "okapi/impl/device/distanceSensor.hpp"
+#include "okapi/impl/device/opticalSensor.hpp"
 #include "okapi/impl/device/motor/motor.hpp"
-#include "16868C/devices/pneumatic.hpp"
+#include "pros/rtos.h"
 
 namespace lib16868C {
 enum class IntakeState {
-	INTAKE,
+	INTAKE_MOGO,
+	INTAKE_BASKET,
 	OUTTAKE,
-	SHOOT,
-	MATCHLOAD,
 	OFF
+};
+enum class TargetRing {
+	RED,
+	BLUE,
+	NONE
 };
 
 class Intake {
 	public:
-		Intake(okapi::Motor& front, okapi::Motor& rear, okapi::DistanceSensor& distSnsr, Pneumatic& mouth, double slewRate);
+		Intake(okapi::Motor& mtr, okapi::OpticalSensor& ringDetector, okapi::DistanceSensor& hookDetector);
 
-		void spin(double power);
-		void spinFront(double power);
-		void spinRear(double power);
-
+		void intakeMogo();
+		void intakeBasket();
+		void outtake();
 		void stop();
 
-		void intake(bool blocking = false);
-		void outtake(bool openMouth = true, int delay = 0, bool blocking = false);
-		void shoot();
-		void matchload();
+		void setTarget(TargetRing tgt);
+		TargetRing getTarget();
 
-		bool hasBall() const;
+		IntakeState getState();
 
-		IntakeState getState() const;
+		void setNumRings(int n);
+		int getNumRings();
+
+		bool isBasket();
 
 	private:
-		okapi::Motor& front, rear;
-		okapi::DistanceSensor& distSnsr;
-		Pneumatic& mouth;
+		okapi::Motor& mtr;
+		okapi::OpticalSensor& ringDetector;
+		okapi::DistanceSensor& hookDetector;
+
+		bool basket = false;
+
+		int numRings = 0;
 
 		IntakeState state = IntakeState::OFF;
+		TargetRing tgt = TargetRing::NONE;
 
-		double frontTarget, rearTarget;
-		double slewRate;
-
-		pros::task_t intakeTask;
-
-		friend void intakeSlewRate(void* param);
+		pros::Task intakeTask = pros::Task(intakeManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Intake");
+		static void intakeManager(void* param);
 };
 
-void intakeSlewRate(void* param);
 } // namespace lib16868C

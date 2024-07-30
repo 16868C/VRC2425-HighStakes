@@ -12,11 +12,6 @@ enum class TurnWheel {
 	RIGHT,
 	BOTH
 };
-enum class TurnDirection {
-	CLOCKWISE = -1,
-	COUNTER_CLOCKWISE = 1,
-	SHORTEST = 0
-};
 
 class Inline {
 	public:
@@ -28,8 +23,8 @@ class Inline {
 		void driveTank(double left, double right, double deadzone = 0);
 		void driveArcade(double forward, double turn, double deadzone = 0);
 
-		void moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDGains distGains, double accel, okapi::QAngle heading, okapi::QAngularSpeed turnRPM, PIDGains headingGains, int timeout = 0);
-		void turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, double accelRate = 1.03, double errorMargin = 1, int numInMargin = 5, TurnWheel turnWheel = TurnWheel::BOTH, int timeout = 0);
+		void moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDGains distGains, okapi::QAngle heading, okapi::QAngularSpeed turnRPM, PIDGains headingGains, int timeout = 0);
+		void turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, double errorMargin = 1, int numInMargin = 5, TurnWheel turnWheel = TurnWheel::BOTH, int timeout = 0);
 
 		void turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, TurnDirection turnDir = TurnDirection::SHORTEST, double errorMargin = 3, int numInMargin = 5, TurnWheel turnWheel = TurnWheel::BOTH, int timeout = 0);
 		void moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward = false, bool stopMtrs = true, int timeout = 0);
