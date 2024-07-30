@@ -5,8 +5,20 @@
 namespace lib16868C {
 typedef unsigned int uint;
 
+enum class TurnDirection {
+	CLOCKWISE = -1,
+	COUNTER_CLOCKWISE = 1,
+	SHORTEST = 0
+};
+
 double sma(double input, double prev);
 double ema(double input, double prev, double a);
+
+double normalizeAngleDeg(double deg);
+double normalizeAngleRad(double rad);
+
+double angleErrorDeg(double target, double current, TurnDirection direction = TurnDirection::SHORTEST);
+double angleErrorRad(double target, double current, TurnDirection direction = TurnDirection::SHORTEST);
 
 namespace ReduceAngle {
 	template<typename T> inline T reduce(T ang, T max, T min) {

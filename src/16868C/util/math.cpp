@@ -1,15 +1,48 @@
 #include "math.hpp"
+#include "logger.hpp"
 #include <limits>
 #include <iomanip>
 #include <sstream>
 
 using namespace lib16868C;
 
-double sma(double input, double prev) {
+double lib16868C::sma(double input, double prev) {
 	return (input + prev) / 2.0;
 }
-double ema(double input, double prev, double a) {
-	return (a * input + (1 - a) * prev) / 2.0;
+double lib16868C::ema(double input, double prev, double a) {
+	return a * input + (1 - a) * prev;
+}
+
+double lib16868C::normalizeAngleDeg(double deg) {
+	double mod = fmod(deg, 360);
+	if (mod < 0) mod += 360;
+	return mod;
+}
+double lib16868C::normalizeAngleRad(double rad) {
+	double mod = fmod(rad, 2 * M_PI);
+	if (mod < 0) mod += 2 * M_PI;
+	return mod;
+}
+
+double lib16868C::angleErrorDeg(double target, double current, TurnDirection direction) {
+	double error = std::abs(normalizeAngleDeg(target) - normalizeAngleDeg(current));
+	if (error <= 180) {
+		if (normalizeAngleDeg(current) <= normalizeAngleDeg(target)) return current + error;
+		else return current - error;
+	} else {
+		if (normalizeAngleDeg(current) <= normalizeAngleDeg(target)) return current - (360 - error);
+		else return current + (360 - error);
+	}
+}
+double lib16868C::angleErrorRad(double target, double current, TurnDirection direction) {
+	double error = std::abs(normalizeAngleRad(target) - normalizeAngleRad(current));
+	if (error <= 180) {
+		if (normalizeAngleRad(current) <= normalizeAngleRad(target)) return current + error;
+		else return current - error;
+	} else {
+		if (normalizeAngleRad(current) <= normalizeAngleRad(target)) return current - (2 * M_PI - error);
+		else return current + (2 * M_PI - error);
+	}
 }
 
 /** Point **/
