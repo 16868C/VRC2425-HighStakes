@@ -1,12 +1,19 @@
 #pragma once
 
-void far6Ball();
-void far5Ball();
-void farRushMid();
+void redSoloAWP();
+void blueSoloAWP();
 
-void closeAWPSafe();
-void closeRushMid();
+void redSoloAWPSafe();
+void blueSoloAWPSafe();
+
+void redRush();
+
+void redRightAWP();
+void blueLeftAWP();
 
 void skills();
-void skills2();
-void skillsStart();
+
+void blueSoloAWPSafeAdjusted();
+
+void blueElimScore();
+void redElimScore();

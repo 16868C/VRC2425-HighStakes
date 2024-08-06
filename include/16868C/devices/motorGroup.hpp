@@ -21,6 +21,7 @@ class MotorGroup : public AbstractEncoder {
 	double getActualVelocity();
 	double getVelocity() override;
 	double getTemperature();
+	double getCurrentDraw();
 
 	okapi::AbstractMotor::gearset getGearing();
 

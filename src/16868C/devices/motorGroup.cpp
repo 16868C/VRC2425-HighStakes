@@ -52,6 +52,11 @@ double MotorGroup::getTemperature() {
 	for (auto& m : mtrs) mx = std::max(mx, m.getTemperature());
 	return mx;
 }
+double MotorGroup::getCurrentDraw() {
+	int mx = 0;
+	for (auto& m : mtrs) mx = std::max(mx, (int) m.getCurrentDraw());
+	return mx;
+}
 
 void MotorGroup::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {
 	for (Motor& mtr : mtrs) mtr.setBrakeMode(mode);

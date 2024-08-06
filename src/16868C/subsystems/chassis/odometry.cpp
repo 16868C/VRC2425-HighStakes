@@ -2,7 +2,6 @@
 #include "16868C/devices/inertial.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
-#include "16868C/util/logger.hpp"
 #include "pros/rtos.hpp"
 #include <iostream>
 

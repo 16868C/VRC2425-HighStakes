@@ -1,114 +1,144 @@
 #include "16868C/subsystems/intake.hpp"
-#include "16868C/util/logger.hpp"
-#include "16868C/util/util.hpp"
 
 using namespace lib16868C;
 
-void lib16868C::intakeSlewRate(void* param) {
+void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
+
+	intake->ringDetector.setLedPWM(100);
 	
 	uint32_t time = pros::millis();
-	double frontVel = 0, rearVel = 0;
+	int n = 0;
 	while (true) {
-		double frontVolts = intake->front.getActualVelocity() / static_cast<double>(intake->front.getGearing()) * 12000;
-		double rearVolts = intake->rear.getActualVelocity() / static_cast<double>(intake->rear.getGearing()) * 12000;
-		if (std::abs(intake->frontTarget - frontVolts) > intake->slewRate && (std::abs(frontVolts) < std::abs(intake->frontTarget) || Util::sgn(frontVolts) != Util::sgn(intake->frontTarget)))
-			frontVel += intake->slewRate * Util::sgn(intake->frontTarget - frontVolts);
-		else {
-			frontVel = intake->frontTarget;
-		}
-		if (std::abs(intake->rearTarget - rearVolts) > intake->slewRate && (std::abs(rearVolts) < std::abs(intake->rearTarget) || Util::sgn(rearVolts) != Util::sgn(intake->rearTarget)))
-			rearVel += intake->slewRate * Util::sgn(intake->rearTarget - rearVolts);
-		else {
-			rearVel = intake->rearTarget;
+		if (intake->mtr.getCurrentDraw() > 2300 && intake->mtr.getActualVelocity() < 30) n++;
+		else if (intake->mtr.getCurrentDraw() < 2300 || intake->mtr.getActualVelocity() > 30) n = 0;
+		if (n >= 5) {
+			n = 0;
+			intake->mtr.moveVoltage(-12000);
+			pros::delay(300);
 		}
 
-		frontVel = std::clamp(frontVel, -12000.0, 12000.0);
-		rearVel = std::clamp(rearVel, -12000.0, 12000.0);
+		switch(intake->getState()) {
+		case IntakeState::INTAKE_MOGO:
+			switch(intake->getTarget()) {
+			case TargetRing::BLUE:
+				if (intake->ringDetector.getHue() > 160 && intake->ringDetector.getHue() < 250) {
+					pros::delay(150);
+					intake->mtr.moveVoltage(0);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
+				} else {
+					intake->mtr.moveVoltage(12000);
+				}
+				break;
+			case TargetRing::RED:
+				if (intake->ringDetector.getHue() < 30) {
+					pros::delay(150);
+					intake->mtr.moveVoltage(0);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
+				} else {
+					intake->mtr.moveVoltage(12000);
+				}
+				break;
+			case TargetRing::NONE:
+				intake->mtr.moveVoltage(12000);
+				break;
+			}
+			break;
+		case IntakeState::INTAKE_BASKET:
+			if (intake->ringDetector.getProximity() > 200) {
+				intake->basket = true;
+				intake->mtr.moveVoltage(6000);
+				pros::delay(270);
+				intake->mtr.moveVoltage(-12000);
+				pros::delay(1500);
+				intake->basket = false;
+				break;
+			}
 
-		intake->front.moveVoltage(frontVel);
-		intake->rear.moveVoltage(rearVel);
+			switch(intake->getTarget()) {
+			case TargetRing::BLUE:
+				if (intake->ringDetector.getHue() > 160 && intake->ringDetector.getHue() < 250) {
+					pros::delay(150);
+					intake->mtr.moveVoltage(0);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
+				} else {
+					intake->mtr.moveVoltage(12000);
+				}
+				break;
+			case TargetRing::RED:
+				if (intake->ringDetector.getHue() < 30) {
+					pros::delay(150);
+					intake->mtr.moveVoltage(0);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
+				} else {
+					intake->mtr.moveVoltage(12000);
+				}
+				break;
+			case TargetRing::NONE:
+				intake->mtr.moveVoltage(12000);
+				break;
+			}
+			break;
+		case IntakeState::OUTTAKE:
+			intake->mtr.moveVoltage(-12000);
+			break;
+		case IntakeState::OFF:
+			if (intake->mtr.getActualVelocity() != 0) intake->mtr.moveVoltage(3000);
+			while (intake->hookDetector.get() > 85) {
+				if (intake->getState() != IntakeState::OFF) break;
+				pros::delay(10);
+			}
+			intake->mtr.moveVoltage(0);
+			break;
+		}
 
 		pros::Task::delay_until(&time, 50);
 	}
 }
 
-Intake::Intake(okapi::Motor& front, okapi::Motor& rear, okapi::DistanceSensor& distSnsr, Pneumatic& mouth, double slewRate)
-	: front(front), rear(rear), distSnsr(distSnsr), mouth(mouth), slewRate(slewRate) {
-	intakeTask = pros::c::task_create(intakeSlewRate, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Intake Manager");
-}
+Intake::Intake(okapi::Motor& mtr, okapi::OpticalSensor& ringDetector, okapi::DistanceSensor& hookDetector)
+	: mtr(mtr), ringDetector(ringDetector), hookDetector(hookDetector) {}
 
-void Intake::spin(double volts) {
-	frontTarget = rearTarget = volts;
-}
-void Intake::spinFront(double volts) {
-	frontTarget = volts;
-}
-void Intake::spinRear(double volts) {
-	rearTarget = volts;
-}
 
+void Intake::intakeMogo() {
+	state = IntakeState::INTAKE_MOGO;
+}
+void Intake::intakeBasket() {
+	state = IntakeState::INTAKE_BASKET;
+}
+void Intake::outtake() {
+	state = IntakeState::OUTTAKE;
+}
 void Intake::stop() {
-	frontTarget = rearTarget = 0;
-	front.moveVoltage(0);
-	rear.moveVoltage(0);
 	state = IntakeState::OFF;
 }
 
-void Intake::intake(bool blocking) {
-	if (state == IntakeState::INTAKE && !blocking) return;
-	state = IntakeState::INTAKE;
-
-	if (blocking) {
-		mouth.retract();
-		frontTarget = 5000;
-		rearTarget = -12000;
-		
-		while (!hasBall()) {
-			if (state != IntakeState::INTAKE) return;
-			pros::delay(50);
-		}
-		stop();
-		printDebug("[Intake Intake] Triball intaked at a distance of %f mm\n", distSnsr.get());
-	} else pros::Task intake([&] {
-		this->intake(true);
-	});
+void Intake::setTarget(TargetRing tgt) {
+	this->tgt = tgt;
 }
-void Intake::outtake(bool openMouth, int delay, bool blocking) {
-	if (state == IntakeState::OUTTAKE && !blocking) return;
-	state = IntakeState::OUTTAKE;
-
-	frontTarget = rearTarget = -12000;
-
-	if (openMouth) {
-		if (blocking) {
-			while (hasBall()) {
-				if (state != IntakeState::OUTTAKE) return;
-				pros::delay(50);
-			}
-
-			pros::delay(delay);
-			mouth.extend();
-			stop();
-			printDebug("[Intake Outtake] Triball outtaked at a distance of %f mm\n", distSnsr.get());
-		} else pros::Task outtake([&] {
-			this->outtake(true, delay, true);
-		});
-	}
-}
-void Intake::shoot() {
-	state = IntakeState::SHOOT;
-	frontTarget = rearTarget = 12000;
-}
-void Intake::matchload() {
-	state = IntakeState::MATCHLOAD;
-	frontTarget = 12000;
-	rearTarget = -12000;
+TargetRing Intake::getTarget() {
+	return tgt;
 }
 
-bool Intake::hasBall() const  {
-	return distSnsr.get() < 150;
-}
-IntakeState Intake::getState() const {
+IntakeState Intake::getState() {
 	return state;
+}
+
+void Intake::setNumRings(int n) {
+	numRings = n;
+}
+int Intake::getNumRings() {
+	return numRings;
+}
+
+bool Intake::isBasket() {
+	return basket;
 }

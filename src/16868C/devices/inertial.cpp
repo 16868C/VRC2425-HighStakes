@@ -8,6 +8,7 @@
 using namespace lib16868C;
 
 Inertial::Inertial(uint port) : pros::Imu(port) {}
+Inertial::Inertial(uint port, okapi::Controller* controller) : pros::Imu(port), controller(controller) {}
 
 void Inertial::calibrate() {
 	uint st = pros::millis();
@@ -15,13 +16,12 @@ void Inertial::calibrate() {
 	do {
 		if (!resetSuccess) {
 			// Inertial failed to reset
-			printError("[Inertial] Inertial Reset Failed\n");
+			printError("[Inertial::calibrate] Inertial Reset Failed\n");
 			pros::lcd::print(0, "Inertial Reset Failed");
 		}
-		resetSuccess = reset(true);
+		reset(true);
+		while (is_calibrating()) pros::delay(10);
 		// std::cout << resetSuccess << "\n";
-		resetSuccess = resetSuccess == 1;
-		pros::delay(10);
 	} while (!resetSuccess);
 
 	double h1 = get_rotation(AngleUnit::DEG);
@@ -31,14 +31,28 @@ void Inertial::calibrate() {
 		// Inertial reading has changed too much in 500 ms
 		printError("[Inertial] Inertial Drift Detected: %f deg difference in 500 ms\n", std::abs(h1 - h2));
 		pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 500ms", std::abs(h1 - h2));
+		if (controller) controller->rumble("--------");
 	}
+	if (std::isinf(pros::Imu::get_rotation())) calibrate();
+
 	printDebug("[Inertial] Calibration time: %d ms\n", pros::millis() - st);
+
+	if (pros::millis() - st < 1950) {
+		if (controller) controller->rumble("--------");
+		calibrate();
+	}
+	if (infDetected) {
+		infDetected = false;
+		if (controller) controller->rumble("--------");
+		calibrate();
+	}
 }
 
 double Inertial::get_rotation(AngleUnit unit) {
 	double a = pros::Imu::get_rotation();
 	if (std::isinf(a)) {
 		printError("[Inertial] Reading of Infinity\n");
+		infDetected = true;
 		while (std::isinf(a)) {
 			a = pros::Imu::get_rotation();
 			pros::delay(20);
