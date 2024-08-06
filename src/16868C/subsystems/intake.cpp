@@ -4,6 +4,8 @@ using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
+
+	intake->ringDetector.setLedPWM(100);
 	
 	uint32_t time = pros::millis();
 	int n = 0;
@@ -21,18 +23,22 @@ void Intake::intakeManager(void* param) {
 			switch(intake->getTarget()) {
 			case TargetRing::BLUE:
 				if (intake->ringDetector.getHue() > 160 && intake->ringDetector.getHue() < 250) {
-					pros::delay(100);
+					pros::delay(150);
 					intake->mtr.moveVoltage(0);
-					pros::delay(500);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
 				} else {
 					intake->mtr.moveVoltage(12000);
 				}
 				break;
 			case TargetRing::RED:
-				if (intake->ringDetector.getHue() < 50) {
-					pros::delay(100);
+				if (intake->ringDetector.getHue() < 30) {
+					pros::delay(150);
 					intake->mtr.moveVoltage(0);
-					pros::delay(500);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
 				} else {
 					intake->mtr.moveVoltage(12000);
 				}
@@ -46,7 +52,7 @@ void Intake::intakeManager(void* param) {
 			if (intake->ringDetector.getProximity() > 200) {
 				intake->basket = true;
 				intake->mtr.moveVoltage(6000);
-				pros::delay(150);
+				pros::delay(270);
 				intake->mtr.moveVoltage(-12000);
 				pros::delay(1500);
 				intake->basket = false;
@@ -56,18 +62,22 @@ void Intake::intakeManager(void* param) {
 			switch(intake->getTarget()) {
 			case TargetRing::BLUE:
 				if (intake->ringDetector.getHue() > 160 && intake->ringDetector.getHue() < 250) {
-					pros::delay(100);
+					pros::delay(150);
 					intake->mtr.moveVoltage(0);
-					pros::delay(500);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
 				} else {
 					intake->mtr.moveVoltage(12000);
 				}
 				break;
 			case TargetRing::RED:
-				if (intake->ringDetector.getHue() < 50) {
-					pros::delay(100);
+				if (intake->ringDetector.getHue() < 30) {
+					pros::delay(150);
 					intake->mtr.moveVoltage(0);
-					pros::delay(500);
+					pros::delay(400);
+					intake->mtr.moveVoltage(12000);
+					pros::delay(100);
 				} else {
 					intake->mtr.moveVoltage(12000);
 				}

@@ -38,7 +38,8 @@ const int VERT_ENC = 12;
 const int HORT_ENC = 11;
 
 const char MOGO_CLAMP = 'A';
-const char MOGO_TILTER = 'B';
+const char HANG = 'B';
+const char STICK = 'D';
 
 const char AUTON_SELECTOR = 'C';
 
@@ -64,7 +65,8 @@ extern lib16868C::MotorGroup armMtrs;
 
 // Pneumatics
 extern lib16868C::Pneumatic clamp;
-extern lib16868C::Pneumatic tilter;
+extern lib16868C::Pneumatic hang;
+extern lib16868C::Pneumatic stick;
 
 // Sensors
 extern lib16868C::Inertial inertial;

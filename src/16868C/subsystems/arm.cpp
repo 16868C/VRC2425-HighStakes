@@ -9,7 +9,7 @@ void Arm::armManager(void* params) {
 	int n = 0;
 	uint32_t time = pros::millis();
 	while (true) {
-		if (arm->mtrs.getCurrentDraw() > 2100 && abs(static_cast<int>(arm->getState()) - arm->mtrs.getPosition()) < 50) n++;
+		if (arm->mtrs.getCurrentDraw() > 2100 && abs(arm->tgt - arm->mtrs.getPosition()) < 50) n++;
 		if (n > 5) {
 			n = 0;
 			arm->state = ArmPosition::IDLE;
@@ -18,7 +18,7 @@ void Arm::armManager(void* params) {
 		if (intake.isBasket())
 			arm->mtrs.moveVoltage(-12000);
 		else if (arm->state != ArmPosition::IDLE)
-			arm->mtrs.moveAbsolute(static_cast<int>(arm->getState()), arm->volts);
+			arm->mtrs.moveAbsolute(arm->tgt, arm->volts);
 		else
 			arm->mtrs.moveVoltage(0);
 
@@ -28,21 +28,30 @@ void Arm::armManager(void* params) {
 
 Arm::Arm(MotorGroup& mtrs) : mtrs(mtrs) {}
 
+void Arm::moveTo(double tgt, double volts) {
+	this->tgt = tgt;
+	this->volts = volts;
+}
+
 void Arm::defaultPos(double volts) {
 	this->volts = volts;
 	state = ArmPosition::DEFAULT;
+	tgt = static_cast<int>(state);
 }
 void Arm::descoreStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::DESECORE_STAKE;
+	tgt = static_cast<int>(state);
 }
 void Arm::allianceStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::ALLIANCE_STAKE;
+	tgt = static_cast<int>(state);
 }
 void Arm::wallStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::WALL_STAKE;
+	tgt = static_cast<int>(state);
 }
 
 void Arm::resetPosition() {

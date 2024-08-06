@@ -231,13 +231,13 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 		double headingCtrl = headingPID.calculate(headingErr);
 
 		// Determine heading deadzone
-		double turnDeadzone = M_PI_2 - std::atan2(distLeft, (endRadius * 0.8).convert(okapi::inch));
+		double turnDeadzone = M_PI_2 - std::atan2(distLeft, (endRadius * 0.7).convert(okapi::inch));
 		if (std::abs(heading) < std::abs(turnDeadzone)) headingCtrl = 0;
 
 		// Calculate final power
 		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
 		moveArcade(volts * distCtrl * dir * std::abs(std::cos(headingErr)), -volts * headingCtrl, 3000);
-		printDebug("%s, %f\n", pose.toStr(), Util::radToDeg(heading));
+		// printDebug("%s, %f\n", pose.toStr(), Util::radToDeg(heading));
 
 		pros::delay(20);
 	}
