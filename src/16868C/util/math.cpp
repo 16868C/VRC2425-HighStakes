@@ -36,7 +36,7 @@ double lib16868C::angleErrorDeg(double target, double current, TurnDirection dir
 }
 double lib16868C::angleErrorRad(double target, double current, TurnDirection direction) {
 	double error = std::abs(normalizeAngleRad(target) - normalizeAngleRad(current));
-	if (error <= 180) {
+	if (error <= M_PI) {
 		if (normalizeAngleRad(current) <= normalizeAngleRad(target)) return current + error;
 		else return current - error;
 	} else {
