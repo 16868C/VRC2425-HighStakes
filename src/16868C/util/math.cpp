@@ -13,36 +13,20 @@ double lib16868C::ema(double input, double prev, double a) {
 	return a * input + (1 - a) * prev;
 }
 
-double lib16868C::normalizeAngleDeg(double deg) {
-	double mod = fmod(deg, 360);
-	if (mod < 0) mod += 360;
-	return mod;
-}
-double lib16868C::normalizeAngleRad(double rad) {
-	double mod = fmod(rad, 2 * M_PI);
-	if (mod < 0) mod += 2 * M_PI;
+double lib16868C::normalizeAngle(double ang, bool rad) {
+	double maxAng = rad ? 2 * M_PI : 360;
+	double mod = fmod(ang, maxAng);
+	if (mod < 0) mod += maxAng;
 	return mod;
 }
 
-double lib16868C::angleErrorDeg(double target, double current, TurnDirection direction) {
-	double error = std::abs(normalizeAngleDeg(target) - normalizeAngleDeg(current));
-	if (error <= 180) {
-		if (normalizeAngleDeg(current) <= normalizeAngleDeg(target)) return current + error;
-		else return current - error;
-	} else {
-		if (normalizeAngleDeg(current) <= normalizeAngleDeg(target)) return current - (360 - error);
-		else return current + (360 - error);
-	}
-}
-double lib16868C::angleErrorRad(double target, double current, TurnDirection direction) {
-	double error = std::abs(normalizeAngleRad(target) - normalizeAngleRad(current));
-	if (error <= M_PI) {
-		if (normalizeAngleRad(current) <= normalizeAngleRad(target)) return current + error;
-		else return current - error;
-	} else {
-		if (normalizeAngleRad(current) <= normalizeAngleRad(target)) return current - (2 * M_PI - error);
-		else return current + (2 * M_PI - error);
-	}
+double lib16868C::getTargetHeading(double target, double current, bool rad, TurnDirection direction) {
+	double maxAng = rad ? 2 * M_PI : 360;
+	double error = normalizeAngle(target - current, rad);
+	if (target - current < 0)
+		return error > maxAng / 2 ? current + (maxAng - error) : current - error;
+	else
+	 	return error > maxAng / 2 ? current - (maxAng - error) : current + error;
 }
 
 /** Point **/

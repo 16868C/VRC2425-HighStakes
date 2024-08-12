@@ -1,6 +1,5 @@
 #include "inline.hpp"
 #include "okapi/api/units/QAngularSpeed.hpp"
-#include "16868C/subsystems/chassis/motionProfiling.hpp"
 #include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
@@ -55,53 +54,69 @@ void Inline::driveArcade(double forward, double turn, double deadzone) {
 	moveArcade(forward * 12000, turn * 12000);
 }
 
-void Inline::moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDGains distGains, okapi::QAngle heading, okapi::QAngularSpeed turnRPM, PIDGains headingGains, int timeout) {
+void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout, MoveDistanceParams params) {
 	leftMtrs.tarePosition();
 	rightMtrs.tarePosition();
 
-	PIDController distPID(distGains, 0, 0);
-	PIDController headingPID(headingGains, 1, -1);
+	PIDController distPID(params.distGains, 0, 0);
+	PIDController headingPID(params.headingGains, 1, -1);
 
 	double currDist = 0;
-
 	int dir = Util::sgn(dist.convert(okapi::inch));
+	dist = dist.abs();
+
+	bool useOdom = odom->getEncoders()[0]->getType() != TrackingWheelType::INVALID;
+	double stDist = odom->getEncoders()[0]->getDist();
 
 	int i = 0;
 	uint st = pros::millis();
-	while (dist.abs().convert(okapi::inch) - currDist > 0) {
+	while (dist.convert(okapi::inch) - currDist > 0) {
 		// Timeout
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::MoveDistance] Timeout: %d\n", pros::millis() - st);
 			break;
 		}
 
-		// Calculate distance
-		double avgTicks = abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2.0);
-		currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
+		// Calculate Distance Using Either Tracking Wheels or IME 
+		if (useOdom) { // Tracking Wheel
+			currDist = odom->getEncoders()[0]->getDist() - stDist;
+		} else { // IME
+			double avgTicks = std::abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2);
+			currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
+		}
 
-		// Calculate linear and angular power
-		double distCtrl = distPID.calculate(dist.abs().convert(okapi::inch), std::abs(currDist));
+		// PID Calculations
+		double distCtrl = distPID.calculate(dist.convert(okapi::inch), currDist);
 		double headingCtrl = headingPID.calculate(heading.convert(okapi::degree), inertial->get_rotation(AngleUnit::DEG));
-		double decelRPM = maxRPM.convert(okapi::rpm) * distCtrl;
-		double vel = std::min(maxRPM.convert(okapi::rpm), decelRPM);
-		double volts = vel / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		double turnVolts = turnRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		moveArcade(volts * dir, -turnVolts * headingCtrl, 6000);
+		
+		// Calculate Linear Power
+		double linearRPM = params.maxRPM.convert(okapi::rpm) * distCtrl;
+		double linearVel = std::clamp(linearRPM, params.minRPM.convert(okapi::rpm), params.maxRPM.convert(okapi::rpm));
+		double linearPower = linearVel / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT * dir;
+		
+		// Calculate Angular Power
+		double angularRPM = params.turnRPM.convert(okapi::rpm) * headingCtrl;
+		double angularVel = std::max(std::abs(angularRPM), params.minRPM.abs().convert(okapi::rpm)) * Util::sgn(headingCtrl);
+		double angularPower = angularVel / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+		
+		// Sets Motor Speeds with Slew Rate for Acceleration
+		moveArcade(linearPower, -angularPower, params.slewRate);
 
 		pros::delay(20);
 	}
 
-	moveTank(0, 0);
+	if (params.minRPM.convert(okapi::rpm) == 0) moveTank(0, 0);
 	printDebug("[Inline::MoveDistance] Finished with distance of %f\" with a heading of %f deg, taking %d ms\n", currDist, inertial->get_rotation(AngleUnit::DEG), pros::millis() - st);
 }
 
-void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib16868C::PIDGains gains, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
-	PIDController turnPID(gains, 1, -1);
+void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams params) {
+	PIDController turnPID(params.gains, 1, -1);
 
-	double currAngle;
+	double currAngle = inertial->get_rotation(AngleUnit::DEG);
+	double target = getTargetHeading(angle.convert(okapi::degree), currAngle, false, params.dir);
 	uint st = pros::millis();
 	int inMargin = 0;
-	while (inMargin < numInMargin) {
+	while (inMargin < params.numInMargin) {
 		// Timeout
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::TurnAbsolute] Timeout: %d\n", pros::millis() - st);
@@ -111,16 +126,17 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 		currAngle = inertial->get_rotation(AngleUnit::DEG);
 
 		// Checks if robot is within the error margin to terminate
-		if (std::abs(angle.convert(okapi::degree) - currAngle) < errorMargin) inMargin++;
+		if (std::abs(angle.convert(okapi::degree) - currAngle) < params.errorMargin) inMargin++;
 		else inMargin = 0;
 
 		// Calculate turn power
-		double turnCtrl = turnPID.calculate(angle.convert(okapi::degree), currAngle);
-		double maxVolts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		double volts = maxVolts * turnCtrl;
+		double turnCtrl = turnPID.calculate(target, currAngle);
+		double turnRPM = params.maxRPM.convert(okapi::rpm) * turnCtrl;
+		turnRPM = std::max(std::abs(turnRPM), params.minRPM.convert(okapi::rpm)) * Util::sgn(turnRPM);
+		double volts = turnRPM / static_cast<int>(leftMtrs.getGearing()) * 12000;
 
 		// Determine turn type
-		switch (turnWheel) {
+		switch (params.turnWheel) {
 			case TurnWheel::LEFT:
 				rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
 				moveTank(-volts, 0);
@@ -143,75 +159,42 @@ void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, lib1
 	printDebug("[Inline::TurnAbsolute] Finished with heading of %f deg, taking %d ms\n", inertial->get_rotation(AngleUnit::DEG), pros::millis() - st);
 }
 
-void Inline::turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, TurnDirection turnDir, double errorMargin, int numInMargin, TurnWheel turnWheel, int timeout) {
-	PIDController turnPID(gains);
 
-	if (turnDir == TurnDirection::SHORTEST) {
-		if (std::abs(angle.convert(okapi::degree) - inertial->get_rotation(AngleUnit::DEG)) < 180) turnDir = TurnDirection::COUNTER_CLOCKWISE;
-		else turnDir = TurnDirection::CLOCKWISE;
+void Inline::turnToPoint(Pose target, int timeout, TurnToPointParams params) {
+	if (!odom) {
+		printError("[Inline::TurnToPoint] No Odometry class was provided, unable to call moveToPoint\n");
+		return;
 	}
 
-	double heading = inertial->get_rotation(AngleUnit::DEG);
-	double target = angle.convert(okapi::degree);
-	if (turnDir == TurnDirection::CLOCKWISE) target = ReduceAngle::reduce(target, heading + 360.0, heading);
-	if (turnDir == TurnDirection::COUNTER_CLOCKWISE) target = ReduceAngle::reduce(target, heading, heading - 360.0);
+	double tgtHeading = odom->getPose().angleTo(target).convert(okapi::degree);
+	tgtHeading = getTargetHeading(tgtHeading, inertial->get_rotation(AngleUnit::DEG));
+	TurnAbsoluteParams turnAbsoluteParams = {params.maxRPM,
+											params.minRPM, 
+											params.gains, 
+											params.errorMargin, 
+											params.numInMargin,
+											params.turnWheel,
+											params.dir,
+											params.slewRate};
 
-	uint st = pros::millis(), t = pros::millis();
-	int inMargin = 0;
-	while (inMargin < numInMargin) {
-		t = pros::millis();
-		if (t - st > timeout && timeout > 0) {
-			printError("[Inline::TurnAbsolute] Timeout: %d\n", pros::millis() - st);
-			break;
-		}
-
-		heading = inertial->get_rotation(AngleUnit::DEG);
-
-		if (std::abs(target - heading) < errorMargin) inMargin++;
-		else inMargin = 0;
-
-		double turnCtrl = turnPID.calculate(target, heading);
-		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000 * turnCtrl;
-
-		switch (turnWheel) {
-			case TurnWheel::LEFT:
-				rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-				moveTank(-volts, 0, 6000);
-				break;
-			case TurnWheel::RIGHT:
-				leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::brake);
-				moveTank(0, volts, 6000);
-				break;
-			case TurnWheel::BOTH:
-				moveTank(-volts, volts, 6000);
-				break;
-		}
-
-		pros::delay(20);
-	}
-
-	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
-	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
-	moveTank(0, 0);
-	std::cout << "[Inline Turn Absolute] Finished with heading of " << inertial->get_rotation(AngleUnit::DEG) << " deg, taking " << pros::millis() - st << "ms" << std::endl;
+	turnAbsolute(tgtHeading * okapi::degree, timeout, turnAbsoluteParams);
 }
 
-void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward, bool stopMtrs, int timeout) {
+void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
 	if (!odom) {
 		printError("[Inline::MoveToPoint] No Odometry class was provided, unable to call moveToPoint\n");
 		return;
 	}
 
-	PIDController distPID(distGains, 0, 0);
-	PIDController headingPID(headingGains, 0, 0);
+	PIDController distPID(params.distGains, 0, 0);
+	PIDController headingPID(params.headingGains, 1, -1);
 
 	Pose pose = odom->getPose();
 
-	int dir = backward ? -1 : 1;
+	int dir = params.reverse ? -1 : 1;
 
 	uint st = pros::millis();
-	int i = 0;
-	while (pose.distTo(target) >= endRadius) {
+	while (pose.distTo(target) >= params.endRadius || (params.minRPM.convert(okapi::rpm) > 0 && pose.distTo(target) >= params.earlyEndRadius)) {
 		// Timeout
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::MoveToPoint] Timeout: %d\n", pros::millis() - st);
@@ -222,8 +205,8 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 		pose = odom->getPose();
 		double curHeading = inertial->get_rotation(AngleUnit::RAD);
 		double distLeft = pose.distTo(target).convert(okapi::inch);
-		double heading = angleErrorRad(pose.angleTo(target).convert(okapi::radian), curHeading);
-		if (backward) heading = angleErrorRad(target.angleTo(pose).convert(okapi::radian), curHeading);
+		double heading = getTargetHeading(pose.angleTo(target).convert(okapi::radian), curHeading, true);
+		if (params.reverse) heading = getTargetHeading(target.angleTo(pose).convert(okapi::radian), curHeading, true);
 
 		// Calculate PID control values
 		double distCtrl = distPID.calculate(distLeft);
@@ -231,19 +214,43 @@ void Inline::moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains dist
 		double headingCtrl = headingPID.calculate(headingErr);
 
 		// Determine heading deadzone
-		double turnDeadzone = M_PI_2 - std::atan2(distLeft, (endRadius * 0.7).convert(okapi::inch));
+		double turnDeadzone = M_PI_2 - std::atan2(distLeft, (params.endRadius * params.turnDeadzone).convert(okapi::inch));
 		if (std::abs(heading) < std::abs(turnDeadzone)) headingCtrl = 0;
 
 		// Calculate final power
-		double volts = maxRPM.convert(okapi::rpm) / static_cast<int>(leftMtrs.getGearing()) * 12000;
-		moveArcade(volts * distCtrl * dir * std::abs(std::cos(headingErr)), -volts * headingCtrl, 3000);
-		// printDebug("%s, %f\n", pose.toStr(), Util::radToDeg(heading));
+		double fwdRPM = params.maxRPM.convert(okapi::rpm) * distCtrl;
+		fwdRPM = std::clamp(fwdRPM, params.minRPM.convert(okapi::rpm), params.maxRPM.convert(okapi::rpm));
+		double fwdVolts = fwdRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+		double fwdPower = fwdVolts * dir * std::abs(std::cos(headingErr));
+
+		double turnRPM = params.maxRPM.convert(okapi::rpm) * headingCtrl;
+		double turnVolts = turnRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+		double turnPower = -turnVolts;
+
+		moveArcade(fwdPower, turnPower, params.slewRate);
 
 		pros::delay(20);
 	}
 
-	if (stopMtrs) moveTank(0, 0);
+	if (params.minRPM.convert(okapi::rpm) == 0)
+		moveTank(0, 0);
 	printDebug("[Inline::MoveToPoint] Finished with pose of %s, taking %d ms\n", odom->getPose().toStr(), pros::millis() - st);
+}
+
+void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
+	if (!odom) {
+		printError("[Inline::MoveToPoint] No Odometry class was provided, unable to call moveToPoint\n");
+		return;
+	}
+
+	PIDController distPID(params.distGains, 0, 0);
+	PIDController headingPID(params.headingGains, 1, -1);
+
+	Pose pose = odom->getPose();
+	
+	int dir = params.reverse ? -1 : 1;
+
+	uint st = pros::millis();
 }
 
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {

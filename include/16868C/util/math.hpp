@@ -14,11 +14,9 @@ enum class TurnDirection {
 double sma(double input, double prev);
 double ema(double input, double prev, double a);
 
-double normalizeAngleDeg(double deg);
-double normalizeAngleRad(double rad);
+double normalizeAngle(double ang, bool rad = true);
 
-double angleErrorDeg(double target, double current, TurnDirection direction = TurnDirection::SHORTEST);
-double angleErrorRad(double target, double current, TurnDirection direction = TurnDirection::SHORTEST);
+double getTargetHeading(double target, double current, bool rad = true, TurnDirection dir = TurnDirection::SHORTEST);
 
 namespace ReduceAngle {
 	template<typename T> inline T reduce(T ang, T max, T min) {

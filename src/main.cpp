@@ -8,7 +8,7 @@
 
 using namespace lib16868C;
 
-
+/*
 std::function<void()> auton = redSoloAWP;
 pros::Task autonSelect = pros::Task([]() {
 	while (true) {
@@ -73,7 +73,7 @@ pros::Task autonSelect = pros::Task([]() {
 
 		pros::delay(100);
 	}
-}, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Selector");
+}, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Selector");*/
 
 void initialize() {
 	pros::lcd::initialize();
@@ -90,11 +90,11 @@ void disabled() {}
 void competition_initialize() {}
 
 void autonomous() {
-	autonSelect.suspend();
+	// autonSelect.suspend();
 	uint st = pros::millis();
 	// arm.resetPosition();
 
-	auton();
+	// auton();
 	// redRightAWP();
 	// redSoloAWP();
 	// blueSoloAWP();
@@ -112,7 +112,7 @@ void autonomous() {
 }
 
 void opcontrol() {
-	autonSelect.suspend();
+	// autonSelect.suspend();
 
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 

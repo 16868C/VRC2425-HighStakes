@@ -8,7 +8,7 @@ using namespace lib16868C;
 void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A) {
 	while (!master.getDigital(btn)) pros::delay(10);
 }
-
+/*
 void redSoloAWP() {
 	odometry.update({124_in, 60_in, 25_deg});
 
@@ -526,4 +526,4 @@ void blueElimScore() {
 	chassis.moveDistance(26_in, 600_rpm, {0.07, 0, 1.5}, 340_deg, 300_rpm, {0.05, 0, 0.1}, 1000);
 	chassis.turnAbsolute(270_deg, 600_rpm, {0.03, 0, 0.7}, 3, 5, TurnWheel::BOTH, 1000);
 	stick.retract();
-}
+}*/
