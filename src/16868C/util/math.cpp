@@ -44,6 +44,19 @@ std::string Point::toStr() {
 	return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
 }
 
+Point Point::operator+(Point rhs) {
+	return Point(x + rhs.x, y + rhs.y);
+}
+Point Point::operator-(Point rhs) {
+	return Point(x - rhs.x, y - rhs.y);
+}
+Point Point::operator*(double rhs) {
+	return Point(x * rhs, y * rhs);
+}
+Point Point::operator/(double rhs) {
+	return Point(x / rhs, y / rhs);
+}
+
 /** Line **/
 Line::Line() : Line(-1, 1, 0) {}
 Line::Line(double A, double B, double C) : A(A), B(B), C(C) {}

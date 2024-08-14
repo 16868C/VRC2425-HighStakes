@@ -36,6 +36,25 @@ std::string lib16868C::Pose::toStr() {
 	return "{" + pos.toStr() + ", theta: " + std::to_string(Util::radToDeg(theta)) + ", time: " + std::to_string(time) + "}";
 }
 
+Pose Pose::operator+(Pose rhs) {
+	return Pose(pos + rhs.pos, theta, time);
+}
+Pose Pose::operator+(Point rhs) {
+	return Pose(pos + rhs, theta, time);
+}
+Pose Pose::operator-(Pose rhs) {
+	return Pose(pos - rhs.pos, theta, time);
+}
+Pose Pose::operator-(Point rhs) {
+	return Pose(pos - rhs, theta, time);
+}
+Pose Pose::operator*(double rhs) {
+	return Pose(pos * rhs, theta, time);
+}
+Pose Pose::operator/(double rhs) {
+	return Pose (pos / rhs, theta, time);
+}
+
 // Pose& lib16868C::Pose::operator=(const Pose& p) {
 // 	pos = p.pos;
 // 	theta = p.theta;

@@ -203,7 +203,7 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
 
 		// Calculate Distance and Heading
 		pose = odom->getPose();
-		double curHeading = inertial->get_rotation(AngleUnit::RAD);
+		double curHeading = pose.theta;
 		double distLeft = pose.distTo(target).convert(okapi::inch);
 		double heading = getTargetHeading(pose.angleTo(target).convert(okapi::radian), curHeading, true);
 		if (params.reverse) heading = getTargetHeading(target.angleTo(pose).convert(okapi::radian), curHeading, true);
@@ -251,6 +251,43 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 	int dir = params.reverse ? -1 : 1;
 
 	uint st = pros::millis();
+	while (pose.distTo(target) < params.endRadius) {
+		if (pros::millis() - st > timeout && timeout > 0) {
+			printError("[Inline::MoveToPose] Timeout: %d\n", pros::millis() - st);
+			break;
+		}
+
+		pose = odom->getPose();
+
+		double dist = pose.distTo(target).convert(okapi::inch);
+		Pose carrot = target - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.ld;
+		if (dist < params.headingCorrect.convert(okapi::inch)) carrot = target;
+
+		double distErr = pose.distTo(carrot).convert(okapi::inch);
+		double headingErr = getTargetHeading(pose.angleTo(carrot).convert(okapi::radian), pose.theta, true);
+		if (params.reverse) headingErr = getTargetHeading(carrot.angleTo(pose).convert(okapi::radian), pose.theta, true);
+
+		double distCtrl = distPID.calculate(distErr);
+		double headingCtrl = headingPID.calculate(headingErr);
+
+		double fwdRPM = params.maxRPM.convert(okapi::rpm) * distCtrl;
+		double turnRPM = params.maxRPM.convert(okapi::rpm) * headingCtrl;
+		fwdRPM = std::clamp(fwdRPM, params.minRPM.convert(okapi::rpm), params.maxRPM.convert(okapi::rpm));
+		turnRPM = std::min(std::abs(turnRPM), params.maxRPM.convert(okapi::rpm)) * Util::sgn(turnRPM);
+
+		double fwdVolts = fwdRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+		double turnVolts = fwdRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+
+		double fwdPower = fwdVolts * dir * std::abs(std::cos(headingErr));
+		double turnPower = -turnVolts;
+
+		moveArcade(fwdPower, turnPower, params.slewRate);
+
+		pros::delay(10);
+	}
+
+	moveTank(0, 0);
+	printDebug("[Inline::MoveToPose] Finished with pose of %s, taking %d ms\n", odom->getPose().toStr(), pros::millis() - st);
 }
 
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {

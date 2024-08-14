@@ -57,6 +57,11 @@ class Point {
 	double angleTo(Point p);
 
 	std::string toStr();
+
+	Point operator+(Point rhs);
+	Point operator-(Point rhs);
+	Point operator*(double rhs);
+	Point operator/(double rhs);
 };
 
 class Line {

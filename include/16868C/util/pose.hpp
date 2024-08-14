@@ -23,6 +23,13 @@ class Pose {
 
 		std::string toStr();
 
+		Pose operator+(Pose rhs);
+		Pose operator+(Point rhs);
+		Pose operator-(Pose rhs);
+		Pose operator-(Point rhs);
+		Pose operator*(double rhs);
+		Pose operator/(double rhs);
+
 	private:
 		Pose(Point pos, double theta, uint time);
 		Pose(double x, double y, double theta, uint time);

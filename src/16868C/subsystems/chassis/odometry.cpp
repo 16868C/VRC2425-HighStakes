@@ -133,6 +133,7 @@ void Odometry::init(Pose pose) {
 
 	// Resetting pose
 	update(pose);
+	inertial->set_rotation(pose.theta * okapi::radian);
 
 	// Starting task
 	odomTask.resume();
@@ -219,7 +220,7 @@ void Odometry::update(okapi::QLength x, okapi::QLength y) {
 	poseMutex.give();
 }
 void Odometry::update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta) {
-	inertial->set_rotation(theta);
+	// inertial->set_rotation(theta);
 	// if (!poseMutex.take(50)) {
 	// 	std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
 	// 	return;
