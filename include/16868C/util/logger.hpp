@@ -59,10 +59,10 @@ class Logger {
 		template<typename ... Args> inline void print(const char* fmt, Args ... args) {
 			char* fmted;
 			char* s;
-			sprintf(fmted, fmt, Argument(args) ...);
-			sprintf(s, "[%s] %s", std::to_string(pros::millis()), fmted);
-			fileOut << s;
-			fileOut.flush();
+			// snprintf(fmted, sizeof(fmt), fmt, Argument(args) ...);
+			// sprintf(s, "[%s] %s", std::to_string(pros::millis()), fmted);
+			// fileOut << s;
+			// fileOut.flush();
 		}
 		
 		/**

@@ -7,7 +7,7 @@ using namespace lib16868C;
 void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A) {
 	while (!master.getDigital(btn)) pros::delay(10);
 }
-
+/*
 void nearAWPBar() {
 	intake.moveVoltage(12000); // Ensure preload is in the robot
 	// Move in front of the matchload triball

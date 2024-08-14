@@ -10,7 +10,7 @@ Logger::Logger(const std::string file) {
 		fileExt = ".txt";
 	fileExt = file.substr(file.find_last_of("."));
 
-	fileOut = std::ofstream("/usd/" + file);
+	fileOut = std::ofstream("/usd/" + fileName + fileExt);
 }
 Logger::~Logger() {
 	fileOut.flush();
@@ -27,7 +27,8 @@ std::ofstream& Logger::getFileOutput() {
 	return fileOut;
 }
 
-CSVLogger::CSVLogger(std::string file, std::initializer_list<std::string> cols, uint writeInterval) : Logger(file.find_last_of(".") == file.size() ? file + ".csv" : file) {
+CSVLogger::CSVLogger(std::string file, std::initializer_list<std::string> cols, uint writeInterval)
+	: Logger(file.find_last_of(".") == file.size() ? file + ".csv" : file) {
 	fileOut << "time,";
 	for (std::string c : cols) {
 		// Headers
