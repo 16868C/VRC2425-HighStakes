@@ -1,8 +1,8 @@
 #include "robotconfig.hpp"
 #include "16868C/devices/trackingWheel.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
-#include "16868C/devices/pneumatic.hpp"
 #include "okapi/api/device/motor/abstractMotor.hpp"
+#include "pros/adi.h"
 #include "pros/adi.hpp"
 
 okapi::Controller master(okapi::ControllerId::master);
@@ -24,16 +24,16 @@ lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
 lib16868C::MotorGroup armMtrs({armLeft, armRight});
 
 // Pneumatics
-lib16868C::Pneumatic clamp(MOGO_CLAMP, false);
-lib16868C::Pneumatic hang(HANG);
-lib16868C::Pneumatic stick(STICK);
+pros::adi::Pneumatics clamp(MOGO_CLAMP, false);
+pros::adi::Pneumatics hang(HANG, false);
+pros::adi::Pneumatics stick(STICK, false);
 
 // Sensors
 lib16868C::Inertial inertial(INERTIAL, &master);
 okapi::DistanceSensor hookDist(HOOK_DISTANCE_SNSR);
 okapi::OpticalSensor ringDetect(RING_OPTICAL_SNSR);
 
-pros::ADIPotentiometer autonSelector(AUTON_SELECTOR);
+pros::adi::Potentiometer autonSelector(AUTON_SELECTOR, pros::E_ADI_POT_V2);
 
 lib16868C::Rotation vertRot(VERT_ENC);
 lib16868C::Rotation hortRot(HORT_ENC);
