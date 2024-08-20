@@ -33,17 +33,22 @@ void Inertial::calibrate() {
 		pros::lcd::print(0, "Inertial Drift Detected: %f deg difference in 500ms", std::abs(h1 - h2));
 		if (controller) controller->rumble("--------");
 	}
-	if (std::isinf(pros::Imu::get_rotation())) calibrate();
+	if (std::isinf(pros::Imu::get_rotation())) {
+		st = pros::millis();
+		calibrate();
+	}
 
 	printDebug("[Inertial] Calibration time: %d ms\n", pros::millis() - st);
 
 	if (pros::millis() - st < 1950) {
 		if (controller) controller->rumble("--------");
+		st = pros::millis();
 		calibrate();
 	}
 	if (infDetected) {
 		infDetected = false;
 		if (controller) controller->rumble("--------");
+		st = pros::millis();
 		calibrate();
 	}
 }

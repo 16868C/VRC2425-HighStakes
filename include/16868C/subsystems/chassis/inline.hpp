@@ -76,7 +76,7 @@ struct MoveToPoseParams {
 	bool reverse = false;
 
 	okapi::QLength endRadius = 1_in;
-	okapi::QLength headingCorrect = 5_in;
+	okapi::QLength settleRadius = 7.5_in;
 
 	double ld = 1.2;
 

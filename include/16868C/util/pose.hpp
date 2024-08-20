@@ -8,6 +8,7 @@ namespace lib16868C {
 class Pose {
 	public:
 		Point pos;
+		double& x = pos.x, y = pos.y;
 		double theta;
 		uint time;
 
@@ -29,6 +30,8 @@ class Pose {
 		Pose operator-(Point rhs);
 		Pose operator*(double rhs);
 		Pose operator/(double rhs);
+
+		Pose& operator=(const Pose& other);
 
 	private:
 		Pose(Point pos, double theta, uint time);

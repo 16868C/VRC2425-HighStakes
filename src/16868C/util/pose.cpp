@@ -55,9 +55,11 @@ Pose Pose::operator/(double rhs) {
 	return Pose (pos / rhs, theta, time);
 }
 
-// Pose& lib16868C::Pose::operator=(const Pose& p) {
-// 	pos = p.pos;
-// 	theta = p.theta;
-// 	time = p.time;
-// 	return *this;
-// }
+Pose& lib16868C::Pose::operator=(const Pose& p) {
+	pos = p.pos;
+	x = p.pos.x;
+	y = p.pos.y;
+	theta = p.theta;
+	time = p.time;
+	return *this;
+}

@@ -94,6 +94,8 @@ void autonomous() {
 	uint st = pros::millis();
 	// arm.resetPosition();
 
+	chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=200_rpm, .distGains={.kP=0.3, .kD=0.1}, .headingGains={.kP=5, .kD=0.1}, .endRadius=3_in, .ld=0.6});
+
 	// auton();
 	// redRightAWP();
 	// redSoloAWP();
