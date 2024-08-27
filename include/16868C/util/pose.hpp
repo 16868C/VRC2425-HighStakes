@@ -5,10 +5,8 @@
 #include <string>
 
 namespace lib16868C {
-class Pose {
+class Pose : public Point {
 	public:
-		Point pos;
-		double& x = pos.x, y = pos.y;
 		double theta;
 		uint time;
 
@@ -16,18 +14,17 @@ class Pose {
 		Pose(okapi::QLength x, okapi::QLength y);
 		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta);
 		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, uint time);
+		Pose(const Pose& pose);
 
-		okapi::QLength distTo(Point p);
 		okapi::QLength distTo(Pose p);
-		okapi::QAngle angleTo(Point p);
 		okapi::QAngle angleTo(Pose p);
 
 		std::string toStr();
 
-		Pose operator+(Pose rhs);
 		Pose operator+(Point rhs);
-		Pose operator-(Pose rhs);
+		Pose operator+(Pose rhs);
 		Pose operator-(Point rhs);
+		Pose operator-(Pose rhs);
 		Pose operator*(double rhs);
 		Pose operator/(double rhs);
 

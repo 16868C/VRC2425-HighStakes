@@ -52,7 +52,7 @@ void Odometry::odomManager(void* param) {
 
 		// Output
 		Pose pose = odom->getPose();
-		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.pos.x, pose.pos.y);
+		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.x, pose.y);
 		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(pose.theta), pose.theta);
 		// printDebug("%f, %f, %f\n", pose.theta, odom->inertial->get_rotation(AngleUnit::RAD), Util::radToDeg(pose.theta));
 
@@ -179,7 +179,7 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 
 		double snsrDir = ReduceAngle::rad2Pi(theta + j * M_PI_2);
 		if (snsrDir == 2 * M_PI) snsrDir = 0;
-		Line dist(tan(snsrDir), getPose().pos);
+		Line dist(tan(snsrDir), getPose());
 		// std::cout << i << "\n";
 
 		// Do not use sensor reading (does not actually read the distance to the correct wall)
@@ -204,8 +204,8 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 
 	// Use the most accurate readings
 	Pose newPose(x1.first * okapi::millimeter, y1.first * okapi::millimeter, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
-	if (x2.second > x1.second) newPose.pos.x = x2.first;
-	if (y2.second > y1.second) newPose.pos.y = y2.first;
+	if (x2.second > x1.second) newPose.x = x2.first;
+	if (y2.second > y1.second) newPose.y = y2.first;
 	update(newPose);
 }
 void Odometry::update(okapi::QLength x, okapi::QLength y) {
@@ -216,7 +216,7 @@ void Odometry::update(okapi::QLength x, okapi::QLength y) {
 	while (!poseMutex.take(5)) {
 		pros::delay(1);
 	}
-	pose.pos = {x.convert(okapi::inch), y.convert(okapi::inch)};
+	pose = Pose(x, y, pose.theta * okapi::radian, pose.time);
 	poseMutex.give();
 }
 void Odometry::update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta) {
@@ -233,7 +233,7 @@ void Odometry::update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta) {
 	poseMutex.give();
 }
 void Odometry::update(Pose pose) {
-	update(pose.pos.x * okapi::inch, pose.pos.y * okapi::inch, pose.theta * okapi::radian);
+	update(pose.x * okapi::inch, pose.y * okapi::inch, pose.theta * okapi::radian);
 }
 
 /* --------------------------- Getters and Setter --------------------------- */
@@ -287,8 +287,8 @@ void Odometry::step(std::array<double, 4> deltas) {
 	if (std::isnan(globalDeltaY)) globalDeltaY = 0;
 	if (std::isnan(deltaA)) deltaA = 0;
 
-	double globalX = pose.pos.x + globalDeltaX;
-	double globalY = pose.pos.y + globalDeltaY;
+	double globalX = pose.x + globalDeltaX;
+	double globalY = pose.y + globalDeltaY;
 	double globalTheta = inertial->get_rotation(AngleUnit::RAD);
 	update({globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()});
 }
