@@ -16,9 +16,6 @@ class Pose : public Point {
 		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, uint time);
 		Pose(const Pose& pose);
 
-		okapi::QLength distTo(Pose p);
-		okapi::QAngle angleTo(Pose p);
-
 		std::string toStr();
 
 		Pose operator+(Point rhs);

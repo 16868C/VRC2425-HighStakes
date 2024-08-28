@@ -167,7 +167,7 @@ void Inline::turnToPoint(Pose target, int timeout, TurnToPointParams params) {
 		return;
 	}
 
-	double tgtHeading = odom->getPose().angleTo(target).convert(okapi::degree);
+	double tgtHeading = Util::radToDeg(odom->getPose().angleTo(target));
 	tgtHeading = getTargetHeading(tgtHeading, inertial->get_rotation(AngleUnit::DEG));
 	TurnAbsoluteParams turnAbsoluteParams = {params.maxRPM,
 											params.minRPM, 
@@ -195,7 +195,7 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
 	int dir = params.reverse ? -1 : 1;
 
 	uint st = pros::millis();
-	while (pose.distTo(target) >= params.endRadius || (params.minRPM.convert(okapi::rpm) > 0 && pose.distTo(target) >= params.earlyEndRadius)) {
+	while (pose.distTo(target) >= params.endRadius.convert(okapi::inch) || (params.minRPM.convert(okapi::rpm) > 0 && pose.distTo(target) >= params.earlyEndRadius.convert(okapi::inch))) {
 		// Timeout
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::MoveToPoint] Timeout: %d\n", pros::millis() - st);
@@ -205,9 +205,9 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
 		// Calculate Distance and Heading
 		pose = odom->getPose();
 		double curHeading = pose.theta;
-		double distLeft = pose.distTo(target).convert(okapi::inch);
-		double heading = getTargetHeading(pose.angleTo(target).convert(okapi::radian), curHeading, true);
-		if (params.reverse) heading = getTargetHeading(target.angleTo(pose).convert(okapi::radian), curHeading, true);
+		double distLeft = pose.distTo(target);
+		double heading = getTargetHeading(pose.angleTo(target), curHeading, true);
+		if (params.reverse) heading = getTargetHeading(target.angleTo(pose), curHeading, true);
 
 		// Calculate PID control values
 		double distCtrl = distPID.calculate(distLeft);
@@ -257,8 +257,8 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 	uint st = pros::millis();
 	FILE* data = fopen("/usd/Data.csv", "w");
 	// printDebug("x,y,theta,crtx,crty,fwdPower,distErr,distCtrl,turnPower,headingErr,headingCtrl\n");
-	fputs("x,y,theta,crtx,crty,fwdPower,distErr,distCtrl,turnPower,headingErr,headingCtrl\n", data);
-	while (pose.distTo(target) >= params.endRadius || Util::radToDeg(abs(target.theta - pose.theta)) > 5) {
+	// fputs("x,y,theta,crtx,crty,fwdPower,distErr,distCtrl,turnPower,headingErr,headingCtrl\n", data);
+	while (pose.distTo(target) >= params.endRadius.convert(okapi::inch) || Util::radToDeg(abs(target.theta - pose.theta)) > 5) {
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::MoveToPose] Timeout: %d\n", pros::millis() - st);
 			break;
@@ -266,17 +266,17 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 		pose = odom->getPose();
 
-		if (pose.distTo(target) < params.settleRadius) settling = true;
+		if (pose.distTo(target) < params.settleRadius.convert(okapi::inch)) settling = true;
 		else settling = false;
 
-		double dist = pose.distTo(target).convert(okapi::inch);
-		Pose carrot = target - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.ld;
+		double dist = pose.distTo(target);
+		Point carrot = target - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.ld;
 		if (settling) carrot = target;
 
-		double distErr = pose.distTo(carrot).convert(okapi::inch);
-		double headingErr = getTargetHeading(pose.angleTo(carrot).convert(okapi::radian), pose.theta, true) - pose.theta;
-		if (params.reverse) headingErr = getTargetHeading(carrot.angleTo(pose).convert(okapi::radian), pose.theta, true) - pose.theta;
-		if (settling) headingErr = getTargetHeading(target.theta, pose.theta) - pose.theta;
+		double distErr = pose.distTo(carrot);
+		double headingErr = getTargetHeading(pose.angleTo(carrot), pose.theta, true) - pose.theta;
+		if (params.reverse) headingErr = getTargetHeading(carrot.angleTo(pose), pose.theta, true) - pose.theta;
+		if (settling) headingErr = getTargetHeading(target.theta, pose.theta, true) - pose.theta;
 
 		double distCtrl = distPID.calculate(distErr);
 		double headingCtrl = headingPID.calculate(headingErr);
@@ -303,12 +303,12 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 		// 	n = 1;
 		// 	printDebug("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, Util::radToDeg(pose.theta), carrot.x, carrot.y, fwdPower, distErr, distCtrl, turnPower, Util::radToDeg(headingErr), headingCtrl);
 		// }
-		fprintf(data, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, Util::radToDeg(pose.theta), carrot.x, carrot.y, fwdPower, distErr, distCtrl, turnPower, Util::radToDeg(headingErr), headingCtrl);
-		fflush(data);
-		if (n++ % 100 == 0) {
-			fclose(data);
-			data = fopen("/usd/Data.csv", "a");
-		}
+		// fprintf(data, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, Util::radToDeg(pose.theta), carrot.x, carrot.y, fwdPower, distErr, distCtrl, turnPower, Util::radToDeg(headingErr), headingCtrl);
+		// fflush(data);
+		// if (n++ % 100 == 0) {
+		// 	fclose(data);
+		// 	data = fopen("/usd/Data.csv", "a");
+		// }
 
 		pros::delay(10);
 	}

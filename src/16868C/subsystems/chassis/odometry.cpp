@@ -141,13 +141,13 @@ void Odometry::init(Pose pose) {
 
 /* -------------------------- Pose Related Methods -------------------------- */
 Pose Odometry::getPose() {
-	// if (!poseMutex.take(50)) {
-	// 	std::cerr << "[Odometry::getPose] Mutex timeout - unable to read current pose" << std::endl;
-	// 	return prevPose;
-	// }
-	while (!poseMutex.take(5)) {
-		pros::delay(1);
+	if (!poseMutex.take(50)) {
+		std::cerr << "[Odometry::getPose] Mutex timeout - unable to read current pose" << std::endl;
+		return prevPose;
 	}
+	// while (!poseMutex.take(5)) {
+	// 	pros::delay(1);
+	// }
 
 	Pose pos = pose;
 	poseMutex.give();
@@ -221,14 +221,18 @@ void Odometry::update(okapi::QLength x, okapi::QLength y) {
 }
 void Odometry::update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta) {
 	// inertial->set_rotation(theta);
-	// if (!poseMutex.take(50)) {
-	// 	std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
-	// 	return;
-	// }
-	while (!poseMutex.take(5)) {
-		pros::delay(1);
+	if (!poseMutex.take(50)) {
+		std::cerr << "[Odometry::update] Mutex timout - unable to update pose" << std::endl;
+		return;
 	}
-	this->pose = Pose(x, y, theta, pros::millis());
+	// while (!poseMutex.take(5)) {
+	// 	pros::delay(1);
+	// }
+	// this->pose = Pose(x, y, theta, pros::millis());
+	pose.x = x.convert(okapi::inch);
+	pose.y = y.convert(okapi::inch);
+	pose.theta = theta.convert(okapi::radian);
+	pose.time = pros::millis();
 	// std::cout << x.convert(okapi::inch) << " " << y.convert(okapi::inch) << "\n";
 	poseMutex.give();
 }
