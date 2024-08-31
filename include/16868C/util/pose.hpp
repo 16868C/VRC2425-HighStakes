@@ -1,7 +1,7 @@
 #pragma once
 #include "okapi/api/units/QAngle.hpp"
 #include "okapi/api/units/QLength.hpp"
-#include "16868C/util/math.hpp"
+#include "16868C/util/point.hpp"
 #include <string>
 
 namespace lib16868C {

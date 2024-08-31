@@ -1,5 +1,6 @@
 #pragma once
-#include <cmath>
+#include "16868C/util/pose.hpp"
+#include "16868C/util/point.hpp"
 #include <string>
 
 namespace lib16868C {
@@ -15,7 +16,6 @@ double sma(double input, double prev);
 double ema(double input, double prev, double a);
 
 double normalizeAngle(double ang, bool rad = true);
-
 double getTargetHeading(double target, double current, bool rad = true, TurnDirection dir = TurnDirection::SHORTEST);
 
 namespace ReduceAngle {
@@ -46,23 +46,7 @@ namespace ReduceAngle {
 	}
 }
 
-class Point {
-	public:
-	double x, y;
-
-	Point();
-	Point(double x, double y);
-
-	double distTo(Point p);
-	double angleTo(Point p);
-
-	std::string toStr();
-
-	Point operator+(Point rhs);
-	Point operator-(Point rhs);
-	Point operator*(double rhs);
-	Point operator/(double rhs);
-};
+double getRadius(Pose p1, Point p2);
 
 class Line {
 	public:

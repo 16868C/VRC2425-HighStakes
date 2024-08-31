@@ -65,7 +65,7 @@ void Odometry::odomManager(void* param) {
 
 		prev = curr;
 
-		pros::Task::delay_until(&time, 50);
+		pros::Task::delay_until(&time, 10);
 	}
 }
 
@@ -284,7 +284,7 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double avgA = pose.theta + (deltaA / 2.0);
 	// double globalDeltaX = localOffsetX * cos(avgA) + localOffsetY * cos(avgA);
 	// double globalDeltaY = localOffsetX * -sin(avgA) + localOffsetY * sin(avgA);
-	double globalDeltaX = localOffsetX * sin(avgA) + localOffsetY * cos(avgA);
+	double globalDeltaX = localOffsetX * -sin(avgA) + localOffsetY * cos(avgA);
 	double globalDeltaY = localOffsetX * cos(avgA) + localOffsetY * sin(avgA);
 
 	if (std::isnan(globalDeltaX)) globalDeltaX = 0;
@@ -294,5 +294,9 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double globalX = pose.x + globalDeltaX;
 	double globalY = pose.y + globalDeltaY;
 	double globalTheta = inertial->get_rotation(AngleUnit::RAD);
+	// pose.x = globalX;
+	// pose.y = globalY;
+	// pose.theta = globalTheta;
+	// pose.time = pros::millis();
 	update({globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()});
 }

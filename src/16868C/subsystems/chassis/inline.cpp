@@ -250,15 +250,20 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 	PIDController headingPID(params.headingGains, 1, -1);
 
 	Pose pose = odom->getPose();
+	double dist = pose.distTo(target);
+	Pose carrot = target - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.dlead;
+	Pose ghost = carrot * params.glead + target * (1 - params.glead);
+	Pose& tgt = ghost;
 	
 	int dir = params.reverse ? -1 : 1;
 	bool settling = false;
+	bool prevSide = true;
 
 	uint st = pros::millis();
-	FILE* data = fopen("/usd/Data.csv", "w");
+	// FILE* data = fopen("/usd/Data.csv", "w");
 	// printDebug("x,y,theta,crtx,crty,fwdPower,distErr,distCtrl,turnPower,headingErr,headingCtrl\n");
 	// fputs("x,y,theta,crtx,crty,fwdPower,distErr,distCtrl,turnPower,headingErr,headingCtrl\n", data);
-	while (pose.distTo(target) >= params.endRadius.convert(okapi::inch) || Util::radToDeg(abs(target.theta - pose.theta)) > 5) {
+	while (true) {
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::MoveToPose] Timeout: %d\n", pros::millis() - st);
 			break;
@@ -266,16 +271,30 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 		pose = odom->getPose();
 
-		if (pose.distTo(target) < params.settleRadius.convert(okapi::inch)) settling = true;
+		if ((pose.distTo(ghost) < 5 || pose.distTo(carrot) < 5) && &tgt == &ghost) tgt = target;
+
+		dist = pose.distTo(tgt);	
+		carrot = tgt - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.dlead;
+
+		if (pose.distTo(carrot) < params.settleRadius.convert(okapi::inch)) settling = true;
 		else settling = false;
 
-		double dist = pose.distTo(target);
-		Point carrot = target - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.ld;
+		// printDebug("%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, carrot.x, carrot.y, target.x, target.y, target.theta);
+		bool botSide = sin(target.theta) * (pose.y - target.y) > -cos(target.theta) * (pose.x - target.x);
+		bool crtSide = sin(target.theta) * (carrot.y - target.y) > -cos(target.theta) * (carrot.x - target.x);
+		bool sameSide = botSide == crtSide;
+		if (sameSide != prevSide && settling) break;
+		prevSide = sameSide;
+
 		if (settling) carrot = target;
 
-		double distErr = pose.distTo(carrot);
-		double headingErr = getTargetHeading(pose.angleTo(carrot), pose.theta, true) - pose.theta;
-		if (params.reverse) headingErr = getTargetHeading(carrot.angleTo(pose), pose.theta, true) - pose.theta;
+		double targetDist = pose.distTo(target);
+		double carrotDist = pose.distTo(carrot);
+		double distErr = settling ? std::max(targetDist, carrotDist) : targetDist;
+		// double distErr = pose.distTo(target);
+
+		double headingErr = getTargetHeading(pose.angleTo(tgt), pose.theta, true) - pose.theta;
+		if (params.reverse) headingErr = getTargetHeading(tgt.angleTo(pose), pose.theta, true) - pose.theta;
 		if (settling) headingErr = getTargetHeading(target.theta, pose.theta, true) - pose.theta;
 
 		double distCtrl = distPID.calculate(distErr);
@@ -291,11 +310,15 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 		double fwdPower = fwdVolts * dir;
 		if (settling) fwdPower *= abs(cos(headingErr));
-		if (distErr < params.endRadius.convert(okapi::inch)) fwdPower = 0;
 		double turnPower = -turnVolts;
 
-		// double overturn = abs(fwdPower) + abs(turnPower) - MAX_VOLT;
-		// if (overturn > 0) fwdPower -= overturn * dir;
+		double radius = getRadius(pose, carrot);
+		double maxSlipSpeed = sqrt(params.horiDrift * radius * 385.83) * 50;
+		if (!settling) fwdPower = std::clamp(fwdPower, -maxSlipSpeed, maxSlipSpeed);
+		printDebug("%f, %f, %f\n", fwdPower, radius, maxSlipSpeed);
+
+		double overturn = abs(fwdPower) + abs(turnPower) - MAX_VOLT;
+		if (overturn > 0) fwdPower -= overturn * dir;
 
 		moveArcade(fwdPower, turnPower, params.slewRate);
 
@@ -315,7 +338,7 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 	moveTank(0, 0);
 	printDebug("[Inline::MoveToPose] Finished with pose of %s, taking %d ms\n", odom->getPose().toStr(), pros::millis() - st);
-	fclose(data);
+	// fclose(data);
 }
 
 void Inline::setBrakeMode(okapi::AbstractMotor::brakeMode mode) {

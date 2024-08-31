@@ -14,7 +14,7 @@ lib16868C::Pose::Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, u
 lib16868C::Pose::Pose(const Pose& p) : Pose(p.x, p.y, p.theta, p.time) {}
 
 std::string lib16868C::Pose::toStr() {
-	return "{" + toStr() + ", theta: " + std::to_string(Util::radToDeg(theta)) + ", time: " + std::to_string(time) + "}";
+	return "{" + Point::toStr() + ", theta: " + std::to_string(Util::radToDeg(theta)) + ", time: " + std::to_string(time) + "}";
 }
 
 Pose Pose::operator+(Point rhs) {

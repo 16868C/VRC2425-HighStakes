@@ -1,5 +1,6 @@
 #include "math.hpp"
 #include "logger.hpp"
+#include <cmath>
 #include <limits>
 #include <iomanip>
 #include <sstream>
@@ -28,32 +29,17 @@ double lib16868C::getTargetHeading(double target, double current, bool rad, Turn
 	return current + error;
 }
 
-/** Point **/
-Point::Point() : Point(0, 0) {}
-Point::Point(double x, double y) : x(x), y(y) {}
+double lib16868C::getRadius(Pose p1, Point p2) {
+	if (fmod(p1.theta, M_PI) == 0) p1.theta -= 1e-5;
 
-double Point::distTo(Point p) {
-	return std::hypot(p.x - x, p.y - y);
-}
-double Point::angleTo(Point p) {
-	return std::atan2(p.y - y, p.x - x);
-}
+	double a = 0.5 * (p2.x * p2.x - p1.x * p1.x + p2.y * p2.y + p1.y * p1.y);
+	double b = p2.y * p1.y + p1.x * (p2.y - p1.y) * 1/tan(p1.theta);
+	double c = p2.x - p1.x - (p2.y - p1.y) * 1/tan(p1.theta);
+	double h = (a - b) / c;
+	double k = -1/tan(p1.theta) * (h - p1.x) + p1.y;
+	Point o(h, k);
 
-std::string Point::toStr() {
-	return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
-}
-
-Point Point::operator+(Point rhs) {
-	return Point(x + rhs.x, y + rhs.y);
-}
-Point Point::operator-(Point rhs) {
-	return Point(x - rhs.x, y - rhs.y);
-}
-Point Point::operator*(double rhs) {
-	return Point(x * rhs, y * rhs);
-}
-Point Point::operator/(double rhs) {
-	return Point(x / rhs, y / rhs);
+	return p1.distTo(o);
 }
 
 /** Line **/

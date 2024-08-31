@@ -78,7 +78,10 @@ struct MoveToPoseParams {
 	okapi::QLength endRadius = 1_in;
 	okapi::QLength settleRadius = 7.5_in;
 
-	double ld = 1.2;
+	double horiDrift = 2;
+
+	double dlead = 0.6;
+	double glead = 1;
 
 	double slewRate = 0;
 };

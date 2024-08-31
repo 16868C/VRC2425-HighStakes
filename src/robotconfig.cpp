@@ -29,7 +29,7 @@ lib16868C::Pneumatic hang(HANG);
 lib16868C::Pneumatic stick(STICK);
 
 // Sensors
-lib16868C::Inertial inertial(INERTIAL, &master);
+lib16868C::Inertial inertial(INERTIAL);
 okapi::DistanceSensor hookDist(HOOK_DISTANCE_SNSR);
 okapi::OpticalSensor ringDetect(RING_OPTICAL_SNSR);
 
