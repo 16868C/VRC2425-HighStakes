@@ -290,7 +290,7 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 		double targetDist = pose.distTo(target);
 		double carrotDist = pose.distTo(carrot);
-		double distErr = settling ? std::max(targetDist, carrotDist) : targetDist;
+		double distErr = settling ? targetDist : std::max(targetDist, carrotDist);
 		// double distErr = pose.distTo(target);
 
 		double headingErr = getTargetHeading(pose.angleTo(tgt), pose.theta, true) - pose.theta;
