@@ -3,6 +3,7 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/devices/pneumatic.hpp"
 #include "okapi/api/device/motor/abstractMotor.hpp"
+#include "okapi/impl/device/distanceSensor.hpp"
 #include "pros/adi.hpp"
 
 okapi::Controller master(okapi::ControllerId::master);
@@ -35,6 +36,15 @@ okapi::OpticalSensor ringDetect(RING_OPTICAL_SNSR);
 
 pros::ADIPotentiometer autonSelector(AUTON_SELECTOR);
 
+okapi::DistanceSensor frontDistance(18);
+okapi::DistanceSensor rightDistance(20);
+okapi::DistanceSensor rearDistance(19);
+okapi::DistanceSensor leftDistance(16);
+lib16868C::DistanceSensor frontDist(&frontDistance, 0_in);
+lib16868C::DistanceSensor rightDist(&rightDistance, 6_in);
+lib16868C::DistanceSensor rearDist(&rearDistance, 2.5_in);
+lib16868C::DistanceSensor leftDist(&leftDistance, 6_in);
+
 lib16868C::Rotation vertRot(VERT_ENC);
 lib16868C::Rotation hortRot(HORT_ENC);
 lib16868C::TrackingWheel vertEnc(&vertRot, 2_in, 0.5_in);
@@ -43,7 +53,7 @@ lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 3.75_in);
 // Subsystems
 lib16868C::Odometry odometry(
 	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
-	std::array<lib16868C::DistanceSensor, 4>{{{}, {}, {}, {}}},
+	std::array<lib16868C::DistanceSensor, 4>{{frontDist, rightDist, rearDist, leftDist}},
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 

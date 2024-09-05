@@ -1,5 +1,6 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/devices/inertial.hpp"
+#include "16868C/util/logger.hpp"
 #include "16868C/util/math.hpp"
 #include "16868C/util/util.hpp"
 #include "pros/rtos.hpp"
@@ -13,11 +14,11 @@ using namespace okapi::literals;
 /* -------------------------------------------------------------------------- */
 DistanceSensor::DistanceSensor() {}
 DistanceSensor::DistanceSensor(okapi::DistanceSensor* snsr, okapi::QLength offset) : snsr(snsr) {
-	this->offset = offset.convert(okapi::inch);
+	this->offset = offset.convert(okapi::millimeter);
 }
 
 double DistanceSensor::getDist() const {
-	if (snsr) return snsr->get();
+	if (snsr) return snsr->get() + offset;
 	return 0;
 }
 double DistanceSensor::getConfidence() const {
@@ -161,11 +162,11 @@ Pose Odometry::getState() {
 void Odometry::update(bool front, bool right, bool rear, bool left) {
 	std::array<bool, 4> snsrUse = {front, right, rear, left};
 
-	double theta = ReduceAngle::radPi2(inertial->get_rotation(AngleUnit::RAD));
-	if (std::abs(theta) > M_PI / 12.0 && std::abs(theta) < M_PI * 5 / 12.0) { // Not perpendicular to wall
+	double theta = std::abs(ReduceAngle::radPi2(getPose().theta));
+	if (theta > M_PI / 12.0 && theta < M_PI * 5 / 12.0) { // Not perpendicular to wall
 		return;
 	}
-	theta = ReduceAngle::rad2Pi(inertial->get_rotation(AngleUnit::RAD));
+	theta = ReduceAngle::rad2Pi(getPose().theta);
 	if (theta == M_PI_2 || theta == M_PI_2 * 3) theta -= 1e-5; // Avoid tan(90) and tan(270) (Divide by zero error)
 	
 	double dir = round(theta / M_PI_2);
@@ -177,35 +178,22 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 	for (int i = 0; i < 4; i++, j++) {
 		if (j == 4) j = 0;
 
-		double snsrDir = ReduceAngle::rad2Pi(theta + j * M_PI_2);
-		if (snsrDir == 2 * M_PI) snsrDir = 0;
-		Line dist(tan(snsrDir), getPose());
-		// std::cout << i << "\n";
-
-		// Do not use sensor reading (does not actually read the distance to the correct wall)
-		if (walls[j].isInsideSegment(walls[j].getIntersection(dist))) {
-			std::cerr << "[Odometry::update] Incorrect wall reading - Did not use the distance sensor in the direction of " << dir << "\n";
-			dirDists[i] = nullptr;
-			continue;
-		}
-		if (!snsrUse[j])
-			dirDists[i] = nullptr;
-		else 
-			dirDists[i] = distanceSensors[j];
+		if (snsrUse[j]) dirDists[i] = distanceSensors[j];
 	}
 
 	// Calculate the robot's position from each side of the robot
+	theta = ReduceAngle::reduce(getPose().theta, M_PI / 4, -M_PI / 4);
 	std::pair<double, double> x1, x2, y1, y2;
-	if (dirDists[0]) x1 = {dirDists[0]->getDist() * std::abs(std::cos(theta)), dirDists[0]->getConfidence()};
+	if (dirDists[0]) x1 = {(12_ft).convert(okapi::millimeter) - dirDists[0]->getDist() * std::abs(std::cos(theta)), dirDists[0]->getConfidence()};
 	if (dirDists[2]) x2 = {dirDists[2]->getDist() * std::abs(std::cos(theta)), dirDists[2]->getConfidence()};
-	if (dirDists[1]) y1 = {dirDists[1]->getDist() * std::abs(std::sin(theta)), dirDists[1]->getConfidence()};
-	if (dirDists[3]) y2 = {dirDists[3]->getDist() * std::abs(std::sin(theta)), dirDists[3]->getConfidence()};
-	std::cout << x1.first << " " << x2.first << " " << y1.first << " " << y2.first << "\n";
+	if (dirDists[1]) y1 = {dirDists[1]->getDist() * std::abs(std::cos(theta)), dirDists[1]->getConfidence()};
+	if (dirDists[3]) y2 = {(12_ft).convert(okapi::millimeter) - dirDists[3]->getDist() * std::abs(std::cos(theta)), dirDists[3]->getConfidence()};
+	std::cout << dirDists[0]->getDist() << " " << dirDists[2]->getDist() << " " << dirDists[1]->getDist() << " " << dirDists[3]->getDist() << "\n";
 
 	// Use the most accurate readings
 	Pose newPose(x1.first * okapi::millimeter, y1.first * okapi::millimeter, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
-	if (x2.second > x1.second) newPose.x = x2.first;
-	if (y2.second > y1.second) newPose.y = y2.first;
+	if (x2.second > x1.second) newPose.x = (x2.first * okapi::millimeter).convert(okapi::inch);
+	if (y2.second > y1.second) newPose.y = (y2.first * okapi::millimeter).convert(okapi::inch);
 	update(newPose);
 }
 void Odometry::update(okapi::QLength x, okapi::QLength y) {

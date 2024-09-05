@@ -78,7 +78,7 @@ pros::Task autonSelect = pros::Task([]() {
 void initialize() {
 	pros::lcd::initialize();
 
-	odometry.init();
+	odometry.init({0_in, 0_in, -80_deg});
 	armMtrs.resetZero();
 	// odometry.init(Pose(0_in, 0_in, 0_deg));
 	// inertial.reset(true);
@@ -94,7 +94,7 @@ void autonomous() {
 	uint st = pros::millis();
 	// arm.resetPosition();
 
-	chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=600_rpm, .distGains={.kP=0.12, .kD=3}, .headingGains={.kP=0.7, .kD=1}, .endRadius=3_in, .settleRadius=2_in, .horiDrift=2.5, .dlead=0.6, .glead=0.5});
+	// chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=600_rpm, .distGains={.kP=0.12, .kD=3}, .headingGains={.kP=0.7, .kD=1}, .endRadius=3_in, .settleRadius=2_in, .horiDrift=2.5, .dlead=0.6, .glead=0.5});
 
 	// auton();
 	// redRightAWP();
@@ -115,6 +115,9 @@ void autonomous() {
 
 void opcontrol() {
 	// autonSelect.suspend();
+	odometry.update(true, true, true, true);
+	// printDebug("%s", odometry.getPose().toStr());
+	std::cout << odometry.getPose().toStr() << "\n";
 
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 

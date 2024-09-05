@@ -75,6 +75,15 @@ extern okapi::OpticalSensor ringDetect;
 
 extern pros::ADIPotentiometer autonSelector;
 
+extern okapi::DistanceSensor frontDistance;
+extern okapi::DistanceSensor rightDistance;
+extern okapi::DistanceSensor rearDistance;
+extern okapi::DistanceSensor leftDistance;
+extern lib16868C::DistanceSensor frontDist;
+extern lib16868C::DistanceSensor rightDist;
+extern lib16868C::DistanceSensor rearDist;
+extern lib16868C::DistanceSensor leftDist;
+
 extern lib16868C::Rotation vertRot;
 extern lib16868C::Rotation hortRot;
 extern lib16868C::TrackingWheel vertEnc;
