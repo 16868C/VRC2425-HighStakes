@@ -78,7 +78,7 @@ pros::Task autonSelect = pros::Task([]() {
 void initialize() {
 	pros::lcd::initialize();
 
-	odometry.init({0_in, 0_in, -80_deg});
+	odometry.init({0_in, 0_in, 0_deg});
 	armMtrs.resetZero();
 	// odometry.init(Pose(0_in, 0_in, 0_deg));
 	// inertial.reset(true);
@@ -94,7 +94,15 @@ void autonomous() {
 	uint st = pros::millis();
 	// arm.resetPosition();
 
-	// chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=600_rpm, .distGains={.kP=0.12, .kD=3}, .headingGains={.kP=0.7, .kD=1}, .endRadius=3_in, .settleRadius=2_in, .horiDrift=2.5, .dlead=0.6, .glead=0.5});
+	chassis.moveToPoint({48_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={0.035, 0, 3}, .headingGains={0.6, 0, 1}, .exitRadius=5_in});
+	chassis.moveToPoint({72_in, 24_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
+	chassis.moveToPoint({96_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
+	chassis.turnAbsolute(90_deg, 0, {.minRPM=200_rpm, .gains={0.03, 0, 3}, .errorMargin=10_deg, .numInMargin=1});
+	// chassis.moveToPoint({96_in, 24_in}, 0, {.distGains={.kP=0.07, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=1_in});
+	chassis.moveToPose({72_in, 72_in, 180_deg}, 0, {.distGains={0.05, 0, 3}, .headingGains={0.5, 0, 1}, .settleRadius=7.5_in, .horiDrift=1.5*52*52, .dlead=0.6, .glead=0.5, .slewRate=2000});
+	// chassis.turnAbsolute(90_deg, 0, {.gains={.kP=0.04, .kD=3}, .turnWheel=TurnWheel::BOTH});
+
+	// chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=600_rpm, .distGains={.kP=0.05, .kD=3}, .headingGains={.kP=0.5, .kD=1}, .settleRadius=7.5_in, .horiDrift=1.5 * 52 * 52, .dlead=0.6, .glead=0});
 
 	// auton();
 	// redRightAWP();
@@ -115,7 +123,7 @@ void autonomous() {
 
 void opcontrol() {
 	// autonSelect.suspend();
-	odometry.update(true, true, true, true);
+	// odometry.update(true, true, true, true);
 	// printDebug("%s", odometry.getPose().toStr());
 	std::cout << odometry.getPose().toStr() << "\n";
 

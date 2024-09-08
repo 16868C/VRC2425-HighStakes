@@ -27,3 +27,7 @@ Point Point::operator*(double rhs) {
 Point Point::operator/(double rhs) {
 	return Point(x / rhs, y / rhs);
 }
+
+Point Point::lerp(Point a, Point b, double t) {
+	return a * (1 - t) + b * t;
+}

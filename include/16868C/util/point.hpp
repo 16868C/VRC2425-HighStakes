@@ -17,4 +17,6 @@ class Point {
 	Point operator-(Point rhs);
 	Point operator*(double rhs);
 	Point operator/(double rhs);
+
+	static Point lerp(Point a, Point b, double t);
 };

@@ -13,9 +13,7 @@ using namespace lib16868C;
 Inline::Inline(MotorGroup& leftMtrs, MotorGroup& rightMtrs, Inertial* inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio)
 	: leftMtrs(leftMtrs), rightMtrs(rightMtrs), inertial(inertial), odom(odom), wheelDiam(wheelDiam), gearRatio(gearRatio) {
 
-	tpr = leftMtrs.getGearing() == okapi::AbstractMotor::gearset::red ? 1800 : 
-			leftMtrs.getGearing() == okapi::AbstractMotor::gearset::green ? 900 :
-																			300;
+	tpr = leftMtrs.getTPR();
 	
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
@@ -71,7 +69,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 
 	int i = 0;
 	uint st = pros::millis();
-	while (dist.convert(okapi::inch) - currDist > 0) {
+	while (dist.convert(okapi::inch) - currDist > params.exitDist.convert(okapi::inch)) {
 		// Timeout
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::MoveDistance] Timeout: %d\n", pros::millis() - st);
@@ -88,7 +86,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 
 		// PID Calculations
 		double distCtrl = distPID.calculate(dist.convert(okapi::inch), currDist);
-		double headingCtrl = headingPID.calculate(heading.convert(okapi::degree), inertial->get_rotation(AngleUnit::DEG));
+		double headingCtrl = headingPID.calculate(heading.convert(okapi::radian), inertial->get_rotation(AngleUnit::RAD));
 		
 		// Calculate Linear Power
 		double linearRPM = params.maxRPM.convert(okapi::rpm) * distCtrl;
@@ -113,8 +111,8 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams params) {
 	PIDController turnPID(params.gains, 1, -1);
 
-	double currAngle = inertial->get_rotation(AngleUnit::DEG);
-	double target = getTargetHeading(angle.convert(okapi::degree), currAngle, false, params.dir);
+	double currAngle = inertial->get_rotation(AngleUnit::RAD);
+	double target = getTargetHeading(angle.convert(okapi::radian), currAngle, false, params.dir);
 	uint st = pros::millis();
 	int inMargin = 0;
 	while (inMargin < params.numInMargin) {
@@ -124,17 +122,17 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 			break;
 		}
 
-		currAngle = inertial->get_rotation(AngleUnit::DEG);
+		currAngle = inertial->get_rotation(AngleUnit::RAD);
 
 		// Checks if robot is within the error margin to terminate
-		if (std::abs(angle.convert(okapi::degree) - currAngle) < params.errorMargin) inMargin++;
+		if (std::abs(angle.convert(okapi::radian) - currAngle) < params.errorMargin.convert(okapi::radian)) inMargin++;
 		else inMargin = 0;
 
 		// Calculate turn power
 		double turnCtrl = turnPID.calculate(target, currAngle);
 		double turnRPM = params.maxRPM.convert(okapi::rpm) * turnCtrl;
 		turnRPM = std::max(std::abs(turnRPM), params.minRPM.convert(okapi::rpm)) * Util::sgn(turnRPM);
-		double volts = turnRPM / static_cast<int>(leftMtrs.getGearing()) * 12000;
+		double volts = turnRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
 
 		// Determine turn type
 		switch (params.turnWheel) {
@@ -193,9 +191,10 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
 	Pose pose = odom->getPose();
 
 	int dir = params.reverse ? -1 : 1;
+	// bool prevSide = sin(pose.theta) * (pose.y - target.y) > -cos(pose.theta) * (pose.x - target.x) - params.earlyEndRadius.convert(okapi::inch);
 
 	uint st = pros::millis();
-	while (pose.distTo(target) >= params.endRadius.convert(okapi::inch) || (params.minRPM.convert(okapi::rpm) > 0 && pose.distTo(target) >= params.earlyEndRadius.convert(okapi::inch))) {
+	while (true) {
 		// Timeout
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::MoveToPoint] Timeout: %d\n", pros::millis() - st);
@@ -209,14 +208,23 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
 		double heading = getTargetHeading(pose.angleTo(target), curHeading, true);
 		if (params.reverse) heading = getTargetHeading(target.angleTo(pose), curHeading, true);
 
+		// bool currSide = sin(pose.angleTo(target)) * (pose.y - target.y) > -cos(pose.angleTo(target)) * (pose.x - target.x);
+		// if (currSide != prevSide && (params.minRPM > 0_rpm && pose.distTo(Point(target.x - params.earlyEndRadius.convert(okapi::inch) * sin(pose.theta), target.y - params.earlyEndRadius.convert(okapi::inch) * cos(pose.theta))) < params.earlyEndRadius.convert(okapi::inch))) break;
+		// if (currSide != prevSide && (pose.distTo(target) < (params.minRPM > 0_rpm ? params.earlyEndRadius.convert(okapi::inch) : params.endRadius.convert(okapi::inch)))) break;
+		// prevSide = currSide;
+		if (pose.distTo(target) < params.exitRadius.convert(okapi::inch)) break;
+
+		// if (params.minRPM > 0_rpm && pose.distTo(target) < params.earlyEndRadius.convert(okapi::inch)) break;
+
 		// Calculate PID control values
 		double distCtrl = distPID.calculate(distLeft);
 		double headingErr = heading - curHeading;
 		double headingCtrl = headingPID.calculate(headingErr);
 
 		// Determine heading deadzone
-		double turnDeadzone = M_PI_2 - std::atan2(distLeft, (params.endRadius * params.turnDeadzone).convert(okapi::inch));
-		if (std::abs(heading) < std::abs(turnDeadzone)) headingCtrl = 0;
+		// double turnDeadzone = M_PI_2 - std::atan2(distLeft, (params.endRadius * params.turnDeadzone).convert(okapi::inch));
+		// if (std::abs(heading) < std::abs(turnDeadzone)) headingCtrl = 0;
+		if (std::abs(distLeft) < params.turnDeadzone.abs().convert(okapi::inch)) headingCtrl = 0;
 
 		// Calculate final power
 		double fwdRPM = params.maxRPM.convert(okapi::rpm) * distCtrl;
@@ -227,14 +235,16 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
 		double turnRPM = params.maxRPM.convert(okapi::rpm) * headingCtrl;
 		double turnVolts = turnRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
 		double turnPower = -turnVolts;
+		
+		double overturn = abs(fwdPower) + abs(turnPower) - MAX_VOLT;
+		if (overturn > 0) fwdPower -= overturn * dir;
 
 		moveArcade(fwdPower, turnPower, params.slewRate);
 
 		pros::delay(20);
 	}
 
-	if (params.minRPM.convert(okapi::rpm) == 0)
-		moveTank(0, 0);
+	moveArcade(params.minRPM.convert(okapi::rpm) * dir, 0, 0);
 	printDebug("[Inline::MoveToPoint] Finished with pose of %s, taking %d ms\n", odom->getPose().toStr(), pros::millis() - st);
 }
 
@@ -251,9 +261,9 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 	Pose pose = odom->getPose();
 	double dist = pose.distTo(target);
-	Pose carrot = target - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.dlead;
-	Pose ghost = carrot * params.glead + target * (1 - params.glead);
-	Pose& tgt = ghost;
+	Point carrot = target - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.dlead;
+	Point ghost = Point::lerp(target, carrot, params.glead);
+	Point& tgt = ghost;
 	
 	int dir = params.reverse ? -1 : 1;
 	bool settling = false;
@@ -271,26 +281,25 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 		pose = odom->getPose();
 
-		if ((pose.distTo(ghost) < 5 || pose.distTo(carrot) < 5) && &tgt == &ghost) tgt = target;
+		if ((pose.distTo(ghost) < params.gRadius.convert(okapi::inch) || pose.distTo(carrot) < params.gRadius.convert(okapi::inch))
+				&& &tgt == &ghost) tgt = target;
 
-		dist = pose.distTo(tgt);	
+		dist = pose.distTo(tgt);
 		carrot = tgt - Point(dist * cos(target.theta), dist * sin(target.theta)) * params.dlead;
 
-		if (pose.distTo(carrot) < params.settleRadius.convert(okapi::inch)) settling = true;
-		else settling = false;
+		if (pose.distTo(target) < params.settleRadius.convert(okapi::inch)) settling = true;
 
 		// printDebug("%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, carrot.x, carrot.y, target.x, target.y, target.theta);
-		bool botSide = sin(target.theta) * (pose.y - target.y) > -cos(target.theta) * (pose.x - target.x);
-		bool crtSide = sin(target.theta) * (carrot.y - target.y) > -cos(target.theta) * (carrot.x - target.x);
+		bool botSide = sin(target.theta) * (pose.y - target.y) > -cos(target.theta) * (pose.x - target.x) - params.earlyExitDist.convert(okapi::inch);
+		bool crtSide = sin(target.theta) * (carrot.y - target.y) > -cos(target.theta) * (carrot.x - target.x) - params.earlyExitDist.convert(okapi::inch);
 		bool sameSide = botSide == crtSide;
 		if (sameSide != prevSide && settling) break;
 		prevSide = sameSide;
 
 		if (settling) carrot = target;
 
-		double targetDist = pose.distTo(target);
-		double carrotDist = pose.distTo(carrot);
-		double distErr = settling ? targetDist : std::max(targetDist, carrotDist);
+		double distErr = std::max(pose.distTo(target), pose.distTo(carrot));
+		// if (settling) distErr = std::max(pose.distTo(target) * std::cos(target.theta - pose.angleTo(target)), 0.0);
 		// double distErr = pose.distTo(target);
 
 		double headingErr = getTargetHeading(pose.angleTo(tgt), pose.theta, true) - pose.theta;
@@ -302,20 +311,23 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 		double fwdRPM = params.maxRPM.convert(okapi::rpm) * distCtrl;
 		double turnRPM = params.maxRPM.convert(okapi::rpm) * headingCtrl;
-		fwdRPM = std::clamp(fwdRPM, params.minRPM.convert(okapi::rpm), params.maxRPM.convert(okapi::rpm));
+		if (params.minRPM == 0_rpm)
+			fwdRPM = std::clamp(std::abs(fwdRPM), params.minRPM.convert(okapi::rpm), params.maxRPM.convert(okapi::rpm)) * Util::sgn(distCtrl);
+		else
+			fwdRPM = std::clamp(fwdRPM, params.minRPM.convert(okapi::rpm), params.maxRPM.convert(okapi::rpm));
 		turnRPM = std::min(std::abs(turnRPM), params.maxRPM.convert(okapi::rpm)) * Util::sgn(turnRPM);
 
-		double fwdVolts = fwdRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+		double fwdVolts = fwdRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT * dir;
 		double turnVolts = turnRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
 
-		double fwdPower = fwdVolts * dir;
-		if (settling) fwdPower *= abs(cos(headingErr));
+		double fwdPower = fwdVolts * abs(cos(headingErr));
+		// if (settling) fwdPower *= abs(cos(headingErr));
 		double turnPower = -turnVolts;
 
 		double radius = getRadius(pose, carrot);
-		double maxSlipSpeed = sqrt(params.horiDrift * radius * 385.83) * 50;
+		double maxSlipSpeed = sqrt(params.horiDrift * radius * 385.83);
 		if (!settling) fwdPower = std::clamp(fwdPower, -maxSlipSpeed, maxSlipSpeed);
-		printDebug("%f, %f, %f\n", fwdPower, radius, maxSlipSpeed);
+		// printDebug("%f, %f, %f\n", fwdPower, radius, maxSlipSpeed);
 
 		double overturn = abs(fwdPower) + abs(turnPower) - MAX_VOLT;
 		if (overturn > 0) fwdPower -= overturn * dir;
@@ -324,7 +336,7 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 
 		// if (n++ % 5 == 0) {
 		// 	n = 1;
-		// 	printDebug("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, Util::radToDeg(pose.theta), carrot.x, carrot.y, fwdPower, distErr, distCtrl, turnPower, Util::radToDeg(headingErr), headingCtrl);
+			// printDebug("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, Util::radToDeg(pose.theta), carrot.x, carrot.y, ghost.x, ghost.y, fwdPower, distErr, turnPower, Util::radToDeg(headingErr), overturn, radius, maxSlipSpeed);
 		// }
 		// fprintf(data, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", pose.x, pose.y, Util::radToDeg(pose.theta), carrot.x, carrot.y, fwdPower, distErr, distCtrl, turnPower, Util::radToDeg(headingErr), headingCtrl);
 		// fflush(data);

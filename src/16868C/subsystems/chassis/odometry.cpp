@@ -38,6 +38,7 @@ void Odometry::odomManager(void* param) {
 	Odometry* odom = static_cast<Odometry*>(param);
 	
 	uint32_t time = pros::millis();
+	int n = 1;
 	while (true) {
 		// Distance and theta
 		std::array<double, 4> curr;
@@ -55,10 +56,13 @@ void Odometry::odomManager(void* param) {
 		Pose pose = odom->getPose();
 		pros::lcd::print(0, "X: %.2f, Y: %.2f", pose.x, pose.y);
 		pros::lcd::print(1, "Deg: %.2f, Rad: %.2f", Util::radToDeg(pose.theta), pose.theta);
-		// printDebug("%f, %f, %f\n", pose.theta, odom->inertial->get_rotation(AngleUnit::RAD), Util::radToDeg(pose.theta));
 
 		std::array<TrackingWheel*, 3> encs = odom->trackingWheels;
 		std::array<DistanceSensor*, 4> dists = odom->distanceSensors;
+		// if (n++ % 5 == 0) {
+		// 	n = 1;
+		// printDebug("%s, %f, %f\n", pose.toStr(), encs[0]->getDist(), encs[2]->getDist());
+		// }
 		if (encs[1]->getType() != TrackingWheelType::INVALID) pros::lcd::print(2, "Left: %.2f, Right: %.2f", encs[0]->getDist(), encs[1]->getDist());
 		else pros::lcd::print(2, "Forward: %.2f", encs[0]->getDist());
 		if (odom->inertial) pros::lcd::print(3, "Middle: %.2f, Theta: %.2f", encs[2]->getDist(), odom->inertial->get_rotation(AngleUnit::DEG));
@@ -282,9 +286,5 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double globalX = pose.x + globalDeltaX;
 	double globalY = pose.y + globalDeltaY;
 	double globalTheta = inertial->get_rotation(AngleUnit::RAD);
-	// pose.x = globalX;
-	// pose.y = globalY;
-	// pose.theta = globalTheta;
-	// pose.time = pros::millis();
 	update({globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()});
 }

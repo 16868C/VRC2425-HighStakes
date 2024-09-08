@@ -47,7 +47,7 @@ lib16868C::DistanceSensor leftDist(&leftDistance, 6_in);
 
 lib16868C::Rotation vertRot(VERT_ENC);
 lib16868C::Rotation hortRot(HORT_ENC);
-lib16868C::TrackingWheel vertEnc(&vertRot, 2_in, 0.5_in);
+lib16868C::TrackingWheel vertEnc(&vertRot, 2_in, 0.65_in);
 lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 3.75_in);
 
 // Subsystems

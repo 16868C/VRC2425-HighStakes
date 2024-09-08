@@ -32,6 +32,7 @@ double lib16868C::getTargetHeading(double target, double current, bool rad, Turn
 double lib16868C::getRadius(Pose p1, Point p2) {
 	if (fmod(p1.theta, M_PI) == 0) p1.theta -= 1e-5;
 
+	// https://www.desmos.com/calculator/04hn4cv0qa
 	double a = 0.5 * (p2.x * p2.x - p1.x * p1.x + p2.y * p2.y + p1.y * p1.y);
 	double b = p2.y * p1.y + p1.x * (p2.y - p1.y) * 1/tan(p1.theta);
 	double c = p2.x - p1.x - (p2.y - p1.y) * 1/tan(p1.theta);

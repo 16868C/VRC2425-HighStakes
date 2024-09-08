@@ -5,6 +5,7 @@
 #include "16868C/devices/motorGroup.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/util/pose.hpp"
+#include "okapi/api/units/QLength.hpp"
 
 namespace lib16868C {
 enum class TurnWheel {
@@ -21,6 +22,8 @@ struct MoveDistanceParams {
 	PIDGains distGains = {0, 0, 0};
 	PIDGains headingGains = {0, 0, 0};
 
+	okapi::QLength exitDist = 0_in;
+
 	double slewRate = 0;
 };
 struct TurnAbsoluteParams {
@@ -29,7 +32,7 @@ struct TurnAbsoluteParams {
 
 	PIDGains gains = {};
 
-	double errorMargin = 3;
+	okapi::QAngle errorMargin = 3_deg;
 	double numInMargin = 5;
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
@@ -43,7 +46,7 @@ struct TurnToPointParams {
 
 	PIDGains gains = {0, 0, 0};
 
-	double errorMargin = 3;
+	okapi::QAngle errorMargin = 3_deg;
 	double numInMargin = 5;
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
@@ -58,9 +61,8 @@ struct MoveToPointParams {
 	PIDGains distGains = {};
 	PIDGains headingGains = {};
 
-	okapi::QLength endRadius = 1_in;
-	okapi::QLength earlyEndRadius = 0_in;
-	double turnDeadzone = 0.8;
+	okapi::QLength exitRadius = 1_in;
+	okapi::QLength turnDeadzone = 6_in;
 
 	bool reverse = false;
 
@@ -75,13 +77,15 @@ struct MoveToPoseParams {
 
 	bool reverse = false;
 
-	okapi::QLength endRadius = 1_in;
 	okapi::QLength settleRadius = 7.5_in;
+	okapi::QLength earlyExitDist = 0_in;
 
-	double horiDrift = 2;
+	double horiDrift = 1 * 52 * 52;
 
 	double dlead = 0.6;
-	double glead = 1;
+	double glead = 0;
+
+	okapi::QLength gRadius = 8_in;
 
 	double slewRate = 0;
 };
