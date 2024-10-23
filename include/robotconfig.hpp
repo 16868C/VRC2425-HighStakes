@@ -24,7 +24,8 @@ const int RIGHT_FRONT = 1;
 const int RIGHT_MIDDLE = 2;
 const int RIGHT_REAR = 3;
 
-const int INTAKE = 7;
+const int INTAKE_1 = 5;
+const int INTAKE_2 = 9;
 
 const int ARM_LEFT = -8;
 const int ARM_RIGHT = 9;
@@ -56,7 +57,8 @@ extern lib16868C::Motor rightRear;
 extern lib16868C::MotorGroup leftDrive;
 extern lib16868C::MotorGroup rightDrive;
 
-extern lib16868C::Motor intakeMtr;
+extern lib16868C::Motor intakeMtr1;
+extern lib16868C::Motor intakeMtr2;
 
 extern lib16868C::Motor armLeft;
 extern lib16868C::Motor armRight;

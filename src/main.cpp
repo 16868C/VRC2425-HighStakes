@@ -76,7 +76,7 @@ pros::Task autonSelect = pros::Task([]() {
 }, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Selector");
 
 void initialize() {
-	pros::lcd::initialize();
+	// pros::lcd::initialize();
 
 	// odometry.init();
 	// armMtrs.resetZero();
@@ -115,21 +115,22 @@ void opcontrol() {
 	autonSelect.suspend();
 	
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
+	okapi::ControllerButton ptoTgl(okapi::ControllerDigital::B);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
-	okapi::ControllerButton intakeBasketTgl(okapi::ControllerDigital::Y);
-	okapi::ControllerButton targetBlueTgl(okapi::ControllerDigital::down);
-	okapi::ControllerButton targetRedTgl(okapi::ControllerDigital::B);
+	okapi::ControllerButton intakeRedirect(okapi::ControllerDigital::Y);
+	okapi::ControllerButton targetBlueTgl(okapi::ControllerDigital::left);
+	okapi::ControllerButton targetRedTgl(okapi::ControllerDigital::up);
 
-	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
-	okapi::ControllerButton stickTgl(okapi::ControllerDigital::right);
+	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L1);
+	okapi::ControllerButton doinkerTgl(okapi::ControllerDigital::right);
 	okapi::ControllerButton hangRelease(okapi::ControllerDigital::A);
 
 	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
 	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
 	okapi::ControllerButton armAllianceStake(okapi::ControllerDigital::right);
-	okapi::ControllerButton armDescoreStake(okapi::ControllerDigital::Y);
+	okapi::ControllerButton armDescoreStake(okapi::ControllerDigital::down);
 
 	while (true) {
 		// Drivetrain -> Tank Drive
@@ -143,19 +144,19 @@ void opcontrol() {
 		pros::lcd::print(1, "%.2f %.2f", leftDrive.getTemperature(), rightDrive.getTemperature());
 
 		// Intake: L1 -> Intake, R1 -> Outtake, Press again to stop
-		if (!shift.isPressed() && intakeTgl.changedToPressed() && (arm.getState() == ArmPosition::DEFAULT || arm.getState() == ArmPosition::IDLE)) {
-			if (intake.getState() == IntakeState::INTAKE_MOGO) intake.stop();
-			else intake.intakeMogo();
-		}
-		else if (!shift.isPressed() && outtakeTgl.changedToPressed() && (arm.getState() == ArmPosition::DEFAULT || arm.getState() == ArmPosition::IDLE)) {
-			if (intake.getState() == IntakeState::OUTTAKE) intake.stop();
-			else intake.outtake();
-		}
-		else if (!shift.isPressed() && intakeBasketTgl.changedToPressed() && (arm.getState() == ArmPosition::DEFAULT || arm.getState() == ArmPosition::IDLE)) {
-			if (intake.getState() == IntakeState::INTAKE_BASKET) intake.stop();
-			else intake.intakeBasket();
-		}
-		pros::lcd::print(2, "%.2f, %.2f", intakeMtr.getTemperature(), armMtrs.getTemperature());
+		// if (!shift.isPressed() && intakeTgl.changedToPressed() && (arm.getState() == ArmPosition::DEFAULT || arm.getState() == ArmPosition::IDLE)) {
+		// 	if (intake.getState() == IntakeState::INTAKE_MOGO) intake.stop();
+		// 	else intake.intakeMogo();
+		// }
+		// else if (!shift.isPressed() && outtakeTgl.changedToPressed() && (arm.getState() == ArmPosition::DEFAULT || arm.getState() == ArmPosition::IDLE)) {
+		// 	if (intake.getState() == IntakeState::OUTTAKE) intake.stop();
+		// 	else intake.outtake();
+		// }
+		// else if (!shift.isPressed() && intakeBasketTgl.changedToPressed() && (arm.getState() == ArmPosition::DEFAULT || arm.getState() == ArmPosition::IDLE)) {
+		// 	if (intake.getState() == IntakeState::INTAKE_BASKET) intake.stop();
+		// 	else intake.intakeBasket();
+		// }
+		// pros::lcd::print(2, "%.2f, %.2f", intakeMtr.getTemperature(), armMtrs.getTemperature());
 
 		// if (targetBlueTgl.changedToPressed())
 		// 	intake.setTarget(intake.getTarget() == TargetRing::BLUE ? TargetRing::NONE : TargetRing::BLUE);
@@ -169,20 +170,20 @@ void opcontrol() {
 		if (shift.isPressed() && armIdle.changedToPressed()) {
 			arm.defaultPos();
 		}
-		if (shift.isPressed() && armWallStake.changedToPressed()) {
-			arm.wallStake();
-			intake.stop();
-		}
-		if (shift.isPressed() && armAllianceStake.changedToPressed()) {
-			arm.allianceStake();
-			intake.stop();
-		}
-		if (shift.isPressed() && armDescoreStake.changedToPressed()) {
-			arm.descoreStake();
-			intake.stop();
-		}
+		// if (shift.isPressed() && armWallStake.changedToPressed()) {
+		// 	arm.wallStake();
+		// 	intake.stop();
+		// }
+		// if (shift.isPressed() && armAllianceStake.changedToPressed()) {
+		// 	arm.allianceStake();
+		// 	intake.stop();
+		// }
+		// if (shift.isPressed() && armDescoreStake.changedToPressed()) {
+		// 	arm.descoreStake();
+		// 	intake.stop();
+		// }
 
-		if (!shift.isPressed() && stickTgl.changedToPressed())
+		if (!shift.isPressed() && doinkerTgl.changedToPressed())
 			stick.toggle();
 
 		if (!shift.isPressed() && hangRelease.changedToPressed()) {
@@ -192,9 +193,9 @@ void opcontrol() {
 
 		int leftDriveTemp = std::max(leftDrive.getTemperature() / 5 - 10, 0.0);
 		int rightDriveTemp = std::max(rightDrive.getTemperature() / 5 - 10, 0.0);
-		int intakeTemp = std::max(intakeMtr.getTemperature() / 5 - 10, 0.0);
+		// int intakeTemp = std::max(intakeMtr.getTemperature() / 5 - 10, 0.0);
 		int armTemp = std::max(armMtrs.getTemperature() / 5 - 10, 0.0);
-		master.setText(0, 0, std::to_string(leftDriveTemp) + " " + std::to_string(rightDriveTemp) + " " + std::to_string(intakeTemp) + " " + std::to_string(armTemp));
+		// master.setText(0, 0, std::to_string(leftDriveTemp) + " " + std::to_string(rightDriveTemp) + " " + std::to_string(intakeTemp) + " " + std::to_string(armTemp));
 
 		pros::delay(100);
 	}

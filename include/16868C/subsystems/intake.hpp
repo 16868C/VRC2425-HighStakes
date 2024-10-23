@@ -1,17 +1,22 @@
 #pragma once
+#include "16868C/devices/rotation.hpp"
 #include "okapi/impl/device/distanceSensor.hpp"
 #include "okapi/impl/device/opticalSensor.hpp"
 #include "okapi/impl/device/motor/motor.hpp"
+#include "pros/adi.hpp"
 #include "pros/rtos.h"
 
 namespace lib16868C {
 enum class IntakeState {
-	INTAKE_MOGO,
-	INTAKE_BASKET,
+	INTAKE,
+	MOGO,
+	REDIRECT,
 	OUTTAKE,
+	EJECTING,
+	UNJAMMING,
 	OFF
 };
-enum class TargetRing {
+enum class RingColour {
 	RED,
 	BLUE,
 	NONE
@@ -19,36 +24,48 @@ enum class TargetRing {
 
 class Intake {
 	public:
-		Intake(okapi::Motor& mtr, okapi::OpticalSensor& ringDetector, okapi::DistanceSensor& hookDetector);
+		Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::ADILineSensor& ring);
 
-		void intakeMogo();
-		void intakeBasket();
+		void intake();
+		void mogo();
+		void redirect();
 		void outtake();
 		void stop();
 
-		void setTarget(TargetRing tgt);
-		TargetRing getTarget();
-
 		IntakeState getState();
 
-		void setNumRings(int n);
+		void setTargetRing(RingColour colour);
+		RingColour getTargetRing();
+		RingColour getCurrentRing();
+
 		int getNumRings();
 
-		bool isBasket();
-
 	private:
-		okapi::Motor& mtr;
-		okapi::OpticalSensor& ringDetector;
-		okapi::DistanceSensor& hookDetector;
+		void eject();
+		void unjam();
+		void update();
 
-		bool basket = false;
+		bool isJamming();
+		static RingColour getColour(double hue);
+
+		okapi::Motor& firstStage, secondStage;
+		lib16868C::Rotation& enc;
+		okapi::OpticalSensor& color;
+		pros::ADILineSensor& ring;
 
 		int numRings = 0;
+		double tgtPos = -1;
+
+		const double tpr = 360;
+		const double ejectPos = 200;
+		const double redirectPos = 50;
 
 		IntakeState state = IntakeState::OFF;
-		TargetRing tgt = TargetRing::NONE;
 
-		pros::Task intakeTask = pros::Task(intakeManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Intake");
+		RingColour tgtRing = RingColour::NONE;
+		RingColour curRing = RingColour::NONE;
+
+		pros::Task managerTask = pros::Task(intakeManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Ring Filter");
 		static void intakeManager(void* param);
 };
 

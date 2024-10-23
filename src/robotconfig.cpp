@@ -17,7 +17,8 @@ lib16868C::Motor rightRear(RIGHT_REAR, okapi::AbstractMotor::gearset::blue);
 lib16868C::MotorGroup leftDrive({leftFront, leftMiddle, leftRear});
 lib16868C::MotorGroup rightDrive({rightFront, rightMiddle, rightRear});
 
-lib16868C::Motor intakeMtr(INTAKE, okapi::AbstractMotor::gearset::blue);
+lib16868C::Motor intakeMtr1(INTAKE_1, okapi::AbstractMotor::gearset::green);
+lib16868C::Motor intakeMtr2(INTAKE_2, okapi::AbstractMotor::gearset::green);
 
 lib16868C::Motor armLeft(ARM_LEFT, okapi::AbstractMotor::gearset::green);
 lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
@@ -47,5 +48,5 @@ lib16868C::Odometry odometry(
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
-lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
+// lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
 lib16868C::Arm arm(armMtrs);
