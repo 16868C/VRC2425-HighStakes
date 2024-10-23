@@ -1,6 +1,6 @@
 #include "main.h"
 #include "16868C/util/pose.hpp"
-#include "display/lv_objx/lv_chart.h"
+#include "okapi/api/device/motor/abstractMotor.hpp"
 #include "okapi/impl/device/controllerUtil.hpp"
 #include "robotconfig.hpp"
 #include "16868C/util/logger.hpp"
@@ -8,7 +8,6 @@
 #include <functional>
 
 using namespace lib16868C;
-
 
 std::function<void()> auton = redSoloAWP;
 pros::Task autonSelect = pros::Task([]() {
@@ -79,8 +78,8 @@ pros::Task autonSelect = pros::Task([]() {
 void initialize() {
 	// pros::lcd::initialize();
 
-	odometry.init();
-	armMtrs.resetZero();
+	// odometry.init();
+	// armMtrs.resetZero();
 	// odometry.init(Pose(0_in, 0_in, 0_deg));
 	// inertial.reset(true);
 	// chassis.coast();
@@ -114,7 +113,7 @@ void autonomous() {
 
 void opcontrol() {
 	autonSelect.suspend();
-
+	
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 	okapi::ControllerButton ptoTgl(okapi::ControllerDigital::B);
 
@@ -137,7 +136,7 @@ void opcontrol() {
 		// Drivetrain -> Tank Drive
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
-		if (hang.getState()) {
+		if (hang.is_extended()) {
 			left *= 0.5;
 			right *= 0.5;
 		}

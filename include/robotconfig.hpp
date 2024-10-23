@@ -4,7 +4,6 @@
 #include "16868C/devices/inertial.hpp"
 #include "16868C/devices/motor.hpp"
 #include "16868C/devices/motorGroup.hpp"
-#include "16868C/devices/pneumatic.hpp"
 #include "16868C/subsystems/chassis/inline.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/subsystems/intake.hpp"
@@ -66,16 +65,16 @@ extern lib16868C::Motor armRight;
 extern lib16868C::MotorGroup armMtrs;
 
 // Pneumatics
-extern lib16868C::Pneumatic clamp;
-extern lib16868C::Pneumatic hang;
-extern lib16868C::Pneumatic stick;
+extern pros::adi::Pneumatics clamp;
+extern pros::adi::Pneumatics hang;
+extern pros::adi::Pneumatics stick;
 
 // Sensors
 extern lib16868C::Inertial inertial;
 extern okapi::DistanceSensor hookDist;
 extern okapi::OpticalSensor ringDetect;
 
-extern pros::ADIPotentiometer autonSelector;
+extern pros::adi::Potentiometer autonSelector;
 
 extern lib16868C::Rotation vertRot;
 extern lib16868C::Rotation hortRot;
