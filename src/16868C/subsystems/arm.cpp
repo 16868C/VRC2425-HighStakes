@@ -15,12 +15,12 @@ void Arm::armManager(void* params) {
 			arm->state = ArmPosition::IDLE;
 		}
 
-		if (intake.isBasket())
-			arm->mtrs.moveVoltage(-12000);
-		else if (arm->state != ArmPosition::IDLE)
-			arm->mtrs.moveAbsolute(arm->tgt, arm->volts);
-		else
-			arm->mtrs.moveVoltage(0);
+		// if (intake.isBasket())
+		// 	arm->mtrs.moveVoltage(-12000);
+		// else if (arm->state != ArmPosition::IDLE)
+		// 	arm->mtrs.moveAbsolute(arm->tgt, arm->volts);
+		// else
+		// 	arm->mtrs.moveVoltage(0);
 
 		pros::Task::delay_until(&time, 50);
 	}
