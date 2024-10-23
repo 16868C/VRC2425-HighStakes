@@ -6,6 +6,7 @@
 #include "16868C/util/pose.hpp"
 #include "okapi/api/units/QAngle.hpp"
 #include "okapi/api/units/QLength.hpp"
+#include "pros/rtos.hpp"
 #include <array>
 
 using namespace okapi::literals;
@@ -37,6 +38,8 @@ class Odometry {
 		Pose getPose();
 		Pose getState();
 
+		Pose getVel();
+
 		void update(bool front, bool right, bool rear, bool left);
 		void update(okapi::QLength x, okapi::QLength y);
 		void update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta);
@@ -49,9 +52,17 @@ class Odometry {
 		void resetSensors();
 
 	private:
+		void updateVel(Pose vel);
+
 		Pose pose { 0_in, 0_in, 0_deg, 0 };
 		pros::Mutex poseMutex;
 		Pose prevPose { 0_in, 0_in, 0_deg, 0 };
+
+		Pose vel {};
+		pros::Mutex velMutex;
+		Pose prevVel {};
+
+		okapi::QTime dt = 10_ms;
 
 		TrackingWheel leftEnc;
 		TrackingWheel rightEnc;

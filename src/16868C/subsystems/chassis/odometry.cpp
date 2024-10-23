@@ -70,7 +70,7 @@ void Odometry::odomManager(void* param) {
 
 		prev = curr;
 
-		pros::Task::delay_until(&time, 10);
+		pros::Task::delay_until(&time, odom->dt.convert(okapi::millisecond));
 	}
 }
 
@@ -154,13 +154,22 @@ Pose Odometry::getPose() {
 	// 	pros::delay(1);
 	// }
 
-	Pose pos = pose;
+	Pose pose = this->pose;
 	poseMutex.give();
-	prevPose = pos;
-	return pos;
+	return prevPose = pose;
 }
 Pose Odometry::getState() {
 	return getPose();
+}
+
+Pose Odometry::getVel() {
+	if (!velMutex.take(50)) {
+		std::cerr << "[Odometry::getVel] Mutex timeout - unable to read current velocity" << std::endl;
+		return prevVel;
+	}
+	Pose vel = this->vel;
+	velMutex.give();
+	return prevVel = vel;
 }
 
 void Odometry::update(bool front, bool right, bool rear, bool left) {
@@ -232,6 +241,16 @@ void Odometry::update(Pose pose) {
 	update(pose.x * okapi::inch, pose.y * okapi::inch, pose.theta * okapi::radian);
 }
 
+void Odometry::updateVel(Pose vel) {
+	if (!velMutex.take(50)) {
+		std::cerr << "[Odometry::updateVel] Mutex timeout - unable to update vel" << std::endl;
+		return;
+	}
+
+	this->vel = vel;
+	velMutex.give();
+}
+
 /* --------------------------- Getters and Setter --------------------------- */
 std::array<TrackingWheel*, 3> Odometry::getEncoders() const {
 	return trackingWheels;
@@ -279,6 +298,8 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double globalDeltaX = localOffsetX * -sin(avgA) + localOffsetY * cos(avgA);
 	double globalDeltaY = localOffsetX * cos(avgA) + localOffsetY * sin(avgA);
 
+	updateVel({globalDeltaX / dt.convert(okapi::second), globalDeltaY / dt.convert(okapi::second), deltaA / dt.convert(okapi::second), pros::millis()});
+
 	if (std::isnan(globalDeltaX)) globalDeltaX = 0;
 	if (std::isnan(globalDeltaY)) globalDeltaY = 0;
 	if (std::isnan(deltaA)) deltaA = 0;
@@ -286,5 +307,5 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double globalX = pose.x + globalDeltaX;
 	double globalY = pose.y + globalDeltaY;
 	double globalTheta = inertial->get_rotation(AngleUnit::RAD);
-	update({globalX * okapi::inch, globalY * okapi::inch, globalTheta * okapi::radian, pros::millis()});
+	update({globalX, globalY, globalTheta, pros::millis()});
 }

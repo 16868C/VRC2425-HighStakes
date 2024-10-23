@@ -11,6 +11,8 @@ class Pose : public Point {
 		uint time;
 
 		Pose();
+		Pose(Point pos, double theta, uint time);
+		Pose(double x, double y, double theta, uint time);
 		Pose(okapi::QLength x, okapi::QLength y);
 		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta);
 		Pose(okapi::QLength x, okapi::QLength y, okapi::QAngle theta, uint time);
@@ -26,9 +28,5 @@ class Pose : public Point {
 		Pose operator/(double rhs);
 
 		Pose& operator=(const Pose& other);
-
-	private:
-		Pose(Point pos, double theta, uint time);
-		Pose(double x, double y, double theta, uint time);
 };
 } // namespace lib16868C
