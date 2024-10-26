@@ -17,31 +17,33 @@ using namespace okapi::literals;
 extern okapi::Controller master;
 
 // Ports
-const int LEFT_FRONT = -4;
-const int LEFT_MIDDLE = -5;
-const int LEFT_REAR = -6;
-const int RIGHT_FRONT = 1;
-const int RIGHT_MIDDLE = 2;
-const int RIGHT_REAR = 3;
+const int LEFT_FRONT = -11;
+const int LEFT_MIDDLE = -12;
+const int LEFT_REAR = 13;
+const int RIGHT_FRONT = 14;
+const int RIGHT_MIDDLE = -16;
+const int RIGHT_REAR = 15;
 
-const int INTAKE_1 = 5;
-const int INTAKE_2 = 9;
+const int INTAKE_FIRST = -1;
+const int INTAKE_SECOND = -2;
 
-const int ARM_LEFT = -8;
-const int ARM_RIGHT = 9;
-
-const int INERTIAL = 14;
-const int HOOK_DISTANCE_SNSR = 13;
-const int RING_OPTICAL_SNSR = 16;
-
-const int VERT_ENC = 12;
-const int HORT_ENC = 11;
+const int ARM_LEFT = 1;
+const int ARM_RIGHT = 2;
 
 const char MOGO_CLAMP = 'A';
-const char HANG = 'B';
-const char STICK = 'D';
+const char HANG = 'C';
+const char DOINKER = 'D';
+const char PTO = 'B';
 
-const char AUTON_SELECTOR = 'C';
+const int INERTIAL = 9;
+const int HORT_ENC = 5;
+
+const int INTAKE_ENC = 21;
+const int RING_OPTICAL = 10;
+const char RING_IR = 'H';
+const int ARM_ENC = 3;
+
+const char AUTON_SELECTOR = 'E';
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;
@@ -57,8 +59,8 @@ extern lib16868C::Motor rightRear;
 extern lib16868C::MotorGroup leftDrive;
 extern lib16868C::MotorGroup rightDrive;
 
-extern lib16868C::Motor intakeMtr1;
-extern lib16868C::Motor intakeMtr2;
+extern lib16868C::Motor intakeFirst;
+extern lib16868C::Motor intakeSecond;
 
 extern lib16868C::Motor armLeft;
 extern lib16868C::Motor armRight;
@@ -67,19 +69,20 @@ extern lib16868C::MotorGroup armMtrs;
 // Pneumatics
 extern pros::adi::Pneumatics clamp;
 extern pros::adi::Pneumatics hang;
-extern pros::adi::Pneumatics stick;
+extern pros::adi::Pneumatics doinker;
+extern pros::adi::Pneumatics pto;
 
 // Sensors
 extern lib16868C::Inertial inertial;
-extern okapi::DistanceSensor hookDist;
-extern okapi::OpticalSensor ringDetect;
+extern lib16868C::Rotation hortRot;
+extern lib16868C::TrackingWheel hortEnc;
+
+extern lib16868C::Rotation intakeEnc;
+extern okapi::OpticalSensor ringOptical;
+extern pros::adi::LineSensor ringIR;
+extern lib16868C::Rotation armEnc;
 
 extern pros::adi::Potentiometer autonSelector;
-
-extern lib16868C::Rotation vertRot;
-extern lib16868C::Rotation hortRot;
-extern lib16868C::TrackingWheel vertEnc;
-extern lib16868C::TrackingWheel hortEnc;
 
 // Subsystems
 extern lib16868C::Odometry odometry;

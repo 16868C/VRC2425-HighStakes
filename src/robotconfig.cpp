@@ -17,29 +17,31 @@ lib16868C::Motor rightRear(RIGHT_REAR, okapi::AbstractMotor::gearset::blue);
 lib16868C::MotorGroup leftDrive({leftFront, leftMiddle, leftRear});
 lib16868C::MotorGroup rightDrive({rightFront, rightMiddle, rightRear});
 
-lib16868C::Motor intakeMtr1(INTAKE_1, okapi::AbstractMotor::gearset::green);
-lib16868C::Motor intakeMtr2(INTAKE_2, okapi::AbstractMotor::gearset::green);
+lib16868C::Motor intakeFirst(INTAKE_FIRST, okapi::AbstractMotor::gearset::green);
+lib16868C::Motor intakeSecond(INTAKE_SECOND, okapi::AbstractMotor::gearset::green);
 
 lib16868C::Motor armLeft(ARM_LEFT, okapi::AbstractMotor::gearset::green);
 lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
 lib16868C::MotorGroup armMtrs({armLeft, armRight});
 
 // Pneumatics
-pros::adi::Pneumatics clamp(MOGO_CLAMP, false);
+pros::adi::Pneumatics clamp(MOGO_CLAMP, true);
 pros::adi::Pneumatics hang(HANG, false);
-pros::adi::Pneumatics stick(STICK, false);
+pros::adi::Pneumatics doinker(DOINKER, false);
+pros::adi::Pneumatics pto(PTO, true);
 
 // Sensors
 lib16868C::Inertial inertial(INERTIAL, &master);
-okapi::DistanceSensor hookDist(HOOK_DISTANCE_SNSR);
-okapi::OpticalSensor ringDetect(RING_OPTICAL_SNSR);
+lib16868C::Rotation hortRot(HORT_ENC);
+lib16868C::TrackingWheel vertEnc(&leftDrive, WHEEL_DIAM, 6_in, GEAR_RATIO);
+lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 3.75_in);
+
+lib16868C::Rotation intakeEnc(INTAKE_ENC);
+okapi::OpticalSensor ringOptical(RING_OPTICAL);
+pros::adi::LineSensor ringIR(RING_IR);
+lib16868C::Rotation armEnc(ARM_ENC);
 
 pros::adi::Potentiometer autonSelector(AUTON_SELECTOR, pros::E_ADI_POT_V2);
-
-lib16868C::Rotation vertRot(VERT_ENC);
-lib16868C::Rotation hortRot(HORT_ENC);
-lib16868C::TrackingWheel vertEnc(&vertRot, 2_in, 0.5_in);
-lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 3.75_in);
 
 // Subsystems
 lib16868C::Odometry odometry(
@@ -49,4 +51,5 @@ lib16868C::Odometry odometry(
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
 // lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
-lib16868C::Arm arm(armMtrs);
+lib16868C::Intake intake(intakeFirst, intakeSecond, intakeEnc, ringOptical, ringIR);
+lib16868C::Arm arm(armMtrs, armEnc, {0.1, 0, 1});

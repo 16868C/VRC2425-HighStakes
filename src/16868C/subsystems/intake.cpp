@@ -12,46 +12,52 @@ void Intake::intakeManager(void* param) {
 	int n = 0;
 	while (true) {
 		intake->curRing = Intake::getColour(intake->color.getHue());
+		// std::cout << intake->color.getHue() << " " << static_cast<int>(intake->curRing) << "\n";
+		// std::cout << remainder(intake->enc.get(), intake->TPR) << "\n";
+		// std::cout << intake->enc.get() << "\n";
 
-		if (intake->curRing == intake->tgtRing && intake->state == IntakeState::INTAKE) {
+		if (intake->tgtRing != RingColour::NONE && intake->curRing == intake->tgtRing && (intake->state == IntakeState::MOGO || intake->state == IntakeState::INTAKE)) {
 			intake->eject();
-			intake->tgtPos = intake->enc.get() + intake->ejectPos;
+			intake->tgtPos = intake->enc.get() + intake->EJECT_POS;
 		}
 
-		if (intake->state == IntakeState::EJECTING && abs(intake->enc.get() - intake->tgtPos) < 10) {
+		if (intake->state == IntakeState::EJECTING && intake->ring.get_value() < 2000) {
 			IntakeState prevState = intake->state;
-			intake->stop();
-			pros::delay(500);
+			pros::delay(50);
+			intake->secondStage.moveVoltage(-12000);
+			pros::delay(1500);
 			intake->state = prevState;
 			intake->update();
 		}
 
-		if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 50) {
+		if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
 			intake->stop();
 		}
 
-		if (intake->state == IntakeState::REDIRECT && abs(fmod(intake->enc.get(), intake->tpr) - intake->redirectPos) > 10) {
-			intake->secondStage.moveVoltage(0);
+		// std::cout << abs(remainder(intake->enc.get(), intake->TPR / 4) - intake->REDIRECT_POS) << "\n";
+		double error = abs(remainder(abs(intake->enc.get()), intake->TPR / 4) - intake->REDIRECT_POS);
+		if (intake->state == IntakeState::REDIRECT && error > intake->ERROR_MARGIN) {
+			intake->secondStage.moveVoltage(-2500 * std::min(error * 0.03, 1.0));
 		} else if (intake->state == IntakeState::REDIRECT) {
-			intake->secondStage.moveVoltage(12000);
+			intake->secondStage.moveVoltage(0);
 		}
 
 		if (intake->isJamming()) n++;
 		else n = 0;
 		
-		if (n >= 5) {
-			IntakeState prevState = intake->state;
-			intake->unjam();
-			pros::delay(500);
-			intake->state = prevState;
-			intake->update();
-		}
+		// if (n >= 5) {
+		// 	IntakeState prevState = intake->state;
+		// 	intake->unjam();
+		// 	pros::delay(500);
+		// 	intake->state = prevState;
+		// 	intake->update();
+		// }
 
 		pros::Task::delay_until(&time, 20);
 	}
 }
 
-Intake::Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::ADILineSensor& ring)
+Intake::Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::adi::LineSensor& ring)
 	: firstStage(firstStage), secondStage(secondStage), enc(enc), color(color), ring(ring) {}
 
 
@@ -112,7 +118,6 @@ void Intake::update() {
 		secondStage.moveVoltage(-12000);
 		break;
 	case IntakeState::EJECTING:
-		secondStage.moveVoltage(-12000);
 		break;
 	case IntakeState::UNJAMMING:
 		firstStage.moveVoltage(-12000);

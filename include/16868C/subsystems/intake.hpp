@@ -24,7 +24,7 @@ enum class RingColour {
 
 class Intake {
 	public:
-		Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::ADILineSensor& ring);
+		Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::adi::LineSensor& ring);
 
 		void intake();
 		void mogo();
@@ -51,14 +51,15 @@ class Intake {
 		okapi::Motor& firstStage, secondStage;
 		lib16868C::Rotation& enc;
 		okapi::OpticalSensor& color;
-		pros::ADILineSensor& ring;
+		pros::adi::LineSensor& ring;
 
 		int numRings = 0;
 		double tgtPos = -1;
 
-		const double tpr = 360;
-		const double ejectPos = 200;
-		const double redirectPos = 50;
+		const double TPR = 4079.18; // 10.74 * 360;
+		const double EJECT_POS = 5 * 360;
+		const double REDIRECT_POS = 0.65 * 360;
+		const double ERROR_MARGIN = 10;
 
 		IntakeState state = IntakeState::OFF;
 
