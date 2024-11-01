@@ -15,7 +15,7 @@ void Inertial::calibrate() {
 	int attempts = 0;
 	do {
 		reset(true);
-		while (get_status() != pros::c::imu_status_e_t::E_IMU_STATUS_ERROR && is_calibrating()) pros::delay(10);
+		while (get_status() != pros::ImuStatus::error && is_calibrating()) pros::delay(10);
 
 		if (!std::isinf(pros::Imu::get_rotation())) break;
 		// std::cout << resetSuccess << "\n";

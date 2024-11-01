@@ -96,12 +96,15 @@ void autonomous() {
 	uint st = pros::millis();
 	// arm.resetPosition();
 
-	chassis.moveToPoint({48_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={0.035, 0, 3}, .headingGains={0.6, 0, 1}, .exitRadius=5_in});
-	chassis.moveToPoint({72_in, 24_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
-	chassis.moveToPoint({96_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
-	chassis.turnAbsolute(90_deg, 0, {.minRPM=200_rpm, .gains={0.03, 0, 3}, .errorMargin=10_deg, .numInMargin=1});
+	// chassis.moveToPoint({24_in, 24_in}, 0, {.distGains={0.04, 0, 3}, .headingGains={0.5, 0, 1.5}, .exitRadius=1_in});
+	chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.distGains={0.2, 0, 3}, .headingGains={0.5, 0, 1.5}, .settleRadius=7.5_in, .horiDrift=1*54*54, .dlead=0.6, .glead=0.4});
+
+	// chassis.moveToPoint({48_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={0.035, 0, 3}, .headingGains={0.6, 0, 1}, .exitRadius=5_in});
+	// chassis.moveToPoint({72_in, 24_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
+	// chassis.moveToPoint({96_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
+	// chassis.turnAbsolute(90_deg, 0, {.minRPM=200_rpm, .gains={0.03, 0, 3}, .errorMargin=10_deg, .numInMargin=1});
 	// chassis.moveToPoint({96_in, 24_in}, 0, {.distGains={.kP=0.07, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=1_in});
-	chassis.moveToPose({72_in, 72_in, 180_deg}, 0, {.distGains={0.05, 0, 3}, .headingGains={0.5, 0, 1}, .settleRadius=7.5_in, .horiDrift=1.5*52*52, .dlead=0.6, .glead=0.5, .slewRate=2000});
+	// chassis.moveToPose({72_in, 72_in, 180_deg}, 0, {.distGains={0.05, 0, 3}, .headingGains={0.5, 0, 1}, .settleRadius=7.5_in, .horiDrift=1.5*52*52, .dlead=0.6, .glead=0.5, .slewRate=2000});
 	// chassis.turnAbsolute(90_deg, 0, {.gains={.kP=0.04, .kD=3}, .turnWheel=TurnWheel::BOTH});
 
 	// chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=600_rpm, .distGains={.kP=0.05, .kD=3}, .headingGains={.kP=0.5, .kD=1}, .settleRadius=7.5_in, .horiDrift=1.5 * 52 * 52, .dlead=0.6, .glead=0});
@@ -115,7 +118,7 @@ void autonomous() {
 
 	// chassis.moveDistance(48_in, 600_rpm, {0.04, 0, 1.5}, 0_deg, 300_rpm, {0.05, 0, 0.1}, 0);
 	// chassis.turnAbsolute(90_deg, 600_rpm, {0.02, 0, 0.95}, 3, 5, TurnWheel::BOTH, 0);
-	chassis.moveToPoint({24_in, 24_in}, 600_rpm, {0.04, 0, 1.5}, {1, 0, 1}, 3_in, false, true, 0);
+	// chassis.moveToPoint({24_in, 24_in}, 600_rpm, {0.04, 0, 1.5}, {1, 0, 1}, 3_in, false, true, 0);
 
 	// chassis.moveToPoint({60_in, -56_in}, 600_rpm, {0.06, 0, 0.1}, {0.8, 0, 1}, 3_in, false, false, 0);
 	// chassis.moveToPoint({48_in, -72_in}, 600_rpm, {0.06, 0, 0.1}, {0.8, 0, 1}, 3_in, false, true, 0);
@@ -154,8 +157,8 @@ void opcontrol() {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 		if (hang.is_extended()) {
-			left *= 0.5;
-			right *= 0.5;
+			left *= 0.4;
+			right *= 0.4;
 		}
 		chassis.driveTank(left, right, 0.05);
 		// pros::lcd::print(1, "%.2f %.2f", leftDrive.getTemperature(), rightDrive.getTemperature());

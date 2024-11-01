@@ -31,7 +31,7 @@ pros::adi::Pneumatics doinker(DOINKER, false);
 pros::adi::Pneumatics pto(PTO, true, true);
 
 // Sensors
-lib16868C::Inertial inertial(INERTIAL, &master);
+lib16868C::Inertial inertial(INERTIAL);
 lib16868C::Rotation hortRot(HORT_ENC);
 lib16868C::TrackingWheel vertEnc(&leftDrive, WHEEL_DIAM, 6_in, GEAR_RATIO);
 lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 3.75_in);
@@ -46,7 +46,7 @@ pros::adi::Potentiometer autonSelector(AUTON_SELECTOR, pros::E_ADI_POT_V2);
 // Subsystems
 lib16868C::Odometry odometry(
 	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
-	std::array<lib16868C::DistanceSensor, 4>{{frontDist, rightDist, rearDist, leftDist}},
+	std::array<lib16868C::DistanceSensor, 4>{{{}, {}, {}, {}}},
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
