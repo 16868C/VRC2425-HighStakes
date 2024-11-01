@@ -9,9 +9,9 @@
 
 using namespace lib16868C;
 
-// std::function<void()> auton = redSoloAWP;
-// pros::Task autonSelect = pros::Task([]() {
-	/*
+/*
+std::function<void()> auton = redSoloAWP;
+pros::Task autonSelect = pros::Task([]() {
 	while (true) {
 		master.clearLine(0);
 
@@ -74,8 +74,7 @@ using namespace lib16868C;
 
 		pros::delay(100);
 	}
-	*/
-// }, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Selector");
+}, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Selector");*/
 
 void initialize() {
 	pros::lcd::initialize();
@@ -96,6 +95,16 @@ void autonomous() {
 	// autonSelect.suspend();
 	uint st = pros::millis();
 	// arm.resetPosition();
+
+	chassis.moveToPoint({48_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={0.035, 0, 3}, .headingGains={0.6, 0, 1}, .exitRadius=5_in});
+	chassis.moveToPoint({72_in, 24_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
+	chassis.moveToPoint({96_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
+	chassis.turnAbsolute(90_deg, 0, {.minRPM=200_rpm, .gains={0.03, 0, 3}, .errorMargin=10_deg, .numInMargin=1});
+	// chassis.moveToPoint({96_in, 24_in}, 0, {.distGains={.kP=0.07, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=1_in});
+	chassis.moveToPose({72_in, 72_in, 180_deg}, 0, {.distGains={0.05, 0, 3}, .headingGains={0.5, 0, 1}, .settleRadius=7.5_in, .horiDrift=1.5*52*52, .dlead=0.6, .glead=0.5, .slewRate=2000});
+	// chassis.turnAbsolute(90_deg, 0, {.gains={.kP=0.04, .kD=3}, .turnWheel=TurnWheel::BOTH});
+
+	// chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=600_rpm, .distGains={.kP=0.05, .kD=3}, .headingGains={.kP=0.5, .kD=1}, .settleRadius=7.5_in, .horiDrift=1.5 * 52 * 52, .dlead=0.6, .glead=0});
 
 	// auton();
 	// redRightAWP();
@@ -119,7 +128,7 @@ void autonomous() {
 
 void opcontrol() {
 	// autonSelect.suspend();
-	
+  
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 	okapi::ControllerButton ptoTgl(okapi::ControllerDigital::B);
 

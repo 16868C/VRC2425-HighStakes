@@ -5,6 +5,7 @@
 #include "16868C/devices/motorGroup.hpp"
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/util/pose.hpp"
+#include "okapi/api/units/QLength.hpp"
 
 namespace lib16868C {
 enum class TurnWheel {
@@ -13,38 +14,116 @@ enum class TurnWheel {
 	BOTH
 };
 
+struct MoveDistanceParams {
+	okapi::QAngularSpeed maxRPM = 600_rpm;
+	okapi::QAngularSpeed minRPM = 0_rpm;
+	okapi::QAngularSpeed turnRPM = 300_rpm;
+
+	PIDGains distGains = {0, 0, 0};
+	PIDGains headingGains = {0, 0, 0};
+
+	okapi::QLength exitDist = 0_in;
+
+	double slewRate = 0;
+};
+struct TurnAbsoluteParams {
+	okapi::QAngularSpeed maxRPM = 600_rpm;
+	okapi::QAngularSpeed minRPM = 0_rpm;
+
+	PIDGains gains = {};
+
+	okapi::QAngle errorMargin = 3_deg;
+	double numInMargin = 5;
+
+	TurnWheel turnWheel = TurnWheel::BOTH;
+	TurnDirection dir = TurnDirection::SHORTEST;
+
+	double slewRate = 0;
+};
+struct TurnToPointParams {
+	okapi::QAngularSpeed maxRPM = 600_rpm;
+	okapi::QAngularSpeed minRPM = 0_rpm;
+
+	PIDGains gains = {0, 0, 0};
+
+	okapi::QAngle errorMargin = 3_deg;
+	double numInMargin = 5;
+
+	TurnWheel turnWheel = TurnWheel::BOTH;
+	TurnDirection dir = TurnDirection::SHORTEST;
+
+	double slewRate = 0;
+};
+struct MoveToPointParams {
+	okapi::QAngularSpeed maxRPM = 600_rpm;
+	okapi::QAngularSpeed minRPM = 0_rpm;
+
+	PIDGains distGains = {};
+	PIDGains headingGains = {};
+
+	okapi::QLength exitRadius = 1_in;
+	okapi::QLength turnDeadzone = 6_in;
+
+	bool reverse = false;
+
+	double slewRate = 0;
+};
+struct MoveToPoseParams {
+	okapi::QAngularSpeed maxRPM = 600_rpm;
+	okapi::QAngularSpeed minRPM = 0_rpm;
+
+	PIDGains distGains = {};
+	PIDGains headingGains = {};
+
+	bool reverse = false;
+
+	okapi::QLength settleRadius = 7.5_in;
+	okapi::QLength earlyExitDist = 0_in;
+
+	double horiDrift = 1 * 52 * 52;
+
+	double dlead = 0.6;
+	double glead = 0;
+
+	okapi::QLength gRadius = 8_in;
+
+	double slewRate = 0;
+};
+
 class Inline {
-	public:
-		Inline(MotorGroup& left, MotorGroup& right, Inertial* inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio = 1.0);
+public:
 
-		void moveTank(double left, double right, double slewRate = 0);
-		void moveArcade(double forward, double turn, double slewRate = 0);
+	Inline(MotorGroup& left, MotorGroup& right, Inertial* inertial, Odometry* odom, okapi::QLength wheelDiam, double gearRatio = 1.0);
 
-		void driveTank(double left, double right, double deadzone = 0);
-		void driveArcade(double forward, double turn, double deadzone = 0);
+	void moveTank(double left, double right, double slewRate = 0);
+	void moveArcade(double forward, double turn, double slewRate = 0);
 
-		void moveDistance(okapi::QLength dist, okapi::QAngularSpeed maxRPM, PIDGains distGains, okapi::QAngle heading, okapi::QAngularSpeed turnRPM, PIDGains headingGains, int timeout = 0);
-		void turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, double errorMargin = 1, int numInMargin = 5, TurnWheel turnWheel = TurnWheel::BOTH, int timeout = 0);
+	void driveTank(double left, double right, double deadzone = 0);
+	void driveArcade(double forward, double turn, double deadzone = 0);
 
-		void turnAbsolute(okapi::QAngle angle, okapi::QAngularSpeed maxRPM, PIDGains gains, TurnDirection turnDir = TurnDirection::SHORTEST, double errorMargin = 3, int numInMargin = 5, TurnWheel turnWheel = TurnWheel::BOTH, int timeout = 0);
-		void moveToPoint(Pose target, okapi::QAngularSpeed maxRPM, PIDGains distGains, PIDGains headingGains, okapi::QLength endRadius, bool backward = false, bool stopMtrs = true, int timeout = 0);
+	void moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout = 0, MoveDistanceParams params = {});
+	void turnAbsolute(okapi::QAngle angle, int timeout = 0, TurnAbsoluteParams params = {});
 
-		void setBrakeMode(okapi::AbstractMotor::brakeMode mode);
-		void coast();
-		void brake();
-		void hold();
+	void turnToPoint(Pose target, int timeout = 0, TurnToPointParams params = {});
+	void moveToPoint(Pose target, int timeout = 0, MoveToPointParams params = {});
+	void moveToPose(Pose target, int timeout = 0, MoveToPoseParams params = {});
 
-	private:
-		MotorGroup& leftMtrs, rightMtrs;
-		Inertial* inertial { nullptr };
-		Odometry* odom { nullptr };
-		okapi::QLength wheelDiam;
-		double gearRatio;
-		double tpr;
+	void setBrakeMode(okapi::AbstractMotor::brakeMode mode);
+	void coast();
+	void brake();
+	void hold();
 
-		// Move Slew Rate Members
-		double prevLeft = 0, prevRight = 0;
+private:
+	MotorGroup& leftMtrs, rightMtrs;
+	Inertial* inertial { nullptr };
+	Odometry* odom { nullptr };
+	okapi::QLength wheelDiam;
+	double gearRatio;
+	double tpr;
 
-		const int MAX_VOLT = 12000;
+	// Move Slew Rate Values
+	double prevLeft = 0, prevRight = 0;
+
+	const int MAX_VOLT = 12000;
 };
 } // namespace lib16868C

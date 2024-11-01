@@ -18,7 +18,6 @@ class Inertial : public pros::Imu {
 		 * @param port The smart port of the inertial on the brain [1, 21]
 		 */
 		Inertial(uint port);
-		Inertial(uint port, okapi::Controller* controller);
 
 		/**
 		 * @brief Custom reset method that detects failed resets and keeps trying, as well as inertial drift, which it will warn the user
@@ -41,7 +40,5 @@ class Inertial : public pros::Imu {
 	private:
 		double DRIFT_THRESHOLD = 1;
 		bool infDetected = false;
-
-		okapi::Controller* controller = nullptr;
 };
 } // namespace lib16868C

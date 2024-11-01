@@ -46,7 +46,7 @@ pros::adi::Potentiometer autonSelector(AUTON_SELECTOR, pros::E_ADI_POT_V2);
 // Subsystems
 lib16868C::Odometry odometry(
 	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
-	std::array<lib16868C::DistanceSensor, 4>{{{}, {}, {}, {}}},
+	std::array<lib16868C::DistanceSensor, 4>{{frontDist, rightDist, rearDist, leftDist}},
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 

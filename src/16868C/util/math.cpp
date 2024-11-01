@@ -1,5 +1,6 @@
 #include "math.hpp"
 #include "logger.hpp"
+#include <cmath>
 #include <limits>
 #include <iomanip>
 #include <sstream>
@@ -13,51 +14,33 @@ double lib16868C::ema(double input, double prev, double a) {
 	return a * input + (1 - a) * prev;
 }
 
-double lib16868C::normalizeAngleDeg(double deg) {
-	double mod = fmod(deg, 360);
-	if (mod < 0) mod += 360;
-	return mod;
-}
-double lib16868C::normalizeAngleRad(double rad) {
-	double mod = fmod(rad, 2 * M_PI);
-	if (mod < 0) mod += 2 * M_PI;
+double lib16868C::normalizeAngle(double ang, bool rad) {
+	double maxAng = rad ? 2 * M_PI : 360;
+	double mod = fmod(ang, maxAng);
+	if (mod < 0) mod += maxAng;
 	return mod;
 }
 
-double lib16868C::angleErrorDeg(double target, double current, TurnDirection direction) {
-	double error = std::abs(normalizeAngleDeg(target) - normalizeAngleDeg(current));
-	if (error <= 180) {
-		if (normalizeAngleDeg(current) <= normalizeAngleDeg(target)) return current + error;
-		else return current - error;
-	} else {
-		if (normalizeAngleDeg(current) <= normalizeAngleDeg(target)) return current - (360 - error);
-		else return current + (360 - error);
-	}
-}
-double lib16868C::angleErrorRad(double target, double current, TurnDirection direction) {
-	double error = std::abs(normalizeAngleRad(target) - normalizeAngleRad(current));
-	if (error <= M_PI) {
-		if (normalizeAngleRad(current) <= normalizeAngleRad(target)) return current + error;
-		else return current - error;
-	} else {
-		if (normalizeAngleRad(current) <= normalizeAngleRad(target)) return current - (2 * M_PI - error);
-		else return current + (2 * M_PI - error);
-	}
+double lib16868C::getTargetHeading(double target, double current, bool rad, TurnDirection direction) {
+	double maxAng = rad ? 2 * M_PI : 360;
+	double error = target - current;
+	while (error > maxAng / 2) error -= maxAng;
+	while (error < -maxAng / 2) error += maxAng;
+	return current + error;
 }
 
-/** Point **/
-Point::Point() : Point(0, 0) {}
-Point::Point(double x, double y) : x(x), y(y) {}
+double lib16868C::getRadius(Pose p1, Point p2) {
+	if (fmod(p1.theta, M_PI) == 0) p1.theta -= 1e-5;
 
-double Point::distTo(Point p) {
-	return std::hypot(p.x - x, p.y - y);
-}
-double Point::angleTo(Point p) {
-	return std::atan2(p.y - y, p.x - x);
-}
+	// https://www.desmos.com/calculator/04hn4cv0qa
+	double a = 0.5 * (p2.x * p2.x - p1.x * p1.x + p2.y * p2.y + p1.y * p1.y);
+	double b = p2.y * p1.y + p1.x * (p2.y - p1.y) * 1/tan(p1.theta);
+	double c = p2.x - p1.x - (p2.y - p1.y) * 1/tan(p1.theta);
+	double h = (a - b) / c;
+	double k = -1/tan(p1.theta) * (h - p1.x) + p1.y;
+	Point o(h, k);
 
-std::string Point::toStr() {
-	return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
+	return p1.distTo(o);
 }
 
 /** Line **/

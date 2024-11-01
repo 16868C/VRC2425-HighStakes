@@ -3,7 +3,7 @@
 
 namespace lib16868C {
 struct PIDGains {
-	double kP, kI, kD, kF = 0;
+	double kP = 0, kI = 0, kD = 0, kF = 0;
 };
 
 class PIDController {
