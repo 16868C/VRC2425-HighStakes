@@ -1,12 +1,11 @@
 #include "16868C/devices/rotation.hpp"
-#include "16868C/util/util.hpp"
 
 using namespace lib16868C;
 
-Rotation::Rotation(int port) : pros::Rotation(std::abs(port), Util::sgn(port) > 0 ? true : false) {
+Rotation::Rotation(int port) : pros::Rotation(port) {
 	tpr = 360;
 }
-Rotation::Rotation(uint port, bool reversed) : pros::Rotation(port, reversed) {
+Rotation::Rotation(uint port, bool reversed) : pros::Rotation(port * (reversed ? 1 : -1)) {
 	tpr = 360;
 }
 
