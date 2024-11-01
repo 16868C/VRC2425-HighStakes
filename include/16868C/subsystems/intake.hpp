@@ -1,6 +1,5 @@
 #pragma once
 #include "16868C/devices/rotation.hpp"
-#include "okapi/impl/device/distanceSensor.hpp"
 #include "okapi/impl/device/opticalSensor.hpp"
 #include "okapi/impl/device/motor/motor.hpp"
 #include "pros/adi.hpp"
@@ -24,7 +23,7 @@ enum class RingColour {
 
 class Intake {
 	public:
-		Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::adi::LineSensor& ring);
+		Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::adi::LineSensor& ring, pros::adi::Pneumatics& pto);
 
 		void intake();
 		void mogo();
@@ -52,13 +51,14 @@ class Intake {
 		lib16868C::Rotation& enc;
 		okapi::OpticalSensor& color;
 		pros::adi::LineSensor& ring;
+		pros::adi::Pneumatics& pto;
 
 		int numRings = 0;
 		double tgtPos = -1;
 
 		const double TPR = 4079.18; // 10.74 * 360;
 		const double EJECT_POS = 5 * 360;
-		const double REDIRECT_POS = 0.65 * 360;
+		const double REDIRECT_POS = 355;
 		const double ERROR_MARGIN = 10;
 
 		IntakeState state = IntakeState::OFF;

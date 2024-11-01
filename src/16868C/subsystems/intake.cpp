@@ -1,20 +1,24 @@
 #include "16868C/subsystems/intake.hpp"
+#include "16868C/controllers/pidController.hpp"
 #include "pros/adi.hpp"
 
 using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
+	PIDController intakePID({0.025, 0, 0.05});
 
 	intake->color.setLedPWM(100);
 	
 	uint32_t time = pros::millis();
 	int n = 0;
 	while (true) {
+		if (!intake->pto.is_extended()) {
+			pros::Task::delay_until(&time, 20);
+			continue;
+		}
+
 		intake->curRing = Intake::getColour(intake->color.getHue());
-		// std::cout << intake->color.getHue() << " " << static_cast<int>(intake->curRing) << "\n";
-		// std::cout << remainder(intake->enc.get(), intake->TPR) << "\n";
-		// std::cout << intake->enc.get() << "\n";
 
 		if (intake->tgtRing != RingColour::NONE && intake->curRing == intake->tgtRing && (intake->state == IntakeState::MOGO || intake->state == IntakeState::INTAKE)) {
 			intake->eject();
@@ -34,31 +38,34 @@ void Intake::intakeManager(void* param) {
 			intake->stop();
 		}
 
-		// std::cout << abs(remainder(intake->enc.get(), intake->TPR / 4) - intake->REDIRECT_POS) << "\n";
-		double error = abs(remainder(abs(intake->enc.get()), intake->TPR / 4) - intake->REDIRECT_POS);
-		if (intake->state == IntakeState::REDIRECT && error > intake->ERROR_MARGIN) {
-			intake->secondStage.moveVoltage(-2500 * std::min(error * 0.03, 1.0));
+		// std::cout << intake->enc.get() << " " << abs(remainder(intake->enc.get(), intake->TPR / 4) - intake->REDIRECT_POS) << " ";
+		double error = remainder(abs(intake->enc.get()), intake->TPR / 4) - intake->REDIRECT_POS;
+		if (intake->state == IntakeState::REDIRECT && abs(error) > intake->ERROR_MARGIN) {
+			// std::cout << "move";
+			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(error));
 		} else if (intake->state == IntakeState::REDIRECT) {
+			// std::cout << "stop";
 			intake->secondStage.moveVoltage(0);
 		}
+		// std::cout << "\n";
 
 		if (intake->isJamming()) n++;
 		else n = 0;
 		
-		// if (n >= 5) {
-		// 	IntakeState prevState = intake->state;
-		// 	intake->unjam();
-		// 	pros::delay(500);
-		// 	intake->state = prevState;
-		// 	intake->update();
-		// }
+		if (n >= 5) {
+			IntakeState prevState = intake->state;
+			intake->unjam();
+			pros::delay(500);
+			intake->state = prevState;
+			intake->update();
+		}
 
 		pros::Task::delay_until(&time, 20);
 	}
 }
 
-Intake::Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::adi::LineSensor& ring)
-	: firstStage(firstStage), secondStage(secondStage), enc(enc), color(color), ring(ring) {}
+Intake::Intake(okapi::Motor& firstStage, okapi::Motor& secondStage, lib16868C::Rotation& enc, okapi::OpticalSensor& color, pros::adi::LineSensor& ring, pros::adi::Pneumatics& pto)
+	: firstStage(firstStage), secondStage(secondStage), enc(enc), color(color), ring(ring), pto(pto) {}
 
 
 void Intake::intake() {

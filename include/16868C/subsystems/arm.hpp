@@ -10,12 +10,12 @@ enum class ArmPosition {
 	DEFAULT = 0,
 	DESECORE_STAKE = 35,
 	ALLIANCE_STAKE = 39,
-	WALL_STAKE = 60
+	WALL_STAKE = 58
 };
 
 class Arm {
 public:
-	Arm(lib16868C::MotorGroup& mtrs, lib16868C::Rotation& enc, PIDGains gains);
+	Arm(lib16868C::MotorGroup& mtrs, lib16868C::Rotation& enc, pros::adi::Pneumatics& pto, PIDGains gains);
 
 	void move(double volts);
 	void moveTo(double tgt, double volts = 12000);
@@ -32,6 +32,7 @@ public:
 private:
 	lib16868C::MotorGroup& mtrs;
 	lib16868C::Rotation& enc;
+	pros::adi::Pneumatics& pto;
 
 	double volts = 12000;
 	double tgt = 0;

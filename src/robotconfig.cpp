@@ -25,10 +25,10 @@ lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
 lib16868C::MotorGroup armMtrs({armLeft, armRight});
 
 // Pneumatics
-pros::adi::Pneumatics clamp(MOGO_CLAMP, true);
+pros::adi::Pneumatics clamp(MOGO_CLAMP, false);
 pros::adi::Pneumatics hang(HANG, false);
 pros::adi::Pneumatics doinker(DOINKER, false);
-pros::adi::Pneumatics pto(PTO, true);
+pros::adi::Pneumatics pto(PTO, true, true);
 
 // Sensors
 lib16868C::Inertial inertial(INERTIAL, &master);
@@ -51,5 +51,5 @@ lib16868C::Odometry odometry(
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
 // lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
-lib16868C::Intake intake(intakeFirst, intakeSecond, intakeEnc, ringOptical, ringIR);
-lib16868C::Arm arm(armMtrs, armEnc, {0.1, 0, 1});
+lib16868C::Intake intake(intakeFirst, intakeSecond, intakeEnc, ringOptical, ringIR, pto);
+lib16868C::Arm arm(armMtrs, armEnc, pto, {0.1, 0, 1.5});

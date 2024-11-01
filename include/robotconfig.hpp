@@ -27,11 +27,11 @@ const int RIGHT_REAR = 15;
 const int INTAKE_FIRST = -1;
 const int INTAKE_SECOND = -2;
 
-const int ARM_LEFT = 1;
+const int ARM_LEFT = -1;
 const int ARM_RIGHT = 2;
 
-const char MOGO_CLAMP = 'A';
-const char HANG = 'C';
+const char MOGO_CLAMP = 'C';
+const char HANG = 'A';
 const char DOINKER = 'D';
 const char PTO = 'B';
 
@@ -43,7 +43,7 @@ const int RING_OPTICAL = 10;
 const char RING_IR = 'H';
 const int ARM_ENC = 3;
 
-const char AUTON_SELECTOR = 'E';
+const char AUTON_SELECTOR = 'F';
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;
