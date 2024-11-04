@@ -8,7 +8,7 @@ namespace lib16868C {
 enum class ArmPosition {
 	IDLE = -1,
 	DEFAULT = 0,
-	DESECORE_STAKE = 35,
+	DESECORE_STAKE = 20,
 	ALLIANCE_STAKE = 39,
 	WALL_STAKE = 58
 };
@@ -25,6 +25,8 @@ public:
 	void allianceStake(double volts = 12000);
 	void wallStake(double volts = 12000);
 
+	double getError();
+
 	void resetPosition();
 
 	ArmPosition getState();
@@ -36,6 +38,7 @@ private:
 
 	double volts = 12000;
 	double tgt = 0;
+	double error = 1e5;
 	ArmPosition state = ArmPosition::IDLE;
 	PIDGains pid;
 

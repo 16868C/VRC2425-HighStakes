@@ -6,7 +6,7 @@ using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
-	PIDController intakePID({0.025, 0, 0.05});
+	PIDController intakePID({0.025, 0, 0.07});
 
 	intake->color.setLedPWM(100);
 	
@@ -52,13 +52,13 @@ void Intake::intakeManager(void* param) {
 		if (intake->isJamming()) n++;
 		else n = 0;
 		
-		if (n >= 5) {
-			IntakeState prevState = intake->state;
-			intake->unjam();
-			pros::delay(500);
-			intake->state = prevState;
-			intake->update();
-		}
+		// if (n >= 5) {
+		// 	IntakeState prevState = intake->state;
+		// 	intake->unjam();
+		// 	pros::delay(500);
+		// 	intake->state = prevState;
+		// 	intake->update();
+		// }
 
 		pros::Task::delay_until(&time, 20);
 	}

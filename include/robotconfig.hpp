@@ -34,6 +34,7 @@ const char MOGO_CLAMP = 'C';
 const char HANG = 'A';
 const char DOINKER = 'D';
 const char PTO = 'B';
+const char INTAKE_RAISER = 'E';
 
 const int INERTIAL = 9;
 const int HORT_ENC = 5;
@@ -71,6 +72,7 @@ extern pros::adi::Pneumatics clamp;
 extern pros::adi::Pneumatics hang;
 extern pros::adi::Pneumatics doinker;
 extern pros::adi::Pneumatics pto;
+extern pros::adi::Pneumatics intakeRaiser;
 
 // Sensors
 extern lib16868C::Inertial inertial;

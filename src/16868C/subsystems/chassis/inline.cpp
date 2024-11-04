@@ -53,10 +53,7 @@ void Inline::driveArcade(double forward, double turn, double deadzone) {
 	moveArcade(forward * 12000, turn * 12000);
 }
 
-void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout, MoveDistanceParams params) {
-	leftMtrs.tarePosition();
-	rightMtrs.tarePosition();
-
+void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout, MoveDistanceParams params) {	
 	PIDController distPID(params.distGains, 0, 0);
 	PIDController headingPID(params.headingGains, 1, -1);
 
@@ -66,6 +63,10 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 
 	bool useOdom = odom->getEncoders()[0]->getType() != TrackingWheelType::INVALID;
 	double stDist = odom->getEncoders()[0]->getDist();
+	if (!useOdom) {
+		leftMtrs.tarePosition();
+		rightMtrs.tarePosition();
+	}
 
 	int i = 0;
 	uint st = pros::millis();
@@ -78,7 +79,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 
 		// Calculate Distance Using Either Tracking Wheels or IME 
 		if (useOdom) { // Tracking Wheel
-			currDist = odom->getEncoders()[0]->getDist() - stDist;
+			currDist = std::abs(odom->getEncoders()[0]->getDist() - stDist);
 		} else { // IME
 			double avgTicks = std::abs((leftMtrs.getPosition() + rightMtrs.getPosition()) / 2);
 			currDist = avgTicks / tpr * (wheelDiam * okapi::pi).convert(okapi::inch) * gearRatio;
@@ -165,8 +166,8 @@ void Inline::turnToPoint(Pose target, int timeout, TurnToPointParams params) {
 		return;
 	}
 
-	double tgtHeading = Util::radToDeg(odom->getPose().angleTo(target));
-	tgtHeading = getTargetHeading(tgtHeading, inertial->get_rotation(AngleUnit::DEG));
+	double tgtHeading = odom->getPose().angleTo(target);
+	tgtHeading = getTargetHeading(tgtHeading, inertial->get_rotation(AngleUnit::RAD));
 	TurnAbsoluteParams turnAbsoluteParams = {params.maxRPM,
 											params.minRPM, 
 											params.gains, 
@@ -176,7 +177,7 @@ void Inline::turnToPoint(Pose target, int timeout, TurnToPointParams params) {
 											params.dir,
 											params.slewRate};
 
-	turnAbsolute(tgtHeading * okapi::degree, timeout, turnAbsoluteParams);
+	turnAbsolute(tgtHeading * okapi::radian, timeout, turnAbsoluteParams);
 }
 
 void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params) {
@@ -325,8 +326,9 @@ void Inline::moveToPose(Pose target, int timeout, MoveToPoseParams params) {
 		double turnPower = -turnVolts;
 
 		double radius = getRadius(pose, carrot);
-		double maxSlipSpeed = sqrt(params.horiDrift * radius * 385.83);
-		if (!settling) fwdPower = std::clamp(fwdPower, -maxSlipSpeed, maxSlipSpeed);
+		double maxSlipSpeed = sqrt(params.horiDrift * radius * 9.81);
+		double maxSlipPower = (maxSlipSpeed * 39.37 * 60 / (wheelDiam.convert(okapi::inch) * M_PI) / gearRatio) / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+		if (!settling) fwdPower = std::clamp(fwdPower, -maxSlipPower, maxSlipPower);
 		// printDebug("%f, %f, %f\n", fwdPower, radius, maxSlipSpeed);
 
 		double overturn = abs(fwdPower) + abs(turnPower) - MAX_VOLT;

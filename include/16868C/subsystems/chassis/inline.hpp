@@ -19,8 +19,8 @@ struct MoveDistanceParams {
 	okapi::QAngularSpeed minRPM = 0_rpm;
 	okapi::QAngularSpeed turnRPM = 300_rpm;
 
-	PIDGains distGains = {0, 0, 0};
-	PIDGains headingGains = {0, 0, 0};
+	PIDGains distGains = {0.4, 0, 1.5};
+	PIDGains headingGains = {1, 0, 1};
 
 	okapi::QLength exitDist = 0_in;
 
@@ -30,7 +30,7 @@ struct TurnAbsoluteParams {
 	okapi::QAngularSpeed maxRPM = 600_rpm;
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
-	PIDGains gains = {};
+	PIDGains gains = {1, 0, 1};
 
 	okapi::QAngle errorMargin = 3_deg;
 	double numInMargin = 5;
@@ -44,7 +44,7 @@ struct TurnToPointParams {
 	okapi::QAngularSpeed maxRPM = 600_rpm;
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
-	PIDGains gains = {0, 0, 0};
+	PIDGains gains = {1, 0, 1};
 
 	okapi::QAngle errorMargin = 3_deg;
 	double numInMargin = 5;
@@ -58,8 +58,8 @@ struct MoveToPointParams {
 	okapi::QAngularSpeed maxRPM = 600_rpm;
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
-	PIDGains distGains = {};
-	PIDGains headingGains = {};
+	PIDGains distGains = {0.04, 0, 1.5};
+	PIDGains headingGains = {1, 0, 1};
 
 	okapi::QLength exitRadius = 1_in;
 	okapi::QLength turnDeadzone = 6_in;

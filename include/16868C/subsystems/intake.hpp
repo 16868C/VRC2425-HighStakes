@@ -58,7 +58,7 @@ class Intake {
 
 		const double TPR = 4079.18; // 10.74 * 360;
 		const double EJECT_POS = 5 * 360;
-		const double REDIRECT_POS = 355;
+		const double REDIRECT_POS = 250;
 		const double ERROR_MARGIN = 10;
 
 		IntakeState state = IntakeState::OFF;

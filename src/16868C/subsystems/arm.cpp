@@ -21,9 +21,12 @@ void Arm::armManager(void* params) {
 		}
 
 		if (arm->state != ArmPosition::IDLE) {
-			double ctrl = armPID.calculate(static_cast<int>(arm->getState()), arm->enc.get());
+			arm->error = static_cast<int>(arm->getState()) - arm->enc.get();
+			double ctrl = armPID.calculate(arm->error);
 			// std::cout << ctrl << " " << static_cast<int>(arm->getState()) << " " << arm->enc.get() << "\n";
 			arm->mtrs.moveVoltage(arm->volts * ctrl);
+		} else {
+			arm->error = 0;
 		}
 
 		pros::Task::delay_until(&time, 50);
@@ -39,27 +42,36 @@ void Arm::move(double volts) {
 void Arm::moveTo(double tgt, double volts) {
 	this->tgt = tgt;
 	this->volts = volts;
+	error = static_cast<int>(state) - enc.get();
 }
 
 void Arm::defaultPos(double volts) {
 	this->volts = volts;
 	state = ArmPosition::DEFAULT;
 	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
 }
 void Arm::descoreStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::DESECORE_STAKE;
 	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
 }
 void Arm::allianceStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::ALLIANCE_STAKE;
 	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
 }
 void Arm::wallStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::WALL_STAKE;
 	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
+}
+
+double Arm::getError() {
+	return error;
 }
 
 void Arm::resetPosition() {

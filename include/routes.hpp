@@ -7,6 +7,7 @@ void redSoloAWPSafe();
 void blueSoloAWPSafe();
 
 void redRush();
+void blueRush();
 
 void redRightAWP();
 void blueLeftAWP();

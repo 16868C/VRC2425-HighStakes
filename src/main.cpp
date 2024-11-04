@@ -9,63 +9,62 @@
 
 using namespace lib16868C;
 
-/*
 std::function<void()> auton = redSoloAWP;
 pros::Task autonSelect = pros::Task([]() {
 	while (true) {
 		master.clearLine(0);
 
 		int a = autonSelector.get_value();
-		if (a > 2899 && a <= 3554) { // 1
+		if (a > 1776 && a <= 2290) { // 1
 			auton = redSoloAWP;
-			master.setText(0, 0, "Red Solo AWP");
-			pros::lcd::print(7, "Red Solo AWP");
-			printDebug("Red Solo AWP\n");
-		} else if (a > 3554 && a <= 4095) { // 2
+			master.setText(0, 0, "redSoloAWP");
+			pros::lcd::print(7, "redSoloAWP");
+			printDebug("redSoloAWP\n");
+		} else if (a > 2290 && a <= 2790) { // 2
 			auton = blueSoloAWP;
-			master.setText(0, 0, "Blue Solo AWP");
-			pros::lcd::print(7, "Blue Solo AWP");
-			printDebug("Blue Solo AWP\n");
-		} else if (a > 4095 || a <= 146) { // 3
-			auton = redRightAWP;
-			master.setText(0, 0, "Red Right AWP");
-			pros::lcd::print(7, "Red Right AWP");
-			printDebug("Red Right AWP\n");
-		} else if (a > 146 && a <= 594) { // 4
-			auton = blueLeftAWP;
-			master.setText(0, 0, "Blue Left AWP");
-			pros::lcd::print(7, "Blue Left AWP");
-			printDebug("Blue Left AWP\n");
-		} else if (a > 594 && a <= 1007) { // 5
-			auton = skills;
-			master.setText(0, 0, "Skills");
-			pros::lcd::print(7, "Skills");
-			printDebug("Skills\n");
-		} else if (a > 1007 && a <= 1363) { // 6
-			auton = redSoloAWPSafe;
-			master.setText(0, 0, "Red Solo AWP Safe");
-			pros::lcd::print(7, "Red Solo AWP Safe");
-			printDebug("Red Solo AWP Safe\n");
-		} else if (a > 1363 && a <= 1793) { // 7
-			auton = blueSoloAWPSafe;
-			master.setText(0, 0, "Blue Solo AWP Safe");
-			pros::lcd::print(7, "Blue Solo AWP Safe");
-			printDebug("Blue Solo AWP Safe\n");
-		} else if (a > 1793 && a <= 2188) { // 8
-			auton = blueSoloAWPSafeAdjusted;
-			master.setText(0, 0, "blueSoloAWPSafeAdjusted");
-			pros::lcd::print(7, "blueSoloAWPSafeAdjusted");
-			printDebug("blueSoloAWPSafeAdjusted\n");
-		} else if (a > 2188 && a <= 2548) { // 9
-			auton = redElimScore;
-			master.setText(0, 0, "redElimScore");
-			pros::lcd::print(7, "redElimScore");
-			printDebug("redElimScore\n");
-		} else if (a > 2548 && a <= 2899) { // 10
-			auton = blueElimScore;
-			master.setText(0, 0, "blueElimScore");
-			pros::lcd::print(7, "blueElimScore");
-			printDebug("blueElimScore\n");
+			master.setText(0, 0, "blueSoloAWP");
+			pros::lcd::print(7, "blueSoloAWP");
+			printDebug("blueSoloAWP\n");
+		} else if (a > 2790 && a <= 3367) { // 3
+			auton = redRush;
+			master.setText(0, 0, "redRush");
+			pros::lcd::print(7, "redRush");
+			printDebug("redRush\n");
+		} else if (a > 3367 && a <= 3975) { // 4
+			auton = blueRush;
+			master.setText(0, 0, "blueRush");
+			pros::lcd::print(7, "blueRush");
+			printDebug("blueRush\n");
+		} else if (a > 3975 || a <= 28) { // 5
+			auton = redSoloAWP;
+			master.setText(0, 0, "redSoloAWP");
+			pros::lcd::print(7, "redSoloAWP");
+			printDebug("redSoloAWP\n");
+		} else if (a > 28 && a <= 414) { // 6
+			auton = redSoloAWP;
+			master.setText(0, 0, "redSoloAWP");
+			pros::lcd::print(7, "redSoloAWP");
+			printDebug("redSoloAWP\n");
+		} else if (a > 414 && a <= 791) { // 7
+			auton = redSoloAWP;
+			master.setText(0, 0, "redSoloAWP");
+			pros::lcd::print(7, "redSoloAWP");
+			printDebug("redSoloAWP\n");
+		} else if (a > 791 && a <= 1160) { // 8
+			auton = redSoloAWP;
+			master.setText(0, 0, "redSoloAWP");
+			pros::lcd::print(7, "redSoloAWP");
+			printDebug("redSoloAWP\n");
+		} else if (a > 1160 && a <= 1487) { // 9
+			auton = redSoloAWP;
+			master.setText(0, 0, "redSoloAWP");
+			pros::lcd::print(7, "redSoloAWP");
+			printDebug("redSoloAWP\n");
+		} else if (a > 1487 && a <= 1776) { // 10
+			auton = redSoloAWP;
+			master.setText(0, 0, "redSoloAWP");
+			pros::lcd::print(7, "redSoloAWP");
+			printDebug("redSoloAWP\n");
 		} else {
 			master.setText(0, 0, "No Auton");
 			pros::lcd::print(7, "No Auton");
@@ -74,7 +73,7 @@ pros::Task autonSelect = pros::Task([]() {
 
 		pros::delay(100);
 	}
-}, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Selector");*/
+}, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Selector");
 
 void initialize() {
 	pros::lcd::initialize();
@@ -92,12 +91,12 @@ void disabled() {}
 void competition_initialize() {}
 
 void autonomous() {
-	// autonSelect.suspend();
+	autonSelect.suspend();
 	uint st = pros::millis();
 	// arm.resetPosition();
 
 	// chassis.moveToPoint({24_in, 24_in}, 0, {.distGains={0.04, 0, 3}, .headingGains={0.5, 0, 1.5}, .exitRadius=1_in});
-	chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.distGains={0.2, 0, 3}, .headingGains={0.5, 0, 1.5}, .settleRadius=7.5_in, .horiDrift=1*54*54, .dlead=0.6, .glead=0.4});
+	// chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.distGains={0.2, 0, 3}, .headingGains={0.5, 0, 1.5}, .settleRadius=7.5_in, .horiDrift=0.2, .dlead=0.6, .glead=0.4});
 
 	// chassis.moveToPoint({48_in, 0_in}, 0, {.minRPM=300_rpm, .distGains={0.035, 0, 3}, .headingGains={0.6, 0, 1}, .exitRadius=5_in});
 	// chassis.moveToPoint({72_in, 24_in}, 0, {.minRPM=300_rpm, .distGains={.kP=0.035, .kD=3}, .headingGains={.kP=0.6, .kD=1}, .exitRadius=5_in, .turnDeadzone=3_in});
@@ -109,7 +108,14 @@ void autonomous() {
 
 	// chassis.moveToPose({24_in, 24_in, 90_deg}, 0, {.maxRPM=600_rpm, .distGains={.kP=0.05, .kD=3}, .headingGains={.kP=0.5, .kD=1}, .settleRadius=7.5_in, .horiDrift=1.5 * 52 * 52, .dlead=0.6, .glead=0});
 
-	// auton();
+	// pros::Task odomMonitor([&] {
+	// 	uint32_t t = pros::millis();
+	// 	while (true) {
+	// 		master.setText(0, 0, odometry.getPose().toStr());
+	// 		pros::Task::delay_until(&t, 50);
+	// 	}
+	// });
+	auton();
 	// redRightAWP();
 	// redSoloAWP();
 	// blueSoloAWP();
@@ -130,7 +136,8 @@ void autonomous() {
 }
 
 void opcontrol() {
-	// autonSelect.suspend();
+	autonSelect.suspend();
+	if (!pto.is_extended()) arm.defaultPos();
   
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 	okapi::ControllerButton ptoTgl(okapi::ControllerDigital::B);
@@ -146,6 +153,7 @@ void opcontrol() {
 	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
 	okapi::ControllerButton doinkerTgl(okapi::ControllerDigital::right);
 	okapi::ControllerButton hangRelease(okapi::ControllerDigital::A);
+	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::down);
 
 	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
 	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
@@ -157,10 +165,10 @@ void opcontrol() {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 		if (hang.is_extended()) {
-			left *= 0.4;
-			right *= 0.4;
+			left *= 0.55;
+			right *= 0.55;
 		}
-		chassis.driveTank(left, right, 0.05);
+		chassis.driveTank(left, right);
 		// pros::lcd::print(1, "%.2f %.2f", leftDrive.getTemperature(), rightDrive.getTemperature());
 
 		if (ptoTgl.changedToPressed()) {
@@ -212,10 +220,10 @@ void opcontrol() {
 		}
 		// pros::lcd::print(2, "%.2f, %.2f", intakeFirst.getTemperature(), intakeSecond.getTemperature());
 
-		if (targetBlueTgl.changedToPressed())
-			intake.setTargetRing(intake.getTargetRing() == RingColour::BLUE ? RingColour::NONE : RingColour::BLUE);
-		if (targetRedTgl.changedToPressed())
-			intake.setTargetRing(intake.getTargetRing() == RingColour::RED ? RingColour::NONE : RingColour::RED);
+		// if (targetBlueTgl.changedToPressed())
+		// 	intake.setTargetRing(intake.getTargetRing() == RingColour::BLUE ? RingColour::NONE : RingColour::BLUE);
+		// if (targetRedTgl.changedToPressed())
+		// 	intake.setTargetRing(intake.getTargetRing() == RingColour::RED ? RingColour::NONE : RingColour::RED);
 
 		if (!shift.isPressed() && clampTgl.changedToPressed()) {
 			clamp.toggle();
@@ -267,7 +275,10 @@ void opcontrol() {
 
 		if (!shift.isPressed() && hangRelease.changedToPressed()) {
 			arm.defaultPos();
-			hang.extend();
+			hang.toggle();
+		}
+		if (!shift.isPressed() && intakeRaiserTgl.changedToPressed()) {
+			intakeRaiser.toggle();
 		}
 
 		int leftDriveTemp = std::max(leftDrive.getTemperature() / 5 - 10, 0.0);
