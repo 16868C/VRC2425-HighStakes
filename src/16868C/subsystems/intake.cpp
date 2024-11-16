@@ -6,10 +6,11 @@ using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
-	PIDController intakePID({0.025, 0, 0.07});
+	PIDController intakePID({0.025, 0, 0.1});
 
 	intake->color.setLedPWM(100);
 	
+	IntakeState state = intake->getState();
 	uint32_t time = pros::millis();
 	int n = 0;
 	while (true) {
@@ -17,50 +18,53 @@ void Intake::intakeManager(void* param) {
 			pros::Task::delay_until(&time, 20);
 			continue;
 		}
+		
+		if (intake->getState() != IntakeState::EJECTING && intake->getState() != IntakeState::UNJAMMING) {
+			state = intake->getState();
+		}
 
 		intake->curRing = Intake::getColour(intake->color.getHue());
+		double encPos = remainder(intake->enc.get(), intake->TPR / 4);
 
 		if (intake->tgtRing != RingColour::NONE && intake->curRing == intake->tgtRing && (intake->state == IntakeState::MOGO || intake->state == IntakeState::INTAKE)) {
 			intake->eject();
-			intake->tgtPos = intake->enc.get() + intake->EJECT_POS;
+			// intake->tgtPos = intake->enc.get() + intake->EJECT_POS;
+		}
+		if (intake->state == IntakeState::EJECTING && intake->ring.get_value() < 2000) {
+			intake->tgtPos = intake->EJECT_POS;
+		} else if (intake->state != IntakeState::EJECTING) {
+			intake->tgtPos = -1;
 		}
 
-		if (intake->state == IntakeState::EJECTING && intake->ring.get_value() < 2000) {
-			IntakeState prevState = intake->state;
-			pros::delay(50);
+		std::cout << intake->enc.get() << " " << std::fmod(intake->enc.get(), intake->TPR / 4) << " " << intake->tgtPos << "\n";
+		if (intake->state == IntakeState::EJECTING && intake->tgtPos != -1 && std::fmod(intake->enc.get(), intake->TPR / 4) > intake->tgtPos) {
 			intake->secondStage.moveVoltage(-12000);
-			pros::delay(1500);
-			intake->state = prevState;
+			pros::delay(500);
+			intake->state = state;
 			intake->update();
 		}
 
 		if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
-			intake->stop();
+			intake->hold();
 		}
 
-		// std::cout << intake->enc.get() << " " << abs(remainder(intake->enc.get(), intake->TPR / 4) - intake->REDIRECT_POS) << " ";
-		double error = remainder(abs(intake->enc.get()), intake->TPR / 4) - intake->REDIRECT_POS;
-		if (intake->state == IntakeState::REDIRECT && abs(error) > intake->ERROR_MARGIN) {
-			// std::cout << "move";
-			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(error));
+		if (intake->state == IntakeState::REDIRECT && abs(encPos - intake->REDIRECT_POS) > intake->ERROR_MARGIN) {
+			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(encPos - intake->REDIRECT_POS));
 		} else if (intake->state == IntakeState::REDIRECT) {
-			// std::cout << "stop";
 			intake->secondStage.moveVoltage(0);
 		}
-		// std::cout << "\n";
 
 		if (intake->isJamming()) n++;
 		else n = 0;
 		
 		// if (n >= 5) {
-		// 	IntakeState prevState = intake->state;
 		// 	intake->unjam();
 		// 	pros::delay(500);
-		// 	intake->state = prevState;
+		// 	intake->state = state;
 		// 	intake->update();
 		// }
 
-		pros::Task::delay_until(&time, 20);
+		pros::Task::delay_until(&time, 10);
 	}
 }
 
@@ -82,6 +86,10 @@ void Intake::redirect() {
 }
 void Intake::outtake() {
 	state = IntakeState::OUTTAKE;
+	update();
+}
+void Intake::hold() {
+	state = IntakeState::HOLDING;
 	update();
 }
 void Intake::eject() {
@@ -108,7 +116,7 @@ void Intake::stop() {
 }
 
 void Intake::update() {
-	switch(getState()) {
+	switch(state) {
 	case IntakeState::MOGO:
 		firstStage.moveVoltage(12000);
 		secondStage.moveVoltage(12000);
@@ -123,6 +131,10 @@ void Intake::update() {
 	case IntakeState::OUTTAKE:
 		firstStage.moveVoltage(-12000);
 		secondStage.moveVoltage(-12000);
+		break;
+	case IntakeState::HOLDING:
+		firstStage.moveVoltage(12000);
+		secondStage.moveVoltage(0);
 		break;
 	case IntakeState::EJECTING:
 		break;

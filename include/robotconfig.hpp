@@ -40,7 +40,7 @@ const int INERTIAL = 9;
 const int HORT_ENC = 5;
 
 const int INTAKE_ENC = 21;
-const int RING_OPTICAL = 10;
+const int RING_OPTICAL = 6;
 const char RING_IR = 'H';
 const int ARM_ENC = 3;
 

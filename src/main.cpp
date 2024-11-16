@@ -145,7 +145,7 @@ void opcontrol() {
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
 	okapi::ControllerButton intakeRedirect(okapi::ControllerDigital::Y);
-	okapi::ControllerButton targetBlueTgl(okapi::ControllerDigital::left);
+	okapi::ControllerButton targetBlueTgl(okapi::ControllerDigital::X);
 	okapi::ControllerButton targetRedTgl(okapi::ControllerDigital::up);
 
 	okapi::ControllerButton intakeHoldTgl(okapi::ControllerDigital::left);
@@ -164,10 +164,6 @@ void opcontrol() {
 		// Drivetrain -> Tank Drive
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
-		if (hang.is_extended()) {
-			left *= 0.55;
-			right *= 0.55;
-		}
 		chassis.driveTank(left, right);
 		// pros::lcd::print(1, "%.2f %.2f", leftDrive.getTemperature(), rightDrive.getTemperature());
 
@@ -220,10 +216,10 @@ void opcontrol() {
 		}
 		// pros::lcd::print(2, "%.2f, %.2f", intakeFirst.getTemperature(), intakeSecond.getTemperature());
 
-		// if (targetBlueTgl.changedToPressed())
-		// 	intake.setTargetRing(intake.getTargetRing() == RingColour::BLUE ? RingColour::NONE : RingColour::BLUE);
-		// if (targetRedTgl.changedToPressed())
-		// 	intake.setTargetRing(intake.getTargetRing() == RingColour::RED ? RingColour::NONE : RingColour::RED);
+		if (targetBlueTgl.changedToPressed())
+			intake.setTargetRing(intake.getTargetRing() == RingColour::BLUE ? RingColour::NONE : RingColour::BLUE);
+		if (targetRedTgl.changedToPressed())
+			intake.setTargetRing(intake.getTargetRing() == RingColour::RED ? RingColour::NONE : RingColour::RED);
 
 		if (!shift.isPressed() && clampTgl.changedToPressed()) {
 			clamp.toggle();

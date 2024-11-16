@@ -11,6 +11,7 @@ enum class IntakeState {
 	MOGO,
 	REDIRECT,
 	OUTTAKE,
+	HOLDING,
 	EJECTING,
 	UNJAMMING,
 	OFF
@@ -28,6 +29,7 @@ class Intake {
 		void intake();
 		void mogo();
 		void redirect();
+		void hold();
 		void outtake();
 		void stop();
 
@@ -56,8 +58,8 @@ class Intake {
 		int numRings = 0;
 		double tgtPos = -1;
 
-		const double TPR = 4079.18; // 10.74 * 360;
-		const double EJECT_POS = 5 * 360;
+		const double TPR = 4020.57; // 10.74 * 360;
+		const double EJECT_POS = 953;
 		const double REDIRECT_POS = 250;
 		const double ERROR_MARGIN = 10;
 
