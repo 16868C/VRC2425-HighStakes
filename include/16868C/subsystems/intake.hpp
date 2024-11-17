@@ -58,8 +58,8 @@ class Intake {
 		int numRings = 0;
 		double tgtPos = -1;
 
-		const double TPR = 4020.57; // 10.74 * 360;
-		const double EJECT_POS = 953;
+		const double TPR = 4019.6; // 10.74 * 360;
+		const double EJECT_POS = 885;
 		const double REDIRECT_POS = 250;
 		const double ERROR_MARGIN = 10;
 
