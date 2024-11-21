@@ -53,7 +53,7 @@ void Inline::driveArcade(double forward, double turn, double deadzone) {
 	moveArcade(forward * 12000, turn * 12000);
 }
 
-void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout, MoveDistanceParams params) {	
+void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout, MoveDistanceParams params) {
 	PIDController distPID(params.distGains, 0, 0);
 	PIDController headingPID(params.headingGains, 1, -1);
 
@@ -151,6 +151,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 		}
 
 		pros::delay(20);
+		std::cout << target - currAngle << "\n";;
 	}
 
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);

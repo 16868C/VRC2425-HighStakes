@@ -35,26 +35,26 @@ pros::Task autonSelect = pros::Task([]() {
 			master.setText(0, 0, "blueRush");
 			pros::lcd::print(7, "blueRush");
 			printDebug("blueRush\n");
-		} else if (a > 3975 || a <= 28) { // 5
-			auton = redSoloAWP;
-			master.setText(0, 0, "redSoloAWP");
-			pros::lcd::print(7, "redSoloAWP");
-			printDebug("redSoloAWP\n");
-		} else if (a > 28 && a <= 414) { // 6
-			auton = redSoloAWP;
-			master.setText(0, 0, "redSoloAWP");
-			pros::lcd::print(7, "redSoloAWP");
-			printDebug("redSoloAWP\n");
+		} else if (a > 3975 || a <= 47) { // 5
+			auton = redSoloAWPSig;
+			master.setText(0, 0, "redSoloAWPSig");
+			pros::lcd::print(7, "redSoloAWPSig");
+			printDebug("redSoloAWPSig\n");
+		} else if (a > 47 && a <= 414) { // 6
+			auton = blueSoloAWPSig;
+			master.setText(0, 0, "blueSoloAWPSig");
+			pros::lcd::print(7, "blueSoloAWPSig");
+			printDebug("blueSoloAWPSig\n");
 		} else if (a > 414 && a <= 791) { // 7
-			auton = redSoloAWP;
-			master.setText(0, 0, "redSoloAWP");
-			pros::lcd::print(7, "redSoloAWP");
-			printDebug("redSoloAWP\n");
+			auton = redRushSig;
+			master.setText(0, 0, "redRushSig");
+			pros::lcd::print(7, "redRushSig");
+			printDebug("redRushSig\n");
 		} else if (a > 791 && a <= 1160) { // 8
-			auton = redSoloAWP;
-			master.setText(0, 0, "redSoloAWP");
-			pros::lcd::print(7, "redSoloAWP");
-			printDebug("redSoloAWP\n");
+			auton = redSoloAWP2;
+			master.setText(0, 0, "redSoloAWP2");
+			pros::lcd::print(7, "redSoloAWP2");
+			printDebug("redSoloAWP2\n");
 		} else if (a > 1160 && a <= 1487) { // 9
 			auton = redSoloAWP;
 			master.setText(0, 0, "redSoloAWP");

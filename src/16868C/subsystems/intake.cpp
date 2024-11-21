@@ -36,7 +36,7 @@ void Intake::intakeManager(void* param) {
 			intake->tgtPos = -1;
 		}
 
-		std::cout << intake->enc.get() << " " << std::fmod(intake->enc.get(), intake->TPR / 4) << " " << intake->tgtPos << "\n";
+		// std::cout << intake->enc.get() << " " << std::fmod(intake->enc.get(), intake->TPR / 4) << " " << intake->tgtPos << "\n";
 		if (intake->state == IntakeState::EJECTING && intake->tgtPos != -1 && std::fmod(intake->enc.get(), intake->TPR / 4) > intake->tgtPos) {
 			intake->secondStage.moveVoltage(-12000);
 			pros::delay(500);
@@ -168,8 +168,7 @@ int Intake::getNumRings() {
 }
 
 bool Intake::isJamming() {
-	return (firstStage.getCurrentDraw() > 2300 && firstStage.getActualVelocity() < 10) ||
-			(secondStage.getCurrentDraw() > 2300 && secondStage.getActualVelocity() < 10);
+	return secondStage.getCurrentDraw() > 2300 && secondStage.getActualVelocity() < 10;
 }
 
 RingColour Intake::getColour(double hue) {
