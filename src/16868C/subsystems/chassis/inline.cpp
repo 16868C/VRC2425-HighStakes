@@ -6,7 +6,6 @@
 #include "okapi/api/units/QLength.hpp"
 #include "okapi/api/util/mathUtil.hpp"
 #include <algorithm>
-#include <iostream>
 
 using namespace lib16868C;
 
@@ -151,7 +150,6 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 		}
 
 		pros::delay(20);
-		std::cout << target - currAngle << "\n";;
 	}
 
 	leftMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);

@@ -40,6 +40,7 @@ class Intake {
 		RingColour getCurrentRing();
 
 		int getNumRings();
+		static RingColour getColour(double hue);
 
 	private:
 		void eject();
@@ -47,7 +48,6 @@ class Intake {
 		void update();
 
 		bool isJamming();
-		static RingColour getColour(double hue);
 
 		okapi::Motor& firstStage, secondStage;
 		lib16868C::Rotation& enc;

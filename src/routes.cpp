@@ -60,21 +60,23 @@ void redSoloAWP() {
 	chassis.moveDistance(10_in, -315_deg, 500, {});
 }
 
-void redSoloAWP2() {
+void redRingAWP() {
 	odometry.update({58_in, 20_in, -50_deg});
 	inertial.set_rotation(-50_deg);
 
 	pto.retract();
 	pros::delay(500);
 	arm.allianceStake();
+	uint t = pros::millis();
 	do {
 		pros::delay(100);
-	} while (arm.getError() > 0);
-	chassis.moveDistance(7.5_in, -50_deg, 600, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}});
+	} while (arm.getError() > 0 && pros::millis() - t < 1000);
+	chassis.moveDistance(8.5_in, -50_deg, 600, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}, .headingGains={0.2, 0, 1.5}});
 	arm.defaultPos();
-	pros::delay(500);
+	pros::delay(200);
 	pto.extend();
 	pros::Task([&] {
+		pros::delay(500);
 		arm.move(0);
 		pto.extend();
 		intake.mogo();
@@ -84,31 +86,36 @@ void redSoloAWP2() {
 		intake.mogo();
 	});
 
-	chassis.moveDistance(-18_in, -90_deg, 900, {});
-	chassis.moveDistance(-17_in, -90_deg, 400, {.maxRPM=200_rpm, .distGains={0.4, 0, 1.5}});
+	chassis.moveDistance(-19_in, -90_deg, 900, {.headingGains={0.8, 0, 0.8}});
+	chassis.moveDistance(-11_in, -85_deg, 500, {.maxRPM=200_rpm, .distGains={0.4, 0, 1.5}});
 	clamp.extend();
 
 	intake.mogo();
-	chassis.turnAbsolute(-230_deg, 1200, {.gains={0.7, 0, 1.1}});
-	chassis.moveDistance(12.5_in, -230_deg, 0, {.maxRPM=300_rpm, .exitDist=2_in});
-	chassis.moveDistance(15_in, -182_deg, 0, {.maxRPM=250_rpm});
+	chassis.turnAbsolute(-230_deg, 1250, {.gains={0.75, 0, 1.1}});
+	chassis.moveDistance(16_in, -230_deg, 0, {.maxRPM=200_rpm, .headingGains={1.5, 0, 1}, .exitDist=2_in});
+	chassis.moveDistance(18_in, -180_deg, 2000, {.maxRPM=150_rpm, .headingGains={0.7, 0, 1.3}});
 	// chassis.moveDistance(3_in, -170_deg, 0, {.maxRPM=250_rpm});
-	chassis.turnAbsolute(-70_deg, 850, {.maxRPM=400_rpm, .gains={1.2, 0, 1}});
-	chassis.moveDistance(10_in, -90_deg, 0, {});
-	// chassis.turnAbsolute(-90_deg, 850, {.maxRPM=400_rpm, .gains={1.2, 0, 1}, .turnWheel=TurnWheel::LEFT});
-	// chassis.moveDistance(10_in, -90_deg, 0, {});
-	chassis.turnAbsolute(-35_deg, 850, {.gains={1.2, 0, 1}, .turnWheel=TurnWheel::LEFT});
+	// chassis.turnAbsolute(-70_deg, 850, {.maxRPM=400_rpm, .gains={1.2, 0, 1}});
+	chassis.moveDistance(-8_in, -190_deg, 0, {.maxRPM=300_rpm, .exitDist=2_in});
+	chassis.moveDistance(-8_in, -230_deg, 0, {.headingGains={1.5, 0, 1}});
+	chassis.turnAbsolute(-149_deg, 1500, {.gains={0.95, 0, 1.45}});
+	chassis.moveDistance(17_in, -145_deg, 1100, {});
+	chassis.turnAbsolute(-25_deg, 1500, {.gains={0.35, 0, 1.9}, .errorMargin=2_deg});
 	intakeRaiser.retract();
-	chassis.moveDistance(22_in, -35_deg, 0, {});
-	chassis.moveDistance(13_in, -35_deg, 0, {.maxRPM=300_rpm});
-	pros::delay(200);
-	intakeRaiser.extend();
-	pros::delay(700);
+	chassis.moveDistance(23_in, -25_deg, 0, {});
+	chassis.moveDistance(15_in, -25_deg, 0, {.maxRPM=300_rpm});
+	// pros::delay(200);
+	// intakeRaiser.extend();
+	pros::delay(800);
 
 	// chassis.turnAbsolute(160_deg, 1100, {});
-	chassis.moveDistance(-10_in, -30_deg, 0, {.exitDist=2_in});
-	chassis.moveDistance(-20_in, -135_deg, 0, {.maxRPM=400_rpm});
-	clamp.retract();
+	chassis.moveDistance(-10_in, -30_deg, 0, {.maxRPM=400_rpm, .exitDist=2_in});
+	chassis.moveDistance(-10_in, -135_deg, 0, {.maxRPM=400_rpm, .headingGains={1.5, 0, 1}});
+	pros::delay(500);
+	// clamp.retract();
+	// hang.extend();
+	intake.stop();
+	chassis.moveDistance(-15_in, -135_deg, 0, {.maxRPM=300_rpm});
 	// chassis.turnAbsolute(-360_deg, 850, {.maxRPM=400_rpm, .gains={1.2, 0, 1}, .turnWheel=TurnWheel::LEFT});
 	// chassis.moveDistance(12_in, -365_deg, 0, {.maxRPM=300_rpm, .distGains={0.45, 0, 1.5}});
 	
@@ -124,6 +131,64 @@ void redSoloAWP2() {
 	// clamp.retract();
 	// chassis.turnAbsolute(-315_deg, 1000, {});
 	// chassis.moveDistance(10_in, -315_deg, 500, {});
+}
+void blueRingAWP() {
+	odometry.update({58_in, 20_in, -50_deg});
+	inertial.set_rotation(-90_deg);
+
+	// pto.retract();
+	// pros::delay(4000);
+	// arm.allianceStake();
+	// uint t = pros::millis();
+	// do {
+	// 	pros::delay(100);
+	// } while (arm.getError() > 0 && pros::millis() - t < 1000);
+	// chassis.moveDistance(9_in, -130_deg, 600, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}, .headingGains={0.2, 0, 1.5}});
+	// arm.defaultPos();
+	// pros::delay(200);
+	// pto.extend();
+	// pros::Task([&] {
+	// 	pros::delay(500);
+	// 	arm.move(0);
+	// 	pto.extend();
+	// 	intake.mogo();
+	// 	pros::delay(250);
+	// 	intake.stop();
+	// 	pros::delay(250);
+	// 	intake.mogo();
+	// });
+
+	chassis.moveDistance(-8_in, -90_deg, 900, {.headingGains={0.9, 0, 0.8}});
+	chassis.moveDistance(-15_in, -90_deg, 600, {.maxRPM=200_rpm, .distGains={0.4, 0, 1.5}});
+	clamp.extend();
+
+	intake.mogo();
+
+	chassis.turnAbsolute(50_deg, 1250, {.gains={0.72, 0, 1.1}});
+	chassis.moveDistance(15_in, 50_deg, 0, {.maxRPM=200_rpm, .headingGains={1.5, 0, 1}, .exitDist=2_in});
+	chassis.moveDistance(28_in, 0_deg, 1800, {.maxRPM=150_rpm, .headingGains={0.8, 0, 1.3}});
+	// chassis.moveDistance(3_in, -170_deg, 0, {.maxRPM=250_rpm});
+	// chassis.turnAbsolute(-70_deg, 850, {.maxRPM=400_rpm, .gains={1.2, 0, 1}});
+	chassis.moveDistance(-12_in, 10_deg, 0, {.maxRPM=300_rpm, .exitDist=2_in});
+	chassis.moveDistance(-8_in, 50_deg, 0, {.headingGains={1.5, 0, 1}});
+	chassis.turnAbsolute(-40_deg, 1300, {.gains={0.95, 0, 1.4}});
+	chassis.moveDistance(16_in, -35_deg, 1100, {});
+	chassis.turnAbsolute(-160_deg, 1500, {.gains={0.4, 0, 1.4}, .errorMargin=2_deg});
+	intakeRaiser.retract();
+	chassis.moveDistance(23_in, -160_deg, 0, {});
+	chassis.moveDistance(15_in, -160_deg, 0, {.maxRPM=300_rpm});
+	// pros::delay(200);
+	// intakeRaiser.extend();
+	pros::delay(800);
+
+	// chassis.turnAbsolute(160_deg, 1100, {});
+	chassis.moveDistance(-5_in, -150_deg, 0, {.maxRPM=400_rpm, .exitDist=2_in});
+	intakeRaiser.extend();
+	chassis.moveDistance(-10_in, -45_deg, 0, {.maxRPM=400_rpm, .headingGains={0.8, 0, 1}});
+	pros::delay(800);
+	// hang.extend();
+	intake.stop();
+	chassis.moveDistance(-23_in, -45_deg, 0, {.maxRPM=300_rpm});
 }
 
 void blueSoloAWP() {
@@ -197,6 +262,68 @@ void blueRush() {
 	chassis.turnAbsolute(270_deg, 0, {.turnWheel=TurnWheel::LEFT});
 }
 
+void redGoalAWP() {
+	odometry.update({-58_in, 20_in, -130_deg});
+	inertial.set_rotation(-128_deg);
+
+	pto.retract();
+	pros::delay(500);
+	arm.allianceStake();
+	do {
+		pros::delay(100);
+	} while (arm.getError() > 0);
+	chassis.moveDistance(9.5_in, -128_deg, 600, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}, .headingGains={0.2, 0, 1.5}});
+	arm.defaultPos();
+	pros::delay(300);
+	pros::Task([&] {
+		// arm.defaultPos();
+		pros::delay(500);
+		arm.move(0);
+		pto.extend();
+		intake.mogo();
+		pros::delay(250);
+		intake.stop();
+		pros::delay(250);
+		intake.mogo();
+	});
+	// pros::delay(300);
+	chassis.moveDistance(-27_in, -90_deg, 700, {.headingGains={0.9, 0, 1}});
+	chassis.moveDistance(-16_in, -90_deg, 800, {.maxRPM=150_rpm, .distGains={0.8, 0, 1.5}, .headingGains={0.8, 0, 1}});
+	clamp.extend();
+	// pros::delay(100);
+	intake.mogo();
+	chassis.turnAbsolute(0_deg, 1500, {.gains={0.9, 0, 1.5}});
+	chassis.moveDistance(13_in, 0_deg, 800, {});
+	pros::delay(500);
+	chassis.turnAbsolute(90_deg, 1000, {});
+	chassis.moveDistance(-20_in, 90_deg, 0, {});
+	clamp.retract();
+	chassis.moveDistance(24_in, 93_deg, 0, {.maxRPM=450_rpm, .distGains={0.30, 0, 1.5}});
+	pros::delay(200);
+	doinker.extend();
+	pros::delay(1000);
+	chassis.moveDistance(-14_in, 90_deg, 0, {});
+	chassis.turnAbsolute(-45_deg, 1500, {.gains={0.8, 0, 1.5}, .turnWheel=TurnWheel::RIGHT});
+	doinker.retract();
+	// chassis.turnAbsolute(-15_deg, 1300, {.gains={0.9, 0, 1.6}});
+	chassis.moveDistance(-22_in, -45_deg, 0, {});
+	chassis.moveDistance(-15_in, -45_deg, 0, {.maxRPM=200_rpm});
+
+	
+	// chassis.turnAbsolute(-157_deg, 1300, {.gains={0.9, 0, 1.6}});
+
+	// intakeRaiser.retract();
+	// // chassis.turnAbsolute(-137_deg, 1250, {.gains={0.87, 0, 1.1}});
+	// chassis.moveDistance(23_in, -157_deg, 850, {.slewRate=2000});
+	// chassis.moveDistance(7_in, -157_deg, 250, {.maxRPM=300_rpm, .distGains={0.6, 0, 1.5}});
+	// pros::delay(400);
+	// intakeRaiser.extend();
+	// pros::delay(1000);
+
+	// hang.extend();
+	// chassis.moveDistance(-30_in, -45_deg, 0, {.headingGains={1.1, 0, 1}});
+}
+
 void redSoloAWPSig() {
 	odometry.update({-58_in, 20_in, -130_deg});
 	inertial.set_rotation(-130_deg);
@@ -207,12 +334,12 @@ void redSoloAWPSig() {
 	do {
 		pros::delay(100);
 	} while (arm.getError() > 0);
-	chassis.moveDistance(7.5_in, -130_deg, 0, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}});
+	chassis.moveDistance(7.5_in, -130_deg, 500, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}});
 	arm.defaultPos();
-	pros::delay(800);
+	pros::delay(200);
 	pros::Task([&] {
 		// arm.defaultPos();
-		// pros::delay(800);
+		pros::delay(500);
 		arm.move(0);
 		pto.extend();
 		intake.mogo();
@@ -222,41 +349,43 @@ void redSoloAWPSig() {
 		intake.mogo();
 	});
 	// pros::delay(300);
-	chassis.moveDistance(-23_in, -100_deg, 0, {.headingGains={1.2, 0, 1}});
-	chassis.moveDistance(-16_in, -90_deg, 0, {.maxRPM=150_rpm, .distGains={0.8, 0, 1.5}, .headingGains={0.8, 0, 1}});
+	chassis.moveDistance(-25_in, -90_deg, 700, {.headingGains={1.07, 0, 1}});
+	chassis.moveDistance(-16_in, -90_deg, 800, {.maxRPM=150_rpm, .distGains={0.8, 0, 1.5}, .headingGains={0.8, 0, 1}});
 	clamp.extend();
 	// pros::delay(100);
 	intake.mogo();
-	chassis.turnAbsolute(7_deg, 1250, {.gains={0.6, 0.003, 1.3}});
-	chassis.moveDistance(8_in, 7_deg, 0, {});
+	chassis.turnAbsolute(7_deg, 1100, {.gains={0.9, 0, 1.5}});
+	chassis.moveDistance(9_in, 7_deg, 500, {});
 	pros::delay(500);
-	chassis.turnAbsolute(-157_deg, 1250, {.gains={0.6, 0.003, 1.3}});
+	chassis.turnAbsolute(-157_deg, 1300, {.gains={0.9, 0, 1.6}});
 
 	intakeRaiser.retract();
 	// chassis.turnAbsolute(-137_deg, 1250, {.gains={0.87, 0, 1.1}});
-	chassis.moveDistance(26_in, -157_deg, 0, {.slewRate=2000});
-	chassis.moveDistance(7_in, -157_deg, 0, {.maxRPM=300_rpm, .distGains={0.6, 0, 1.5}});
+	chassis.moveDistance(28_in, -157_deg, 850, {.slewRate=2000});
+	chassis.moveDistance(7_in, -157_deg, 250, {.maxRPM=300_rpm, .distGains={0.6, 0, 1.5}});
 	pros::delay(400);
 	intakeRaiser.extend();
 	// chassis.moveDistance(-2_in, -150_deg, 750, {});
 	// pros::delay(1200);
 	// clamp.retract();
-	chassis.turnAbsolute(-19_deg, 1250, {.gains={0.6, 0.003, 1.3}});
+	chassis.turnAbsolute(-20_deg, 1300, {.gains={0.7, 0, 1.4}, .errorMargin=5_deg});
 	// intake.outtake();
-	chassis.moveDistance(-23.5_in, -17_deg, 0, {.headingGains={1, 0, 1}});
+	chassis.moveDistance(-23_in, -15_deg, 800, {.headingGains={1.5, 0, 1}});
 	clamp.retract();
 	// chassis.moveDistance(-10_in, -75_deg, 0, {.headingGains={1, 0, 1.1}});
-	chassis.turnAbsolute(-85_deg, 1250, {.gains={0.7, 0, 1}, .turnWheel=TurnWheel::LEFT});
+	chassis.turnAbsolute(-80_deg, 1100, {.gains={0.85, 0, 1}, .turnWheel=TurnWheel::LEFT});
 
-	chassis.moveDistance(-11_in, -75_deg, 0, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}});
+	chassis.moveDistance(-12_in, -75_deg, 600, {.headingGains={1.2, 0, 1}});
+	chassis.moveDistance(-8_in, -75_deg, 500, {.maxRPM=200_rpm, .distGains={0.4, 0, 1.5}});
 	clamp.extend();
 	pros::delay(100);
 	// intake.mogo();
-	chassis.turnAbsolute(-200_deg, 1250, {.gains={0.55, 0.003, 1.3}});
-	chassis.moveDistance(10_in, -175_deg, 0, {});
-	pros::delay(600);
+	chassis.turnAbsolute(-183_deg, 1100, {.gains={0.9, 0, 1.5}});
+	chassis.moveDistance(12_in, -175_deg, 600, {});
+	pros::delay(800);
 
-	chassis.moveDistance(-25_in, -150_deg, 0, {.maxRPM=250_rpm, .headingGains={1.1, 0, 1}});
+	hang.extend();
+	chassis.moveDistance(-25_in, -150_deg, 0, {.headingGains={1.1, 0, 1}});
 	pros::delay(700);
 	clamp.retract();
 	chassis.moveDistance(-5_in, -140_deg, 0, {.maxRPM=200_rpm});
@@ -353,4 +482,51 @@ void redRushSig() {
 		std::cout << arm.getError() << "\n";
 	} while (arm.getError() > 0);
 	chassis.moveDistance(10_in, -225_deg, 0, {});
+}
+
+void skills(){
+	odometry.update({-58_in, 20_in, -50_deg});
+	inertial.set_rotation(-90_deg);
+
+	pto.retract();
+	pros::delay(500);
+	arm.allianceStake();
+	do {
+		pros::delay(100);
+	} while (arm.getError() > 0);
+	chassis.moveDistance(6_in, -90_deg, 0, {.maxRPM=200_rpm, .distGains={0.4, 0, 1.5}});
+	arm.defaultPos();
+	pros::delay(800);
+	pros::Task([&] {
+		arm.move(0);
+		pto.extend();
+		intake.mogo();
+		pros::delay(250);
+		intake.stop();
+		pros::delay(250);
+		intake.mogo();
+	});
+	chassis.moveDistance(-6_in, -90_deg, 0, {.maxRPM={400_rpm}, .headingGains={1, 0, 1}});
+	chassis.turnAbsolute(-180_deg, 1100, {.gains={0.7, 0, 1.1}});
+	chassis.moveDistance(-12_in, -180_deg, 0, {.maxRPM={400_rpm}, .headingGains={1, 0, 1}});
+	chassis.moveDistance(-7_in, -180_deg, 0, {.maxRPM={200_rpm}, .headingGains={1, 0, 1}});
+	clamp.extend();
+	chassis.turnAbsolute(-270_deg, 1100, {.gains={0.7, 0, 1.1}});
+
+	chassis.moveDistance(12_in, -270_deg, 0, {.maxRPM={400_rpm}, .headingGains={1, 0, 1}});
+	pros::delay(400);
+	chassis.turnAbsolute(-370_deg, 1100, {.gains={0.8, 0, 1.2}});
+	chassis.moveDistance(16_in, -370_deg, 0, {.maxRPM={400_rpm}, .headingGains={1.1, 0, 1}});
+	pros::delay(400);
+	chassis.turnAbsolute(-480_deg, 1100, {.gains={0.8, 0, 1.2}});
+	chassis.moveDistance(7_in, -480_deg, 0, {.maxRPM={350_rpm}, .headingGains={1, 0, 1}});
+	chassis.moveDistance(25_in, -450_deg, 0, {.maxRPM={150_rpm}, .headingGains={1.1, 0, 1}});
+	chassis.moveDistance(-7_in, -440_deg, 0, {.maxRPM={300_rpm}, .headingGains={1, 0, 1}});
+	chassis.moveDistance(-20_in, -380_deg, 0, {.maxRPM={300_rpm}, .headingGains={0.7, 0, 1}});
+	chassis.moveDistance(12_in, -395_deg, 0, {.maxRPM={200_rpm}, .headingGains={1, 0, 1}});
+	pros::delay(400);
+	chassis.turnAbsolute(-240_deg, 1100, {});
+	chassis.moveDistance(-9_in, -240_deg, 0, {.maxRPM={500_rpm}, .headingGains={1, 0, 1}});
+	clamp.retract();
+	chassis.moveDistance(10_in, -180_deg, 0, {.maxRPM={400_rpm}, .headingGains={1, 0, 1}});
 }

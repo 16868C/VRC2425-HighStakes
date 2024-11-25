@@ -33,7 +33,7 @@ const int ARM_RIGHT = 2;
 const char MOGO_CLAMP = 'C';
 const char HANG = 'A';
 const char DOINKER = 'D';
-const char PTO = 'B';
+const char PTO = 'G';
 const char INTAKE_RAISER = 'E';
 
 const int INERTIAL = 9;

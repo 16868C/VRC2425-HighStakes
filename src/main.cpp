@@ -16,10 +16,10 @@ pros::Task autonSelect = pros::Task([]() {
 
 		int a = autonSelector.get_value();
 		if (a > 1776 && a <= 2290) { // 1
-			auton = redSoloAWP;
-			master.setText(0, 0, "redSoloAWP");
-			pros::lcd::print(7, "redSoloAWP");
-			printDebug("redSoloAWP\n");
+			auton = skills; //redSoloAWP
+			master.setText(0, 0, "skills");
+			pros::lcd::print(7, "skills");
+			printDebug("skills\n");
 		} else if (a > 2290 && a <= 2790) { // 2
 			auton = blueSoloAWP;
 			master.setText(0, 0, "blueSoloAWP");
@@ -46,25 +46,25 @@ pros::Task autonSelect = pros::Task([]() {
 			pros::lcd::print(7, "blueSoloAWPSig");
 			printDebug("blueSoloAWPSig\n");
 		} else if (a > 414 && a <= 791) { // 7
-			auton = redRushSig;
-			master.setText(0, 0, "redRushSig");
-			pros::lcd::print(7, "redRushSig");
-			printDebug("redRushSig\n");
+			auton = redGoalAWP;
+			master.setText(0, 0, "redGoalAWP");
+			pros::lcd::print(7, "redGoalAWP");
+			printDebug("redGoalAWP\n");
 		} else if (a > 791 && a <= 1160) { // 8
-			auton = redSoloAWP2;
-			master.setText(0, 0, "redSoloAWP2");
-			pros::lcd::print(7, "redSoloAWP2");
-			printDebug("redSoloAWP2\n");
+			auton = blueRush;
+			master.setText(0, 0, "blueRush");
+			pros::lcd::print(7, "blueRush");
+			printDebug("blueRush\n");
 		} else if (a > 1160 && a <= 1487) { // 9
-			auton = redSoloAWP;
-			master.setText(0, 0, "redSoloAWP");
-			pros::lcd::print(7, "redSoloAWP");
-			printDebug("redSoloAWP\n");
+			auton = redRingAWP;
+			master.setText(0, 0, "redRingAWP");
+			pros::lcd::print(7, "redRingAWP");
+			printDebug("redRingAWP\n");
 		} else if (a > 1487 && a <= 1776) { // 10
-			auton = redSoloAWP;
-			master.setText(0, 0, "redSoloAWP");
-			pros::lcd::print(7, "redSoloAWP");
-			printDebug("redSoloAWP\n");
+			auton = blueRingAWP;
+			master.setText(0, 0, "blueRingAWP");
+			pros::lcd::print(7, "blueRingAWP");
+			printDebug("blueRingAWP\n");
 		} else {
 			master.setText(0, 0, "No Auton");
 			pros::lcd::print(7, "No Auton");
@@ -138,6 +138,8 @@ void autonomous() {
 void opcontrol() {
 	autonSelect.suspend();
 	if (!pto.is_extended()) arm.defaultPos();
+	intakeRaiser.extend();
+	hang.retract();
   
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 	okapi::ControllerButton ptoTgl(okapi::ControllerDigital::B);
