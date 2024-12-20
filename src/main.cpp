@@ -93,6 +93,9 @@ void competition_initialize() {}
 void autonomous() {
 	autonSelect.suspend();
 	uint st = pros::millis();
+	clamp.toggle();
+	pros::delay(500);
+	chassis.turnAbsolute(90_deg, 0, {.gains={0.39, 0.01, 2}, .slewRate=6000});
 	// arm.resetPosition();
 
 	// chassis.moveToPoint({24_in, 24_in}, 0, {.distGains={0.04, 0, 3}, .headingGains={0.5, 0, 1.5}, .exitRadius=1_in});
@@ -115,7 +118,7 @@ void autonomous() {
 	// 		pros::Task::delay_until(&t, 50);
 	// 	}
 	// });
-	auton();
+	// auton();
 	// redRightAWP();
 	// redSoloAWP();
 	// blueSoloAWP();

@@ -109,24 +109,24 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 }
 
 void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams params) {
-	PIDController turnPID(params.gains, 1, -1);
+	PIDController turnPID(params.gains, 1, -1, 1e5, 0.09, false);
 
 	double currAngle = inertial->get_rotation(AngleUnit::RAD);
 	double target = getTargetHeading(angle.convert(okapi::radian), currAngle, false, params.dir);
+
+	double prevAngle = 0;
+	uint pt = 0;
+
 	uint st = pros::millis();
-	int inMargin = 0;
-	while (inMargin < params.numInMargin) {
+	while (std::abs(target - currAngle) > params.errorMargin.convert(okapi::radian) || std::abs((currAngle - prevAngle) / ((pros::millis() - pt) * 1e-3)) > params.angularVelThreshold.convert(okapi::radian)) {
 		// Timeout
 		if (pros::millis() - st > timeout && timeout > 0) {
 			printError("[Inline::TurnAbsolute] Timeout: %d\n", pros::millis() - st);
 			break;
 		}
 
+		prevAngle = currAngle;
 		currAngle = inertial->get_rotation(AngleUnit::RAD);
-
-		// Checks if robot is within the error margin to terminate
-		if (std::abs(angle.convert(okapi::radian) - currAngle) < params.errorMargin.convert(okapi::radian)) inMargin++;
-		else inMargin = 0;
 
 		// Calculate turn power
 		double turnCtrl = turnPID.calculate(target, currAngle);
@@ -148,6 +148,8 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 				moveTank(-volts, volts);
 				break;
 		}
+
+		pt = pros::millis();
 
 		pros::delay(20);
 	}
@@ -171,7 +173,7 @@ void Inline::turnToPoint(Pose target, int timeout, TurnToPointParams params) {
 											params.minRPM, 
 											params.gains, 
 											params.errorMargin, 
-											params.numInMargin,
+											params.angularVelThreshold,
 											params.turnWheel,
 											params.dir,
 											params.slewRate};

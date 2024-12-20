@@ -1,4 +1,5 @@
 #pragma once
+#include "okapi/api/units/QAngle.hpp"
 #include "okapi/api/units/QAngularSpeed.hpp"
 #include "16868C/controllers/pidController.hpp"
 #include "16868C/devices/inertial.hpp"
@@ -32,8 +33,8 @@ struct TurnAbsoluteParams {
 
 	PIDGains gains = {1, 0, 1};
 
-	okapi::QAngle errorMargin = 3_deg;
-	double numInMargin = 5;
+	okapi::QAngle errorMargin = 1.5_deg;
+	okapi::QAngle angularVelThreshold = 30_deg; // per second
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
 	TurnDirection dir = TurnDirection::SHORTEST;
@@ -46,8 +47,8 @@ struct TurnToPointParams {
 
 	PIDGains gains = {1, 0, 1};
 
-	okapi::QAngle errorMargin = 3_deg;
-	double numInMargin = 5;
+	okapi::QAngle errorMargin = 2_deg;
+	okapi::QAngle angularVelThreshold = 30_deg; // per second
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
 	TurnDirection dir = TurnDirection::SHORTEST;
