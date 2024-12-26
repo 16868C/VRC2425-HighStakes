@@ -34,8 +34,8 @@ pros::adi::Pneumatics intakeRaiser(INTAKE_RAISER, true, true);
 // Sensors
 lib16868C::Inertial inertial(INERTIAL);
 lib16868C::Rotation hortRot(HORT_ENC);
-lib16868C::TrackingWheel vertEnc(&leftDrive, WHEEL_DIAM, 6_in, GEAR_RATIO);
-lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 3.75_in);
+lib16868C::TrackingWheel vertEnc(&leftDrive, WHEEL_DIAM, 5.93_in, GEAR_RATIO);
+lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 1.27_in);
 
 lib16868C::Rotation intakeEnc(INTAKE_ENC);
 okapi::OpticalSensor ringOptical(RING_OPTICAL);
