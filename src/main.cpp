@@ -80,7 +80,7 @@ void initialize() {
 
 	armEnc.resetZero();
 	intakeEnc.resetZero();
-	odometry.init();
+	odometry.init({0_in, 0_in, 0_deg});
 	// odometry.init(Pose(0_in, 0_in, 0_deg));
 	// inertial.reset(true);
 	// chassis.coast();
@@ -93,9 +93,12 @@ void competition_initialize() {}
 void autonomous() {
 	autonSelect.suspend();
 	uint st = pros::millis();
-	clamp.toggle();
-	pros::delay(500);
-	chassis.turnAbsolute(90_deg, 0, {.gains={0.39, 0.01, 2}, .slewRate=6000});
+	// clamp.toggle();
+	// pros::delay(500);
+	// chassis.turnAbsolute(3600_deg, 0, {.maxRPM=300_rpm, .gains={0.39, 0.01, 2}, .slewRate=6000});
+	// chassis.moveDistance(48_in, 0_deg, 0, {.distGains={0.04, 0, 1.5}, .slewRate=6000});
+	// chassis.moveToPoint({48_in, 48_in}, 0, {.distGains={0.041, 0, 1.5}, .headingGains={0.39, 0, 2}, .reverse=true, .slewRate=6000});
+	// chassis.moveToPose({24_in, 48_in, 0_deg}, 0, {.distGains={0.04, 0, 1.5}, .headingGains={0.45, 0, 2}, .dlead=0.8, .slewRate=6000});
 	// arm.resetPosition();
 
 	// chassis.moveToPoint({24_in, 24_in}, 0, {.distGains={0.04, 0, 3}, .headingGains={0.5, 0, 1.5}, .exitRadius=1_in});
@@ -118,7 +121,7 @@ void autonomous() {
 	// 		pros::Task::delay_until(&t, 50);
 	// 	}
 	// });
-	// auton();
+	auton();
 	// redRightAWP();
 	// redSoloAWP();
 	// blueSoloAWP();

@@ -295,8 +295,8 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double avgA = pose.theta + (deltaA / 2.0);
 	// double globalDeltaX = localOffsetX * cos(avgA) + localOffsetY * cos(avgA);
 	// double globalDeltaY = localOffsetX * -sin(avgA) + localOffsetY * sin(avgA);
-	double globalDeltaX = localOffsetX * -sin(avgA) + localOffsetY * cos(avgA);
-	double globalDeltaY = localOffsetX * cos(avgA) + localOffsetY * sin(avgA);
+	double globalDeltaX = localOffsetX * sin(avgA) + localOffsetY * cos(avgA);
+	double globalDeltaY = localOffsetX * -cos(avgA) + localOffsetY * sin(avgA);
 
 	updateVel({globalDeltaX / dt.convert(okapi::second), globalDeltaY / dt.convert(okapi::second), deltaA / dt.convert(okapi::second), pros::millis()});
 

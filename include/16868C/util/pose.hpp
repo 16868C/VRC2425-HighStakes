@@ -2,6 +2,7 @@
 #include "okapi/api/units/QAngle.hpp"
 #include "okapi/api/units/QLength.hpp"
 #include "16868C/util/point.hpp"
+#include "16868C/util/util.hpp"
 #include <string>
 
 namespace lib16868C {
