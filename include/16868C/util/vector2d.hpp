@@ -1,6 +1,4 @@
 #pragma once
-#include <array>
-#include <initializer_list>
 
 namespace lib16868C {
 class Vector2d {

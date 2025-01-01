@@ -30,6 +30,7 @@ pros::adi::Pneumatics hang(HANG, false);
 pros::adi::Pneumatics doinker(DOINKER, false);
 pros::adi::Pneumatics pto(PTO, true, true);
 pros::adi::Pneumatics intakeRaiser(INTAKE_RAISER, true, true);
+pros::adi::Pneumatics claw(CLAW, false);
 
 // Sensors
 lib16868C::Inertial inertial(INERTIAL);

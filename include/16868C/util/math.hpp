@@ -4,8 +4,6 @@
 #include <string>
 
 namespace lib16868C {
-typedef unsigned int uint;
-
 enum class TurnDirection {
 	CLOCKWISE = -1,
 	COUNTER_CLOCKWISE = 1,

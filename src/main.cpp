@@ -80,7 +80,7 @@ void initialize() {
 
 	armEnc.resetZero();
 	intakeEnc.resetZero();
-	odometry.init({0_in, 0_in, 0_deg});
+	odometry.init();
 	// odometry.init(Pose(0_in, 0_in, 0_deg));
 	// inertial.reset(true);
 	// chassis.coast();
@@ -162,6 +162,7 @@ void opcontrol() {
 	okapi::ControllerButton doinkerTgl(okapi::ControllerDigital::right);
 	okapi::ControllerButton hangRelease(okapi::ControllerDigital::A);
 	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::down);
+	okapi::ControllerButton clawTgl(okapi::ControllerDigital::up);
 
 	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
 	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
@@ -283,6 +284,9 @@ void opcontrol() {
 		}
 		if (!shift.isPressed() && intakeRaiserTgl.changedToPressed()) {
 			intakeRaiser.toggle();
+		}
+		if (!shift.isPressed() && clawTgl.changedToPressed()) {
+			claw.toggle();
 		}
 
 		int leftDriveTemp = std::max(leftDrive.getTemperature() / 5 - 10, 0.0);

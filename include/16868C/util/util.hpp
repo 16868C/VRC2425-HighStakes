@@ -5,6 +5,8 @@
 #include <vector>
 
 namespace lib16868C {
+typedef unsigned int uint;
+
 namespace Util {
 template<typename T> inline int sgn(T n) {
 	return (n > T(0)) - (n < T(0));

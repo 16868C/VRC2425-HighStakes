@@ -35,6 +35,7 @@ const char HANG = 'A';
 const char DOINKER = 'D';
 const char PTO = 'G';
 const char INTAKE_RAISER = 'E';
+const char CLAW = 'B';
 
 const int INERTIAL = 9;
 const int HORT_ENC = 5;
@@ -73,6 +74,7 @@ extern pros::adi::Pneumatics hang;
 extern pros::adi::Pneumatics doinker;
 extern pros::adi::Pneumatics pto;
 extern pros::adi::Pneumatics intakeRaiser;
+extern pros::adi::Pneumatics claw;
 
 // Sensors
 extern lib16868C::Inertial inertial;
