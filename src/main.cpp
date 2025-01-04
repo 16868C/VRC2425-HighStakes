@@ -162,7 +162,6 @@ void opcontrol() {
 	okapi::ControllerButton doinkerTgl(okapi::ControllerDigital::right);
 	okapi::ControllerButton hangRelease(okapi::ControllerDigital::A);
 	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::down);
-	okapi::ControllerButton clawTgl(okapi::ControllerDigital::up);
 
 	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
 	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
@@ -275,8 +274,14 @@ void opcontrol() {
 			});
 		}
 
-		if (!shift.isPressed() && doinkerTgl.changedToPressed())
-			doinker.toggle();
+		if (!shift.isPressed() && doinkerTgl.changedToPressed()) {
+			if (doinker.is_extended()) claw.retract();
+			else doinker.extend();
+		}
+		if (!shift.isPressed() && doinkerTgl.changedToReleased()) {
+			if (doinker.is_extended()) doinker.retract();
+			else claw.extend();
+		}
 
 		if (!shift.isPressed() && hangRelease.changedToPressed()) {
 			arm.defaultPos();
@@ -285,9 +290,6 @@ void opcontrol() {
 		}
 		if (!shift.isPressed() && intakeRaiserTgl.changedToPressed()) {
 			intakeRaiser.toggle();
-		}
-		if (!shift.isPressed() && clawTgl.changedToPressed()) {
-			claw.toggle();
 		}
 
 		int leftDriveTemp = std::max(leftDrive.getTemperature() / 5 - 10, 0.0);
