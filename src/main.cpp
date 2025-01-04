@@ -159,7 +159,7 @@ void opcontrol() {
 	okapi::ControllerButton intakeHoldTgl(okapi::ControllerDigital::left);
 
 	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
-	okapi::ControllerButton doinkerTgl(okapi::ControllerDigital::right);
+	okapi::ControllerButton doinkerCtrl(okapi::ControllerDigital::right);
 	okapi::ControllerButton hangRelease(okapi::ControllerDigital::A);
 	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::down);
 
@@ -167,6 +167,8 @@ void opcontrol() {
 	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
 	okapi::ControllerButton armAllianceStake(okapi::ControllerDigital::right);
 	okapi::ControllerButton armDescoreStake(okapi::ControllerDigital::down);
+
+	bool doinkerTgl = false;
 
 	while (true) {
 		// Drivetrain -> Tank Drive
@@ -274,13 +276,22 @@ void opcontrol() {
 			});
 		}
 
-		if (!shift.isPressed() && doinkerTgl.changedToPressed()) {
-			if (doinker.is_extended()) claw.retract();
-			else doinker.extend();
+		if (!shift.isPressed() && doinkerCtrl.changedToPressed()) {
+			doinkerTgl = !doinkerTgl;
+			if (doinkerTgl) {
+				claw.extend();
+				doinker.extend();
+			} else {
+				claw.extend();
+			}
 		}
-		if (!shift.isPressed() && doinkerTgl.changedToReleased()) {
-			if (doinker.is_extended()) doinker.retract();
-			else claw.extend();
+		if (!shift.isPressed() && doinkerCtrl.changedToReleased()) {
+			if (doinkerTgl) {
+				claw.retract();
+			} else {
+				doinker.retract();
+				claw.retract();
+			}
 		}
 
 		if (!shift.isPressed() && hangRelease.changedToPressed()) {
