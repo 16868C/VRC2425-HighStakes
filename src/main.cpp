@@ -281,6 +281,7 @@ void opcontrol() {
 		if (!shift.isPressed() && hangRelease.changedToPressed()) {
 			arm.defaultPos();
 			hang.toggle();
+			std::cout << intakeEnc.get() / 10 << "\n";
 		}
 		if (!shift.isPressed() && intakeRaiserTgl.changedToPressed()) {
 			intakeRaiser.toggle();

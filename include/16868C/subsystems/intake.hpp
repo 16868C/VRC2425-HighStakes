@@ -40,7 +40,9 @@ class Intake {
 		RingColour getCurrentRing();
 
 		int getNumRings();
-		static RingColour getColour(double hue);
+		RingColour getColour();
+
+		int getCurrHook();
 
 	private:
 		void eject();
@@ -58,15 +60,16 @@ class Intake {
 		int numRings = 0;
 		double tgtPos = -1;
 
-		const double TPR = 4019.6; // 10.74 * 360;
-		const double EJECT_POS = 885;
+		const double TPR = 4199.2; // 10.74 * 360;
+		const std::array<double, 5> HOOK_TICKS = {0, 1079.8, 2 * 1079.8, 2 * 1079.8 + 1019.8, 2 * (1079.8 + 1019.8)};
+		const std::array<double, 4> EJECT_POS = {435, 435, 435, 435};
 		const double REDIRECT_POS = 250;
 		const double ERROR_MARGIN = 10;
 
 		IntakeState state = IntakeState::OFF;
 
-		RingColour tgtRing = RingColour::NONE;
-		RingColour curRing = RingColour::NONE;
+		RingColour tgtRing = RingColour::RED;
+		std::array<RingColour, 4> hookRings = {RingColour::NONE, RingColour::NONE, RingColour::NONE, RingColour::NONE};
 
 		pros::Task managerTask = pros::Task(intakeManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Ring Filter");
 		static void intakeManager(void* param);
