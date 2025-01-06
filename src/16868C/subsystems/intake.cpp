@@ -6,7 +6,7 @@ using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
-	PIDController intakePID({0.025, 0, 0.1});
+	PIDController intakePID({0.02, 0, 0.4});
 
 	intake->color.setLedPWM(100);
 	
@@ -48,7 +48,7 @@ void Intake::intakeManager(void* param) {
 		}
 
 		double ejectHookPos = encPos - intake->HOOK_TICKS[hookNum + 1] + intake->HOOK_TICKS[hookNum];
-		if (intake->tgtRing != RingColour::NONE && intake->hookRings[prevHook] == intake->tgtRing && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_POS[hookNum]) {
+		if (intake->tgtRing != RingColour::NONE && intake->hookRings[prevHook] == intake->tgtRing && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET[hookNum]) {
 			intake->secondStage.moveVoltage(-12000);
 			pros::delay(300);
 			intake->state = state;
@@ -61,8 +61,10 @@ void Intake::intakeManager(void* param) {
 			intake->hold();
 		}
 
-		if (intake->state == IntakeState::REDIRECT && abs(encPos - intake->REDIRECT_POS) > intake->ERROR_MARGIN) {
-			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(encPos - intake->REDIRECT_POS));
+		double error = encPos - intake->HOOK_TICKS[intake->getRedirectHook()] + intake->REDIRECT_POS;
+		std::cout << encPos << " " << intake->getRedirectHook() << " " << intake->HOOK_TICKS[intake->getRedirectHook()] << "\n";
+		if (intake->state == IntakeState::REDIRECT && abs(error) > intake->ERROR_MARGIN) {
+			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(error));
 		} else if (intake->state == IntakeState::REDIRECT) {
 			intake->secondStage.moveVoltage(0);
 		}
@@ -78,7 +80,7 @@ void Intake::intakeManager(void* param) {
 		// }
 
 		// std::cout << ejectHookPos << " " << intake->HOOK_TICKS[hookNum]<< "\n";
-		pros::Task::delay_until(&time, 10);
+		pros::Task::delay_until(&time, 50);
 	}
 }
 
@@ -124,7 +126,6 @@ void Intake::stop() {
 		return;
 	}
 
-	tgtPos = 0;
 	state = IntakeState::OFF;
 	update();
 }
@@ -173,13 +174,8 @@ void Intake::setTargetRing(RingColour colour) {
 RingColour Intake::getTargetRing() {
 	return tgtRing;
 }
-RingColour Intake::getCurrentRing() {
-	// return curRing;
-	return RingColour::NONE;
-}
-
-int Intake::getNumRings() {
-	return numRings;
+std::array<RingColour, 4> Intake::getCurrRings() {
+	return hookRings;
 }
 
 bool Intake::isJamming() {
@@ -187,8 +183,6 @@ bool Intake::isJamming() {
 }
 
 RingColour Intake::getColour() {
-	// if (color.getProximity() < 100) return RingColour::NONE;
-
 	if (color.getHue() > 200 && color.getHue() < 250) return RingColour::BLUE;
 	if (color.getHue() < 20) return RingColour::RED;
 	return RingColour::NONE;
@@ -198,4 +192,12 @@ int Intake::getCurrHook() {
 	for (int i = 1; i <= 4; i++) {
 		if (encPos < HOOK_TICKS[i]) return i;
 	}
+	return 0;
+}
+int Intake::getRedirectHook() {
+	double encPos = fmod(enc.get(), TPR);
+	for (int i = 0; i < 4; i++) {
+		if (encPos < sma(HOOK_TICKS[i], HOOK_TICKS[i + 1])) return i;
+	}
+	return 4;
 }
