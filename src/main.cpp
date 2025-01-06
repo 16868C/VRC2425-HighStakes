@@ -277,21 +277,13 @@ void opcontrol() {
 		}
 
 		if (!shift.isPressed() && doinkerCtrl.changedToPressed()) {
+			claw.extend();
 			doinkerTgl = !doinkerTgl;
-			if (doinkerTgl) {
-				claw.extend();
-				doinker.extend();
-			} else {
-				claw.extend();
-			}
+			if (doinkerTgl) doinker.extend();
 		}
 		if (!shift.isPressed() && doinkerCtrl.changedToReleased()) {
-			if (doinkerTgl) {
-				claw.retract();
-			} else {
-				doinker.retract();
-				claw.retract();
-			}
+			claw.retract();
+			if (!doinkerTgl) doinker.retract();
 		}
 
 		if (!shift.isPressed() && hangRelease.changedToPressed()) {
