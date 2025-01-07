@@ -48,7 +48,7 @@ void Intake::intakeManager(void* param) {
 		}
 
 		double ejectHookPos = encPos - intake->HOOK_TICKS[hookNum + 1] + intake->HOOK_TICKS[hookNum];
-		if (intake->tgtRing != RingColour::NONE && intake->hookRings[prevHook] == intake->tgtRing && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET[hookNum]) {
+		if (intake->tgtRing != RingColour::NONE && intake->hookRings[prevHook] == intake->tgtRing && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET) {
 			intake->secondStage.moveVoltage(-12000);
 			pros::delay(300);
 			intake->state = state;

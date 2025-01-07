@@ -59,7 +59,7 @@ class Intake {
 
 		const double TPR = 4199.2; // 10.74 * 360;
 		const std::array<double, 5> HOOK_TICKS = {0, 1079.8, 2 * 1079.8, 2 * 1079.8 + 1019.8, 2 * (1079.8 + 1019.8)};
-		const std::array<double, 4> EJECT_OFFSET = {435, 435, 435, 435};
+		const double EJECT_OFFSET = 435;
 		const double REDIRECT_POS = 60;
 		const double ERROR_MARGIN = 10;
 
