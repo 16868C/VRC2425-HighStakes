@@ -10,16 +10,11 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	auton.add("Red Solo AWP", redSoloAWP, 1776, 2290);
-	auton.add("Blue Solo AWP", blueSoloAWP, 2290, 2790);
-	auton.add("Red Rush", redRush, 2790, 3367);
-	auton.add("Blue Rush", blueRush, 3367, 3975);
-	auton.add("Red Solo AWP Sig", redSoloAWPSig, 3975, 47);
-	auton.add("Blue Solo AWP Sig", blueSoloAWPSig, 47, 414);
-	auton.add("Red Goal AWP", redGoalAWP, 414, 791);
-	auton.add("Blue Goal AWP", blueGoalAWP, 791, 1160);
-	auton.add("Red Ring AWP", redRingAWP, 1160, 1487);
-	auton.add("Blue Ring AWP", blueRingAWP, 1487, 1776);
+	auton.add("redGoalAWP", redGoalAWP, 1776, 2290); // 1
+	auton.add("blueGoalAWP", blueGoalAWP, 2290, 2790); // 2
+	auton.add("redRingAWP", redRingAWP, 2790, 3367); // 3
+	auton.add("blueRingAWP", blueRingAWP, 3367, 3975); // 4
+	auton.add("Skills", skills, 3975, 47); // 5
 	auton.start();
 
 	armEnc.resetZero();
