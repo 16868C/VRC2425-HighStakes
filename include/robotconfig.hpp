@@ -8,6 +8,7 @@
 #include "16868C/subsystems/chassis/odometry.hpp"
 #include "16868C/subsystems/intake.hpp"
 #include "16868C/subsystems/arm.hpp"
+#include "16868C/util/autonSelector.hpp"
 #include "okapi/impl/device/opticalSensor.hpp"
 #include "pros/adi.hpp"
 
@@ -87,6 +88,7 @@ extern pros::adi::LineSensor ringIR;
 extern lib16868C::Rotation armEnc;
 
 extern pros::adi::Potentiometer autonSelector;
+extern lib16868C::AutonSelector auton;
 
 // Subsystems
 extern lib16868C::Odometry odometry;

@@ -44,6 +44,7 @@ pros::adi::LineSensor ringIR(RING_IR);
 lib16868C::Rotation armEnc(ARM_ENC);
 
 pros::adi::Potentiometer autonSelector(AUTON_SELECTOR, pros::E_ADI_POT_V2);
+lib16868C::AutonSelector auton(autonSelector);
 
 // Subsystems
 lib16868C::Odometry odometry(
