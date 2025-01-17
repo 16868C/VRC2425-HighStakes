@@ -11,6 +11,13 @@ struct Route {
 	inline void run() {
 		route();
 	}
+
+	bool operator==(Route& rhs) {
+		return name == rhs.name;
+	}
+	bool operator!=(Route& rhs) {
+		return !(*this == rhs);
+	}
 };
 
 class AutonSelector {

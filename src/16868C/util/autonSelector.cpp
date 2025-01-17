@@ -43,10 +43,14 @@ void AutonSelector::run() {
 void AutonSelector::start() {
 	pros::Task([this] {
 		while (pros::competition::is_disabled()) {
-			std::cout << getSelectedRoute().name << "\n";
-			pros::c::controller_set_text(pros::E_CONTROLLER_MASTER, 0, 0, getSelectedRoute().name.c_str());
-			pros::lcd::print(7, getSelectedRoute().name.c_str());
+			if (getSelectedRoute() != prevRoute) {
+				std::cout << getSelectedRoute().name << "\n";
+				pros::c::controller_clear_line(pros::E_CONTROLLER_MASTER, 0);
+				pros::c::controller_set_text(pros::E_CONTROLLER_MASTER, 0, 0, getSelectedRoute().name.c_str());
+				pros::lcd::print(7, getSelectedRoute().name.c_str());
+			}
 
+			prevRoute = getSelectedRoute();
 			pros::delay(200);
 		}
 	});
