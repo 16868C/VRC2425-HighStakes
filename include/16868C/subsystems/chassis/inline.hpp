@@ -31,10 +31,10 @@ struct TurnAbsoluteParams {
 	okapi::QAngularSpeed maxRPM = 600_rpm;
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
-	PIDGains gains = {1, 0, 1};
+	PIDGains gains = {0.4, 0, 2};
 
 	okapi::QAngle errorMargin = 1.5_deg;
-	okapi::QAngle angularVelThreshold = 20_deg; // per second
+	okapi::QAngle angularVelThreshold = 10_deg; // per second
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
 	TurnDirection dir = TurnDirection::SHORTEST;
@@ -60,7 +60,7 @@ struct MoveToPointParams {
 	okapi::QAngularSpeed minRPM = 0_rpm;
 	okapi::QLength velThreshold = 1_in;
 
-	PIDGains distGains = {0.04, 0, 1.5};
+	PIDGains distGains = {0.07, 0, 1.5};
 	PIDGains headingGains = {1, 0, 1};
 
 	okapi::QLength exitRadius = 1_in;
@@ -76,8 +76,8 @@ struct MoveToPoseParams {
 	okapi::QAngularSpeed minRPM = 0_rpm;
 	okapi::QLength velThreshold = 1_in;
 
-	PIDGains distGains = {};
-	PIDGains headingGains = {};
+	PIDGains distGains = {0.1, 0, 1.3};
+	PIDGains headingGains = {0.42, 0, 2};
 
 	bool reverse = false;
 
@@ -109,7 +109,7 @@ public:
 	void turnAbsolute(okapi::QAngle angle, int timeout = 0, TurnAbsoluteParams params = {}, bool async = false);
 
 	void turnToPoint(Pose target, int timeout = 0, TurnToPointParams params = {}, bool async = false);
-	void moveToPoint(Pose target, int timeout = 0, MoveToPointParams params = {}, bool async = false);
+	void moveToPoint(Pose target, int timeout = 0, MoveToPointParams params = {}, bool async = false, bool debug = false);
 	void moveToPose(Pose target, int timeout = 0, MoveToPoseParams params = {}, bool async = false);
 
 	void setBrakeMode(okapi::AbstractMotor::brakeMode mode);

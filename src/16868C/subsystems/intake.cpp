@@ -21,7 +21,7 @@ void Intake::intakeManager(void* param) {
 			continue;
 		}
 
-		double encPos = fmod(intake->enc.get(), intake->TPR);
+		double encPos = ReduceAngle::reduce(intake->enc.get(), intake->TPR, 0.0);
 		int hookNum = intake->getCurrHook() - 1;
 		int prevHook = hookNum - 1 < 0 ? 3 : hookNum - 1;
 		intake->hookRings[hookNum] = intake->getColour();
@@ -48,7 +48,7 @@ void Intake::intakeManager(void* param) {
 		}
 
 		double ejectHookPos = encPos - intake->HOOK_TICKS[hookNum + 1] + intake->HOOK_TICKS[hookNum];
-		if (intake->tgtRing != RingColour::NONE && intake->hookRings[prevHook] == intake->tgtRing && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET) {
+		if (intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] == intake->filteredRing && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET) {
 			intake->secondStage.moveVoltage(-12000);
 			pros::delay(300);
 			intake->state = state;
@@ -62,7 +62,7 @@ void Intake::intakeManager(void* param) {
 		}
 
 		double error = encPos - intake->HOOK_TICKS[intake->getRedirectHook()] + intake->REDIRECT_POS;
-		std::cout << encPos << " " << intake->getRedirectHook() << " " << intake->HOOK_TICKS[intake->getRedirectHook()] << "\n";
+		// std::cout << encPos << " " << intake->getRedirectHook() << " " << intake->HOOK_TICKS[intake->getRedirectHook()] << "\n";
 		if (intake->state == IntakeState::REDIRECT && abs(error) > intake->ERROR_MARGIN) {
 			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(error));
 		} else if (intake->state == IntakeState::REDIRECT) {
@@ -169,10 +169,27 @@ IntakeState Intake::getState() {
 }
 
 void Intake::setTargetRing(RingColour colour) {
-	tgtRing = colour;
+	switch (colour) {
+		case RingColour::BLUE:
+			filteredRing = RingColour::RED;
+			break;
+		case RingColour::RED:
+			filteredRing = RingColour::BLUE;
+			break;
+		default:
+			filteredRing = colour;
+			break;
+	}
 }
 RingColour Intake::getTargetRing() {
-	return tgtRing;
+	switch (filteredRing) {
+		case RingColour::BLUE:
+			return RingColour::RED;
+		case RingColour::RED:
+			return RingColour::BLUE;
+		default:
+			return filteredRing;
+	}
 }
 std::array<RingColour, 4> Intake::getCurrRings() {
 	return hookRings;
@@ -195,7 +212,7 @@ int Intake::getCurrHook() {
 	return 0;
 }
 int Intake::getRedirectHook() {
-	double encPos = fmod(enc.get(), TPR);
+	double encPos = ReduceAngle::reduce(fmod(enc.get(), TPR), TPR, 0.0);
 	for (int i = 0; i < 4; i++) {
 		if (encPos < sma(HOOK_TICKS[i], HOOK_TICKS[i + 1])) return i;
 	}

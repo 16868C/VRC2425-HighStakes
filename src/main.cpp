@@ -10,11 +10,11 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	auton.add("redGoalAWP", redGoalAWP, 1776, 2290); // 1
-	auton.add("blueGoalAWP", blueGoalAWP, 2290, 2790); // 2
-	auton.add("redRingAWP", redRingAWP, 2790, 3367); // 3
-	auton.add("blueRingAWP", blueRingAWP, 3367, 3975); // 4
-	auton.add("Skills", skills, 3975, 47); // 5
+	auton.add(1, "redGoalAWP", redGoalAWP);
+	auton.add(2, "blueGoalAWP", blueGoalAWP);
+	auton.add(3, "redRingAWP", redRingAWP);
+	auton.add(4, "blueRingAWP", blueRingAWP);
+	auton.add(5, "Skills", skills);
 	auton.start();
 
 	armEnc.resetZero();
@@ -35,6 +35,11 @@ void autonomous() {
 }
 
 void opcontrol() {
+	auton.stop();
+	if (auton.getSelectedIdx() == 5) {
+		intake.setTargetRing(RingColour::RED);
+	}
+
 	if (!pto.is_extended()) arm.defaultPos();
 	intakeRaiser.extend();
 	hang.retract();
@@ -179,10 +184,10 @@ void opcontrol() {
 		if (targetRedTgl.changedToPressed())
 			intake.setTargetRing(intake.getTargetRing() == RingColour::RED ? RingColour::NONE : RingColour::RED);
 
-		std::string leftDriveTemp = std::to_string(std::max(leftDrive.getTemperature() / 5 - 10, 0.0));
-		std::string rightDriveTemp = std::to_string(std::max(rightDrive.getTemperature() / 5 - 10, 0.0));
-		std::string intakeFirstTemp = std::to_string(std::max(intakeFirst.getTemperature() / 5 - 10, 0.0));
-		std::string intakeSecondTemp = std::to_string(std::max(intakeSecond.getTemperature() / 5 - 10, 0.0));
+		std::string leftDriveTemp = std::to_string((int) std::max(leftDrive.getTemperature() / 5 - 7, 0.0));
+		std::string rightDriveTemp = std::to_string((int) std::max(rightDrive.getTemperature() / 5 - 7, 0.0));
+		std::string intakeFirstTemp = std::to_string((int) std::max(intakeFirst.getTemperature() / 5 - 7, 0.0));
+		std::string intakeSecondTemp = std::to_string((int) std::max(intakeSecond.getTemperature() / 5 - 7, 0.0));
 		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp);
 
 		pros::delay(20);
