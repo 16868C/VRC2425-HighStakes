@@ -21,11 +21,17 @@ double lib16868C::normalizeAngle(double ang, bool rad) {
 	return mod;
 }
 
-double lib16868C::getTargetHeading(double target, double current, bool rad, TurnDirection direction) {
+double lib16868C::getTargetHeading(double target, double current, bool rad, TurnDirection dir) {
 	double maxAng = rad ? 2 * M_PI : 360;
 	double error = target - current;
 	while (error > maxAng / 2) error -= maxAng;
 	while (error < -maxAng / 2) error += maxAng;
+
+	if (dir == TurnDirection::CW) {
+		if (error > 0) error -= maxAng;
+	} else if (dir == TurnDirection::CCW) {
+		if (error < 0) error += maxAng;
+	}
 	return current + error;
 }
 

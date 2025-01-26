@@ -33,7 +33,7 @@ struct TurnAbsoluteParams {
 
 	PIDGains gains = {0.4, 0, 2};
 
-	okapi::QAngle errorMargin = 1.5_deg;
+	okapi::QAngle errorMargin = 2_deg;
 	okapi::QAngle angularVelThreshold = 10_deg; // per second
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
@@ -106,7 +106,7 @@ public:
 	void driveArcade(double forward, double turn, double deadzone = 0);
 
 	void moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout = 0, MoveDistanceParams params = {}, bool async = false);
-	void turnAbsolute(okapi::QAngle angle, int timeout = 0, TurnAbsoluteParams params = {}, bool async = false);
+	void turnAbsolute(okapi::QAngle angle, int timeout = 0, TurnAbsoluteParams params = {}, bool async = false, bool debug = false);
 
 	void turnToPoint(Pose target, int timeout = 0, TurnToPointParams params = {}, bool async = false);
 	void moveToPoint(Pose target, int timeout = 0, MoveToPointParams params = {}, bool async = false, bool debug = false);

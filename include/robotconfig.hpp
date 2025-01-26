@@ -21,9 +21,9 @@ extern okapi::Controller master;
 const int LEFT_FRONT = -11;
 const int LEFT_MIDDLE = -12;
 const int LEFT_REAR = 13;
-const int RIGHT_FRONT = 14;
+const int RIGHT_FRONT = 17;
 const int RIGHT_MIDDLE = -16;
-const int RIGHT_REAR = 15;
+const int RIGHT_REAR = 18;
 
 const int INTAKE_FIRST = -1;
 const int INTAKE_SECOND = -2;

@@ -6,7 +6,7 @@ using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
-	PIDController intakePID({0.02, 0, 0.4});
+	PIDController intakePID({0.025, 0, 0.4});
 
 	intake->color.setLedPWM(100);
 	

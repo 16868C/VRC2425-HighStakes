@@ -6,6 +6,7 @@
 #include "okapi/api/units/QLength.hpp"
 #include "okapi/api/util/mathUtil.hpp"
 #include <algorithm>
+#include <cmath>
 #include <optional>
 
 using namespace lib16868C;
@@ -125,7 +126,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 		((currDist - prevDist) / ((pros::millis() - pt) * 1e-3)),  pros::millis() - st);
 }
 
-void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams params, bool async) {
+void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams params, bool async, bool debug) {
 	if (async) {
 		pros::Task([&] {
 			turnAbsolute(angle, timeout, params, false);
@@ -136,11 +137,12 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 	PIDController turnPID(params.gains, 1, -1, 1e5, 0.09, false);
 
 	double currAngle = inertial->get_rotation(AngleUnit::RAD);
-	double target = getTargetHeading(angle.convert(okapi::radian), currAngle, false, params.dir);
+	double target = getTargetHeading(angle.convert(okapi::radian), currAngle, true, params.dir);
 
-	double prevAngle = 0;
+	std::optional<double> prevAngle = std::nullopt;
 	uint pt = pros::millis();
 	double vel = 0;
+	bool settling = false;
 
 	uint st = pros::millis();
 	while (std::abs(target - currAngle) > params.errorMargin.convert(okapi::radian) || vel > params.angularVelThreshold.convert(okapi::radian)) {
@@ -150,10 +152,13 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 			break;
 		}
 
-		prevAngle = currAngle;
-		vel = std::abs(currAngle - prevAngle) / ((pros::millis() - pt) * 1e-3);
-
 		currAngle = inertial->get_rotation(AngleUnit::RAD);
+		vel = std::abs(currAngle - prevAngle.value_or(INFINITY)) / ((pros::millis() - pt) * 1e-3);
+		if (prevAngle != std::nullopt && Util::sgn(target - prevAngle.value()) != Util::sgn(target - currAngle)) settling = true;
+		if (debug) std::cout << Util::radToDeg(currAngle) << " " << Util::radToDeg(prevAngle.value_or(0)) << " " << Util::radToDeg(target) << " " << settling << " " << vel << " " << pros::millis() - st << "\n";
+		prevAngle = currAngle;
+
+		if (settling && vel < 1e-2) break;
 
 		// Calculate turn power
 		double turnCtrl = turnPID.calculate(target, currAngle);
@@ -221,7 +226,7 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params, boo
 		return;
 	}
 
-	if (params.minRPM == 0_rpm) params.earlyExitRadius = 0_in;
+	// if (params.minRPM == 0_rpm) params.earlyExitRadius = 0_in;
 
 	PIDController distPID(params.distGains, 0, 0);
 	PIDController headingPID(params.headingGains, 0, 0);
@@ -254,18 +259,19 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params, boo
 
 		if (distLeft < params.turnDeadzone.convert(okapi::inch) && !settling) {
 			settling = true;
-			params.maxRPM = max(std::abs(prevFwdRPM) * okapi::rpm, 60_rpm);
+			// params.maxRPM = std::abs(prevFwdRPM) * okapi::rpm;
 		}
 
 		bool currSide = cos(heading) * (pose.x - target.x) > -sin(heading) * (pose.y - target.y) - params.earlyExitRadius.convert(okapi::inch) * dir;
-		if (debug) std::cout << heading << " " << pose.x << " " << pose.y << " " << crossed << "\n";
+		if (debug) std::cout << heading << " " << pose.x << " " << pose.y << " " << currSide << " " << prevSide.value_or(false) << " " << crossed << " " << prevFwdRPM << "\n";
 		// if (currSide != prevSide && (params.minRPM > 0_rpm && pose.distTo(Point(target.x - params.earlyExitRadius.convert(okapi::inch) * sin(pose.theta), target.y - params.earlyExitRadius.convert(okapi::inch) * cos(pose.theta))) < params.earlyExitRadius.convert(okapi::inch))) break;
 		// if (currSide != prevSide && (pose.distTo(target) < (params.minRPM > 0_rpm ? params.earlyExitRadius.convert(okapi::inch) : params.exitRadius.convert(okapi::inch)))) break;
 		if (prevSide != std::nullopt && currSide != prevSide) crossed = true;
 		prevSide = currSide;
 
 		if (settling && crossed && std::hypot(vel.x, vel.y) < params.velThreshold.convert(okapi::inch)) break;
-		if (params.earlyExitRadius != 0_in && crossed) break;
+		if (settling && std::hypot(vel.x, vel.y) == 0 && vel.theta == 0) break;
+		if (params.minRPM != 0_rpm && params.earlyExitRadius != 0_in && crossed) break;
 		// if (pose.distTo(target) < params.exitRadius.convert(okapi::inch)) break;
 
 		// if (params.minRPM > 0_rpm && pose.distTo(target) < params.earlyEndRadius.convert(okapi::inch)) break;

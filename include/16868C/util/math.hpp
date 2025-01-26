@@ -5,8 +5,8 @@
 
 namespace lib16868C {
 enum class TurnDirection {
-	CLOCKWISE = -1,
-	COUNTER_CLOCKWISE = 1,
+	CW = -1,
+	CCW = 1,
 	SHORTEST = 0
 };
 

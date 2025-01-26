@@ -1,4 +1,5 @@
 #include "main.h"
+#include "16868C/subsystems/intake.hpp"
 #include "okapi/impl/device/controllerUtil.hpp"
 #include "robotconfig.hpp"
 #include "16868C/util/logger.hpp"
@@ -36,9 +37,8 @@ void autonomous() {
 
 void opcontrol() {
 	auton.stop();
-	if (auton.getSelectedIdx() == 5) {
+	if (auton.getSelectedIdx() == 5)
 		intake.setTargetRing(RingColour::RED);
-	}
 
 	if (!pto.is_extended()) arm.defaultPos();
 	intakeRaiser.extend();
@@ -50,8 +50,7 @@ void opcontrol() {
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
 	okapi::ControllerButton intakeRedirect(okapi::ControllerDigital::Y);
-	okapi::ControllerButton targetBlueTgl(okapi::ControllerDigital::X);
-	okapi::ControllerButton targetRedTgl(okapi::ControllerDigital::up);
+	okapi::ControllerButton targetRingTgl(okapi::ControllerDigital::X);
 
 	okapi::ControllerButton intakeHoldTgl(okapi::ControllerDigital::left);
 
@@ -66,6 +65,7 @@ void opcontrol() {
 	okapi::ControllerButton armDescoreStake(okapi::ControllerDigital::down);
 
 	bool doinkerTgl = false;
+	int i = 0;
 
 	while (true) {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
@@ -179,16 +179,14 @@ void opcontrol() {
 		if (ptoTgl.changedToPressed())
 			pto.toggle();
 
-		if (targetBlueTgl.changedToPressed())
-			intake.setTargetRing(intake.getTargetRing() == RingColour::BLUE ? RingColour::NONE : RingColour::BLUE);
-		if (targetRedTgl.changedToPressed())
-			intake.setTargetRing(intake.getTargetRing() == RingColour::RED ? RingColour::NONE : RingColour::RED);
+		if (targetRingTgl.changedToPressed())
+			intake.setTargetRing(intake.getTargetRing() == RingColour::BLUE ? RingColour::RED : RingColour::BLUE);
 
 		std::string leftDriveTemp = std::to_string((int) std::max(leftDrive.getTemperature() / 5 - 7, 0.0));
 		std::string rightDriveTemp = std::to_string((int) std::max(rightDrive.getTemperature() / 5 - 7, 0.0));
 		std::string intakeFirstTemp = std::to_string((int) std::max(intakeFirst.getTemperature() / 5 - 7, 0.0));
 		std::string intakeSecondTemp = std::to_string((int) std::max(intakeSecond.getTemperature() / 5 - 7, 0.0));
-		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp);
+		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
 
 		pros::delay(20);
 	}
