@@ -38,7 +38,7 @@ const char PTO = 'G';
 const char INTAKE_RAISER = 'E';
 const char CLAW = 'B';
 
-const int INERTIAL = 9;
+const int INERTIAL = 20;
 const int HORT_ENC = 5;
 
 const int INTAKE_ENC = 21;
