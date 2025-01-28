@@ -105,6 +105,15 @@ void Intake::outtake() {
 	update();
 }
 void Intake::hold() {
+	if (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100) {
+		pros::Task([&] {
+			do pros::delay(50);
+			while (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100);
+			hold();
+		});
+		return;
+	}
+
 	state = IntakeState::HOLDING;
 	update();
 }
@@ -121,6 +130,14 @@ void Intake::stop() {
 		pros::Task([&] {
 			do pros::delay(50);
 			while (state == IntakeState::EJECTING || state == IntakeState::UNJAMMING);
+			stop();
+		});
+		return;
+	}
+	if (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100) {
+		pros::Task([&] {
+			do pros::delay(50);
+			while (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100);
 			stop();
 		});
 		return;
