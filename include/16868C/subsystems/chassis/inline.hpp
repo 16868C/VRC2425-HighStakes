@@ -20,7 +20,7 @@ struct MoveDistanceParams {
 	okapi::QAngularSpeed minRPM = 0_rpm;
 	okapi::QLength velThreshold = 1_in; // per second
 
-	PIDGains distGains = {0.4, 0, 1.5};
+	PIDGains distGains = {0.07, 0, 1.5};
 	PIDGains headingGains = {1, 0, 1};
 
 	okapi::QLength exitDist = 0_in;
@@ -76,7 +76,7 @@ struct MoveToPoseParams {
 	okapi::QAngularSpeed minRPM = 0_rpm;
 	okapi::QLength velThreshold = 1_in;
 
-	PIDGains distGains = {0.1, 0, 1.3};
+	PIDGains distGains = {0.07, 0, 1.5};
 	PIDGains headingGains = {0.42, 0, 2};
 
 	bool reverse = false;

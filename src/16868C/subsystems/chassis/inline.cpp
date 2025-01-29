@@ -102,7 +102,7 @@ void Inline::moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeou
 
 		// PID Calculations
 		double distCtrl = distPID.calculate(dist.convert(okapi::inch), currDist);
-		double headingCtrl = headingPID.calculate(heading.convert(okapi::radian), inertial->get_rotation(AngleUnit::RAD));
+		double headingCtrl = headingPID.calculate(getTargetHeading(heading.convert(okapi::radian), inertial->get_rotation(AngleUnit::RAD), true), inertial->get_rotation(AngleUnit::RAD));
 		
 		// Calculate Linear Power
 		double linearRPM = params.maxRPM.convert(okapi::rpm) * distCtrl;
