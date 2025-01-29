@@ -15,7 +15,8 @@ void initialize() {
 	auton.add(2, "blueGoalAWP", blueGoalAWP);
 	auton.add(3, "redRingAWP", redRingAWP);
 	auton.add(4, "blueRingAWP", blueRingAWP);
-	auton.add(5, "Skills", skills);
+	auton.add(5, "redGoalSide", redGoalSide);
+	auton.add(6, "Skills", skills);
 	auton.start();
 
 	armEnc.resetZero();

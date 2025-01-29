@@ -170,6 +170,106 @@ void blueGoalAWP() {
 	chassis.moveDistance(10_in, 10_deg, 0, {.maxRPM=200_rpm});
 }
 
+void redGoalSide() {
+	odometry.update({135_in, 21.5_in, 90_deg});
+	inertial.set_rotation(90_deg);
+	intake.setTargetRing(RingColour::RED);
+
+	//grab mogo from middle
+	doinker.extend();
+	claw.extend();
+	chassis.moveToPoint({132_in, 55_in}, 400, {.minRPM=600_rpm, .earlyExitRadius=3_in});
+	chassis.moveToPoint({127_in, 71_in}, 500, {.minRPM=200_rpm, .distGains={0.06, 0, 1.5}});
+	// chassis.moveToPose({126_in, 66_in, 110_deg}, 500, {.distGains={0.1, 0, 1.5}, .dlead=4_in, .glead=0, .gRadius=5_in});
+	claw.retract();
+	pros::delay(50);
+	chassis.moveToPoint({129_in, 45_in}, 1000, {.minRPM=600_rpm, .distGains={0.15, 0, 1.5}, .earlyExitRadius=5_in, .reverse=true});
+	pros::Task([&] {
+		pros::delay(450);
+		doinker.retract();
+		claw.retract();
+	});
+	chassis.moveToPoint({122_in, 30_in}, 0, {.distGains={0.2, 0, 1.5}, .headingGains={2, 0, 1}, .reverse=true});
+	claw.extend();
+
+	//Release middle mogo
+	chassis.turnAbsolute(250_deg, 0, {.gains={0.32, 0, 2}, .dir=TurnDirection::CCW}, false, true);
+
+	//grab middle mogo
+	pros::Task([] {
+		while (odometry.getPose().distTo(Pose(128_in, 48_in)) > 1) pros::delay(100);
+		clamp.extend();
+	});
+	chassis.moveToPoint({128_in, 48_in}, 0, {.maxRPM=200_rpm, .distGains={0.15, 0, 1.5}, .reverse=true});
+	clamp.extend();
+	intake.mogo();//Score on middle mogo
+
+	//face ring stack and release mogo
+	chassis.moveToPoint({120_in, 40_in}, 0, {.distGains={0.15, 0, 1.5}});
+	chassis.turnAbsolute(110_deg, 0, {.gains={0.37, 0, 2}}, false, true);
+    clamp.retract();
+
+	//grab ring and hold in intake
+	intake.intake();
+	chassis.moveToPoint({114_in, 58_in}, 0, {});
+	pros::delay(300);
+
+	//grab second mogo
+	chassis.turnAbsolute(0_deg, 1000, {.gains={0.48, 0, 2}, .errorMargin=2.5_deg}, false, true);
+	intake.stop();
+	pros::Task([] {
+		pros::delay(1100);
+		clamp.extend();
+	});
+	chassis.moveToPoint({87_in, 52_in}, 0, {.maxRPM=300_rpm, .distGains={0.15, 0, 1.5}, .reverse=true});
+	clamp.extend();
+	intake.mogo();
+	pros::delay(800);
+
+	chassis.turnAbsolute(210_deg, 0, {.gains={0.34, 0, 2}}, false, true);
+	intakeRaiser.retract();
+
+	// the two tile (with red on top) beside the red alliance stake
+	chassis.moveToPoint({68_in, 35_in}, 0, {.maxRPM=400_rpm, .distGains={0.12, 0, 1.5}});
+	pros::delay(150);
+	intakeRaiser.extend();
+	pros::delay(300);
+
+	//face tower
+	chassis.turnAbsolute(90_deg, 0, {.gains={0.34, 0, 2}}, false, true);
+	chassis.moveDistance(8_in, 90_deg, 0, {.maxRPM=300_rpm});
+	// chassis.moveToPoint({87_in, 57_in}, 0, {.maxRPM=300_rpm, .distGains={0.15, 0, 1.5}, .reverse=true});
+	// intake.hold();
+	// chassis.moveDistance(-5_in, 270_deg, 0, {});
+	// intake.intake();
+	// clamp.retract();
+
+    // chassis.turnAbsolute(-60_deg, 0, {.gains={0.7, 0, 2}, .dir=TurnDirection::CW}, false, true);
+    // clamp.retract();
+
+	// // move to corner
+    // chassis.moveToPoint({132_in, 15_in}, 1000, {.maxRPM=400_rpm, .distGains={0.12, 0, 1.5}});
+	// doinker.extend();
+    // chassis.turnAbsolute(-30_deg, 0, {.gains={0.32, 0, 2}, .dir=TurnDirection::CCW}, false, true);
+	// chassis.turnAbsolute(-90_deg, 0, {.gains={0.32, 0, 2}, .dir=TurnDirection::CW}, false, true);
+	// doinker.retract();
+
+	// // pto.retract();
+	// // pros::delay(300);
+	// // arm.allianceStake();
+	// chassis.turnAbsolute(360_deg, 0, {.gains={0.6, 0, 2}});
+	// chassis.moveToPoint({135_in, 12_in}, 0, {.distGains={0.12, 0, 1.5}});
+	// chassis.moveDistance(5_in, 315_deg, 0, {});
+	// // arm.defaultPos();
+	// // pros::delay(200);
+	// // chassis.moveDistance(-50_in, 270_deg, 0, {});
+	// chassis.turnAbsolute(495_deg, 1000, {.gains={0.36, 0, 2}});
+	// // intake.outtake();
+	// // chassis.moveDistance(10_in, 170_deg, 0, {.maxRPM=200_rpm});
+	// chassis.moveToPoint({80_in, 40_in}, 0, {.distGains={0.12, 0, 1.5}});
+	// clamp.retract();
+}
+
 void skills() {
 
 }

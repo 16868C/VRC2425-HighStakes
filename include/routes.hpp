@@ -6,4 +6,6 @@ void blueRingAWP();
 void redGoalAWP();
 void blueGoalAWP();
 
+void redGoalSide();
+
 void skills();
