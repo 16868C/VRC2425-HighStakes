@@ -16,7 +16,10 @@ void initialize() {
 	auton.add(3, "redRingAWP", redRingAWP);
 	auton.add(4, "blueRingAWP", blueRingAWP);
 	auton.add(5, "redGoalSide", redGoalSide);
-	auton.add(6, "Skills", skills);
+	auton.add(6, "blueGoalSide", blueGoalSide);
+	auton.add(7, "redSoloAWP", redSoloAWP);
+	auton.add(8, "blueSoloAWP", blueSoloAWP);
+	auton.add(9, "Skills", skills);
 	auton.start();
 
 	armEnc.resetZero();
@@ -111,7 +114,7 @@ void opcontrol() {
 						arm.move(0);
 						pros::delay(500);
 					}
-					if (intake.getState() == IntakeState::INTAKE) intake.stop();
+					if (intake.getState() == IntakeState::INTAKE || intake.getState() == IntakeState::HOLDING) intake.stop();
 					else intake.intake();
 				});
 			}

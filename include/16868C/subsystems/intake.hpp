@@ -59,13 +59,14 @@ class Intake {
 
 		const double TPR = 4199.2; // 10.74 * 360;
 		const std::array<double, 5> HOOK_TICKS = {0, 1079.8, 2 * 1079.8, 2 * 1079.8 + 1019.8, 2 * (1079.8 + 1019.8)};
-		const double EJECT_OFFSET = 435;
+		const double EJECT_OFFSET = 440;
 		const double REDIRECT_POS = 0;
 		const double ERROR_MARGIN = 0;
 
 		IntakeState state = IntakeState::OFF;
 
 		RingColour filteredRing = RingColour::NONE;
+		RingColour targetRing = RingColour::NONE;
 		std::array<RingColour, 4> hookRings = {RingColour::NONE, RingColour::NONE, RingColour::NONE, RingColour::NONE};
 
 		pros::Task managerTask = pros::Task(intakeManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Ring Filter");

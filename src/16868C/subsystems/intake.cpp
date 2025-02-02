@@ -1,6 +1,7 @@
 #include "16868C/subsystems/intake.hpp"
 #include "16868C/controllers/pidController.hpp"
 #include "pros/adi.hpp"
+#include "pros/misc.hpp"
 
 using namespace lib16868C;
 
@@ -15,6 +16,13 @@ void Intake::intakeManager(void* param) {
 	int n = 0;
 	bool ring = false;
 	intake->color.disableGestures();
+
+	// pros::delay(500);
+	// do {
+	// 	pros::delay(50);
+	// } while (!pros::competition::is_autonomous());
+	// intake->hookRings[0] = RingColour::NONE;
+
 	while (true) {
 		if (!intake->pto.is_extended()) {
 			pros::Task::delay_until(&time, 20);
@@ -58,6 +66,9 @@ void Intake::intakeManager(void* param) {
 		}
 
 		if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
+			intake->hold();
+		}
+		if (intake->state == IntakeState::INTAKE && intake->targetRing != RingColour::NONE && intake->hookRings[prevHook] == intake->targetRing && encPos - intake->HOOK_TICKS[hookNum + 1] + 600 > 0) {
 			intake->hold();
 		}
 
@@ -107,6 +118,7 @@ void Intake::outtake() {
 void Intake::hold() {
 	if (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100) {
 		pros::Task([&] {
+			secondStage.moveVoltage(-12000);
 			do pros::delay(50);
 			while (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100);
 			hold();
@@ -186,6 +198,7 @@ IntakeState Intake::getState() {
 }
 
 void Intake::setTargetRing(RingColour colour) {
+	targetRing = colour;
 	switch (colour) {
 		case RingColour::BLUE:
 			filteredRing = RingColour::RED;
@@ -199,14 +212,7 @@ void Intake::setTargetRing(RingColour colour) {
 	}
 }
 RingColour Intake::getTargetRing() {
-	switch (filteredRing) {
-		case RingColour::BLUE:
-			return RingColour::RED;
-		case RingColour::RED:
-			return RingColour::BLUE;
-		default:
-			return filteredRing;
-	}
+	return targetRing;
 }
 std::array<RingColour, 4> Intake::getCurrRings() {
 	return hookRings;
@@ -217,8 +223,10 @@ bool Intake::isJamming() {
 }
 
 RingColour Intake::getColour() {
-	if (color.getHue() > 200 && color.getHue() < 250) return RingColour::BLUE;
-	if (color.getHue() < 20) return RingColour::RED;
+	if (color.getProximity() < 150) return RingColour::NONE;
+
+	if (color.getHue() > 200 && color.getHue() < 230) return RingColour::BLUE;
+	if (color.getHue() > 0 && color.getHue() < 20) return RingColour::RED;
 	return RingColour::NONE;
 }
 int Intake::getCurrHook() {
