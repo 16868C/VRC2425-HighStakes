@@ -131,19 +131,18 @@ void redGoalAWP() {
 	intake.intake();
 	doinker.extend();
 	claw.extend();
-	chassis.moveToPoint({119_in, 47_in}, 750, {.minRPM=600_rpm, .earlyExitRadius=3_in});
-	chassis.moveToPoint({124_in, 61_in}, 350, {.minRPM=200_rpm, .distGains={0.06, 0, 1.5}});
+	chassis.moveToPoint({117_in, 44_in}, 750, {.minRPM=600_rpm, .earlyExitRadius=3_in});
+	chassis.moveToPoint({123.5_in, 61_in}, 350, {.minRPM=200_rpm, .distGains={0.06, 0, 1.5}, .headingGains={1.25, 0, 1.5}});
 	claw.retract();
 
-	chassis.moveToPoint({123_in, 30_in}, 1300, {.reverse=true});
-	intake.hold();
+	chassis.moveToPoint({105_in, 30_in}, 1300, {.reverse=true});
 	claw.extend();
 	pros::Task([&] {
 		pros::delay(400);
 		doinker.retract();
 		claw.retract();
 	});
-	chassis.turnAbsolute(300_deg, 1150, {.gains={0.35, 0, 2}});
+	chassis.turnAbsolute(235_deg, 1150, {.gains={0.35, 0, 2}});
 	
 	chassis.moveToPoint({118_in, 58_in}, 1250, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
@@ -152,15 +151,15 @@ void redGoalAWP() {
 	pros::delay(500);
 
 	clamp.retract();
-	chassis.turnAbsolute(15_deg, 1100, {.gains={0.5, 0, 2}});
+	chassis.turnAbsolute(-10_deg, 1100, {.gains={0.5, 0, 2}});
 	chassis.moveToPoint({95_in, 52_in}, 1150, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
 	pros::delay(50);
 
-	chassis.turnAbsolute(222_deg, 1150, {.gains={0.32, 0, 2}});
+	chassis.turnAbsolute(225_deg, 1150, {.gains={0.32, 0, 2}});
 	intakeRaiser.retract();
 	intake.mogo();
-	chassis.moveDistance(23_in, 222_deg, 850, {.distGains={0.07, 0, 1.5}});
+	chassis.moveDistance(23_in, 225_deg, 850, {.distGains={0.07, 0, 1.5}});
 	// chassis.moveToPoint({80_in, 39_in}, 0, {.maxRPM=300_rpm, .distGains={0.12, 0, 1.5}});
 	pros::delay(300);
 	intakeRaiser.extend();
