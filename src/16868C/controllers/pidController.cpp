@@ -1,6 +1,7 @@
 #include "16868C/controllers/pidController.hpp"
 #include "16868C/util/util.hpp"
 #include <algorithm>
+#include <iostream>
 
 using namespace lib16868C;
 
@@ -52,17 +53,19 @@ double PIDController::calculate(double error) {
 	double dT = currTime - prevTime;
 	prevTime = currTime;
 
-	if (error <= integralRange) integral += error;
+	if (std::abs(error) <= integralRange) integral += error;
 	
 	double dError = error - prevError;
-	double derivative = dError / dT;
-	prevError = error;
+	double derivative = dError / (dT * 1e-3);
 
 	if (resetIntegralOnCross && Util::sgn(error) != Util::sgn(prevError)) integral = 0;
 	integral = std::clamp(integral, -maxIntegral, maxIntegral);
 
+	prevError = error;
+
 	output = error * gains.kP + integral * gains.kI + derivative * gains.kD + gains.kF;
 	if (outputMin != outputMax) output = std::clamp(output, outputMin, outputMax);
+	std::cout << error << " " << integral << " " << derivative << " " << output << "\n";
 	return output;
 }
 double PIDController::calculate(double target, double current) {

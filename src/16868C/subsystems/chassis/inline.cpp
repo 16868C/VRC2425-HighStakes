@@ -134,7 +134,7 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 		return;
 	}
 
-	PIDController turnPID(params.gains, 1, -1, 1e5, 0.09, false);
+	PIDController turnPID(params.gains, 1, -1, 1e5, 0.2, true);
 
 	double currAngle = inertial->get_rotation(AngleUnit::RAD);
 	double target = getTargetHeading(angle.convert(okapi::radian), currAngle, true, params.dir);
@@ -155,16 +155,16 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 		currAngle = inertial->get_rotation(AngleUnit::RAD);
 		vel = std::abs(currAngle - prevAngle.value_or(INFINITY)) / ((pros::millis() - pt) * 1e-3);
 		if (prevAngle != std::nullopt && Util::sgn(target - prevAngle.value()) != Util::sgn(target - currAngle)) settling = true;
-		if (debug) std::cout << Util::radToDeg(currAngle) << " " << Util::radToDeg(prevAngle.value_or(0)) << " " << Util::radToDeg(target) << " " << settling << " " << vel << " " << pros::millis() - st << "\n";
 		prevAngle = currAngle;
 
-		if (settling && vel < 1e-2) break;
+		// if (settling && vel < 1e-2) break;
 
 		// Calculate turn power
 		double turnCtrl = turnPID.calculate(target, currAngle);
 		double turnRPM = params.maxRPM.convert(okapi::rpm) * turnCtrl;
 		turnRPM = std::max(std::abs(turnRPM), params.minRPM.convert(okapi::rpm)) * Util::sgn(turnRPM);
 		double volts = turnRPM / static_cast<int>(leftMtrs.getGearing()) * MAX_VOLT;
+		// if (debug) std::cout << Util::radToDeg(target - currAngle) <<  " " << Util::degToRad(vel) << " " << turnCtrl << "\n";
 
 		// Determine turn type
 		switch (params.turnWheel) {

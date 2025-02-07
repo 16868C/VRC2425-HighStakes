@@ -17,12 +17,14 @@ void Intake::intakeManager(void* param) {
 	bool ring = false;
 	intake->color.disableGestures();
 
-	// pros::delay(500);
+	pros::delay(2000);
 	// do {
 	// 	pros::delay(50);
 	// } while (!pros::competition::is_autonomous());
 	// intake->hookRings[0] = RingColour::NONE;
 
+	bool stop = false;
+	int preNum = 0;
 	while (true) {
 		if (!intake->pto.is_extended()) {
 			pros::Task::delay_until(&time, 20);
@@ -38,6 +40,9 @@ void Intake::intakeManager(void* param) {
 				intake->hookRings[i] = RingColour::NONE;
 			}
 		}
+
+		if (preNum != hookNum) stop = false;
+		preNum = hookNum;
 
 		if (intake->getColour() != RingColour::NONE && !ring) {
 			ring = true;
@@ -56,13 +61,20 @@ void Intake::intakeManager(void* param) {
 		}
 
 		double ejectHookPos = encPos - intake->HOOK_TICKS[hookNum + 1] + intake->HOOK_TICKS[hookNum];
-		if (intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] == intake->filteredRing && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET) {
-			intake->secondStage.moveVoltage(-12000);
-			pros::delay(300);
-			intake->state = state;
-			intake->update();
-			std::cout << "eject " << ejectHookPos << "\n";
-			intake->hookRings[prevHook] = RingColour::NONE;
+		// intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] == intake->filteredRing && 
+		if (!stop && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET) {
+			stop = true;
+			intake->secondStage.moveVoltage(0);
+			pros::delay(1000);
+			intake->secondStage.moveVoltage(12000);
+			// intake->secondStage.moveVoltage(-12000);
+			// pros::delay(300);
+			// intake->state = state;
+			// intake->update();
+			// std::cout << "eject " << ejectHookPos << "\n";
+			// intake->hookRings[prevHook] = RingColour::NONE;
+		} else {
+			intake->secondStage.moveVoltage(12000);
 		}
 
 		if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
@@ -91,7 +103,7 @@ void Intake::intakeManager(void* param) {
 		// }
 
 		// std::cout << ejectHookPos << " " << intake->HOOK_TICKS[hookNum]<< "\n";
-		pros::Task::delay_until(&time, 50);
+		pros::Task::delay_until(&time, 20);
 	}
 }
 
@@ -225,8 +237,8 @@ bool Intake::isJamming() {
 RingColour Intake::getColour() {
 	if (color.getProximity() < 150) return RingColour::NONE;
 
-	if (color.getHue() > 200 && color.getHue() < 230) return RingColour::BLUE;
-	if (color.getHue() > 0 && color.getHue() < 20) return RingColour::RED;
+	if (color.getHue() > 200) return RingColour::BLUE;
+	if (color.getHue() < 50) return RingColour::RED;
 	return RingColour::NONE;
 }
 int Intake::getCurrHook() {

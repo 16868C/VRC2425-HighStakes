@@ -33,8 +33,8 @@ struct TurnAbsoluteParams {
 
 	PIDGains gains = {0.4, 0, 2};
 
-	okapi::QAngle errorMargin = 2_deg;
-	okapi::QAngle angularVelThreshold = 10_deg; // per second
+	okapi::QAngle errorMargin = 1_deg;
+	okapi::QAngle angularVelThreshold = 5_deg; // per second
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
 	TurnDirection dir = TurnDirection::SHORTEST;
