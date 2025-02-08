@@ -49,7 +49,21 @@ void opcontrol() {
 	intakeRaiser.extend();
 	hang.retract();
 
-	// chassis.turnAbsolute(45_deg, 0, {.gains={0.8, 0.2, 0.06}}, false, true);
+	chassis.moveToPoint({24_in, 24_in}, 0, {.distGains={0.09, 0, 0.011}, .headingGains={0.6, 0, 0.01}});
+
+	// chassis.turnAbsolute(180_deg, 0, {.gains={1.2, 0.2, 0.1}});
+
+	// for (int i = 1; i <= 4; i++) {
+	// 	double t, a, v;
+	// 	for (int j = 0; j < 10; j++) {
+	// 		chassis.turnAbsolute(inertial.get_rotation(AngleUnit::DEG) * okapi::degree + i * 45_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	// 		a += std::abs(chassis.a - a);
+	// 		v += chassis.v;
+	// 		t += chassis.t;
+	// 		pros::delay(500);
+	// 	}
+	// 	std::cout << a / 10 << " " << v / 10 << " " << t / 10 << "\n"; 
+	// }
   
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
 	okapi::ControllerButton ptoTgl(okapi::ControllerDigital::B);

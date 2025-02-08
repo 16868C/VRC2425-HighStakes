@@ -21,7 +21,7 @@ struct MoveDistanceParams {
 	okapi::QLength velThreshold = 1_in; // per second
 
 	PIDGains distGains = {0.07, 0, 1.5};
-	PIDGains headingGains = {1, 0, 1};
+	PIDGains headingGains = {0.8, 0.2, 0.06};
 
 	okapi::QLength exitDist = 0_in;
 
@@ -31,7 +31,7 @@ struct TurnAbsoluteParams {
 	okapi::QAngularSpeed maxRPM = 600_rpm;
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
-	PIDGains gains = {0.4, 0, 2};
+	PIDGains gains = {0.8, 0.2, 0.06}; // {1.2, 0.2, 0.1}
 
 	okapi::QAngle errorMargin = 1_deg;
 	okapi::QAngle angularVelThreshold = 5_deg; // per second
@@ -60,8 +60,8 @@ struct MoveToPointParams {
 	okapi::QAngularSpeed minRPM = 0_rpm;
 	okapi::QLength velThreshold = 1_in;
 
-	PIDGains distGains = {0.07, 0, 1.5};
-	PIDGains headingGains = {1, 0, 1};
+	PIDGains distGains = {0.09, 0, 0.011};
+	PIDGains headingGains = {0.6, 0, 0.01};
 
 	okapi::QLength exitRadius = 1_in;
 	okapi::QLength earlyExitRadius = 5_in;
@@ -116,6 +116,8 @@ public:
 	void coast();
 	void brake();
 	void hold();
+
+	double a, v, t;
 
 private:
 	MotorGroup& leftMtrs, rightMtrs;

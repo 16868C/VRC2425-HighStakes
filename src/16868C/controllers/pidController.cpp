@@ -65,7 +65,7 @@ double PIDController::calculate(double error) {
 
 	output = error * gains.kP + integral * gains.kI + derivative * gains.kD + gains.kF;
 	if (outputMin != outputMax) output = std::clamp(output, outputMin, outputMax);
-	std::cout << error << " " << integral << " " << derivative << " " << output << "\n";
+	// std::cout << error << " " << integral << " " << derivative << " " << output << "\n";
 	return output;
 }
 double PIDController::calculate(double target, double current) {

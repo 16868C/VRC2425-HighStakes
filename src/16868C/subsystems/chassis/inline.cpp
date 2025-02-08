@@ -190,6 +190,9 @@ void Inline::turnAbsolute(okapi::QAngle angle, int timeout, TurnAbsoluteParams p
 	rightMtrs.setBrakeMode(okapi::AbstractMotor::brakeMode::coast);
 	moveTank(0, 0);
 	printDebug("[Inline::TurnAbsolute] Finished with heading of %f deg at a speed of %f deg/s, taking %d ms\n", inertial->get_rotation(AngleUnit::DEG), Util::radToDeg(vel), pros::millis() - st);
+	a = inertial->get_rotation(AngleUnit::DEG);
+	v = Util::radToDeg(vel);
+	t = pros::millis() - st;
 }
 
 
@@ -270,7 +273,7 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params, boo
 		prevSide = currSide;
 
 		if (settling && crossed && std::hypot(vel.x, vel.y) < params.velThreshold.convert(okapi::inch)) break;
-		if (settling && std::hypot(vel.x, vel.y) == 0 && vel.theta == 0) break;
+		// if (settling && std::hypot(vel.x, vel.y) == 0 && vel.theta == 0) break;
 		if (params.minRPM != 0_rpm && params.earlyExitRadius != 0_in && crossed) break;
 		// if (pose.distTo(target) < params.exitRadius.convert(okapi::inch)) break;
 
@@ -303,7 +306,7 @@ void Inline::moveToPoint(Pose target, int timeout, MoveToPointParams params, boo
 
 		moveArcade(fwdPower, turnPower, params.slewRate);
 
-		// std::cout << pose.toStr() << " " << crossed << " " << vel.toStr() << "\n";
+		// std::cout << distLeft << " " << std::hypot(vel.x, vel.y) << " " << distCtrl << "\n";
 
 		pros::delay(20);
 	}

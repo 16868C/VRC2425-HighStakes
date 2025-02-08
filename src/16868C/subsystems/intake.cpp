@@ -64,9 +64,9 @@ void Intake::intakeManager(void* param) {
 		// intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] == intake->filteredRing && 
 		if (!stop && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET) {
 			stop = true;
-			intake->secondStage.moveVoltage(0);
-			pros::delay(1000);
-			intake->secondStage.moveVoltage(12000);
+			// intake->secondStage.moveVoltage(0);
+			// pros::delay(1000);
+			// intake->secondStage.moveVoltage(12000);
 			// intake->secondStage.moveVoltage(-12000);
 			// pros::delay(300);
 			// intake->state = state;
@@ -74,7 +74,7 @@ void Intake::intakeManager(void* param) {
 			// std::cout << "eject " << ejectHookPos << "\n";
 			// intake->hookRings[prevHook] = RingColour::NONE;
 		} else {
-			intake->secondStage.moveVoltage(12000);
+			// intake->secondStage.moveVoltage(12000);
 		}
 
 		if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
