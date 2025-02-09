@@ -12,4 +12,6 @@ void blueSoloAWP();
 void redGoalSide();
 void blueGoalSide();
 
+void redGoalCorner();
+
 void skills();
