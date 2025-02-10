@@ -7,7 +7,7 @@ using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
-	PIDController intakePID({0.025, 0, 0.4});
+	PIDController intakePID({0.004, 0, 0});
 
 	intake->color.setLedPWM(100);
 	
@@ -15,13 +15,8 @@ void Intake::intakeManager(void* param) {
 	uint32_t time = pros::millis();
 	int n = 0;
 	bool ring = false;
+	int tgtHook = -1;
 	intake->color.disableGestures();
-
-	pros::delay(2000);
-	// do {
-	// 	pros::delay(50);
-	// } while (!pros::competition::is_autonomous());
-	// intake->hookRings[0] = RingColour::NONE;
 
 	while (true) {
 		if (!intake->pto.is_extended()) {
@@ -46,9 +41,6 @@ void Intake::intakeManager(void* param) {
 				std::cout << (intake->hookRings[i] == RingColour::NONE ? "None" : intake->hookRings[i] == RingColour::BLUE ? "Blue" : "Red") << ", ";
 			}
 			std::cout << "}\n";
-			// intake->secondStage.moveVoltage(0);
-			// pros::delay(1000);
-			// intake->secondStage.moveVoltage(12000);
 		}
 		if (intake->getColour() == RingColour::NONE) {
 			ring = false;
@@ -58,39 +50,40 @@ void Intake::intakeManager(void* param) {
 			state = intake->getState();
 		}
 
-		double ejectHookPos = intake->HOOK_TICKS[hookNum] - encPos;
-		// intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] == intake->filteredRing && 
-		// std::cout << ejectHookPos << " " << intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET << "\n";
-		// std::cout << encPos << " " << intake->HOOK_TICKS[hookNum] << " " << hookNum << "\n";
-		if (intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] != RingColour::NONE && encPos - intake->EJECT_POS[prevHook] < 500 && encPos - intake->EJECT_POS[prevHook] > 0) {
-			// intake->secondStage.moveVoltage(0);
-			// pros::delay(1000);
-			// encPos = ReduceAngle::reduce(intake->enc.get(), intake->TPR, 0.0);
-			// std::cout << "stop " << encPos - intake->HOOK_TICKS[hookNum] - ejectHookPos << "\n";
-			// intake->secondStage.moveVoltage(12000);
-			// pros::delay(200);
+		if (intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] == intake->filteredRing && encPos - intake->EJECT_POS[prevHook] < 500 && encPos - intake->EJECT_POS[prevHook] > 0) {
 			std::cout << "eject " << encPos << " " << intake->EJECT_POS[prevHook] << "\n";
 			intake->secondStage.moveVoltage(-12000);
 			pros::delay(200);
 			intake->state = state;
 			intake->update();
 			intake->hookRings[prevHook] = RingColour::NONE;
+		}
+
+		if (intake->state == IntakeState::HOLDING) {
+			intakePID.setGains({0.004, 0, 0});
 		} else {
-			// intake->secondStage.moveVoltage(12000);
+			tgtHook = -1;
+		}
+		if (intake->state == IntakeState::REDIRECT) {
+			intakePID.setGains({0.03, 0, 0.005});
 		}
 
-		if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
+		// if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
+		// 	intake->hold();
+		// }
+		if (intake->state == IntakeState::INTAKE && intake->targetRing != RingColour::NONE && intake->hookRings[prevHook] == intake->targetRing) {
 			intake->hold();
-		}
-		if (intake->state == IntakeState::INTAKE && intake->targetRing != RingColour::NONE && intake->hookRings[prevHook] == intake->targetRing && encPos - intake->HOOK_TICKS[hookNum + 1] + 600 > 0) {
-			intake->hold();
+			tgtHook = prevHook;
 		}
 
-		double error = encPos - intake->HOOK_TICKS[intake->getRedirectHook()] + intake->REDIRECT_POS;
+		double redirectError = encPos - intake->HOOK_TICKS[intake->getRedirectHook()] - intake->REDIRECT_POS;
+		double holdError = encPos - (tgtHook == -1 ? 0 : intake->HOLD_POS[tgtHook]);
 		// std::cout << encPos << " " << intake->getRedirectHook() << " " << intake->HOOK_TICKS[intake->getRedirectHook()] << "\n";
-		if (intake->state == IntakeState::REDIRECT && abs(error) > intake->ERROR_MARGIN) {
-			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(error));
-		} else if (intake->state == IntakeState::REDIRECT) {
+		if (intake->state == IntakeState::REDIRECT && abs(redirectError) > intake->ERROR_MARGIN) {
+			intake->secondStage.moveVoltage(-4000 * intakePID.calculate(redirectError));
+		} else if (intake->state == IntakeState::HOLDING && abs(holdError)) {
+			intake->secondStage.moveVoltage(-12000 * intakePID.calculate(holdError));
+		} else if (intake->state == IntakeState::REDIRECT || intake->state == IntakeState::HOLDING) {
 			intake->secondStage.moveVoltage(0);
 		}
 
@@ -130,16 +123,6 @@ void Intake::outtake() {
 	update();
 }
 void Intake::hold() {
-	if (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100) {
-		pros::Task([&] {
-			secondStage.moveVoltage(-12000);
-			do pros::delay(50);
-			while (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100);
-			hold();
-		});
-		return;
-	}
-
 	state = IntakeState::HOLDING;
 	update();
 }
@@ -192,7 +175,6 @@ void Intake::update() {
 		break;
 	case IntakeState::HOLDING:
 		firstStage.moveVoltage(12000);
-		secondStage.moveVoltage(0);
 		break;
 	case IntakeState::EJECTING:
 		break;
