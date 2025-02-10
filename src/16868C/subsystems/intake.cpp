@@ -23,8 +23,6 @@ void Intake::intakeManager(void* param) {
 	// } while (!pros::competition::is_autonomous());
 	// intake->hookRings[0] = RingColour::NONE;
 
-	bool stop = false;
-	int preNum = 0;
 	while (true) {
 		if (!intake->pto.is_extended()) {
 			pros::Task::delay_until(&time, 20);
@@ -41,9 +39,6 @@ void Intake::intakeManager(void* param) {
 			}
 		}
 
-		if (preNum != hookNum) stop = false;
-		preNum = hookNum;
-
 		if (intake->getColour() != RingColour::NONE && !ring) {
 			ring = true;
 			std::cout << "#" << hookNum << " " << encPos << " Ring Detected: " << (intake->getColour() == RingColour::BLUE ? "Blue" : "Red") << " { ";
@@ -51,6 +46,9 @@ void Intake::intakeManager(void* param) {
 				std::cout << (intake->hookRings[i] == RingColour::NONE ? "None" : intake->hookRings[i] == RingColour::BLUE ? "Blue" : "Red") << ", ";
 			}
 			std::cout << "}\n";
+			// intake->secondStage.moveVoltage(0);
+			// pros::delay(1000);
+			// intake->secondStage.moveVoltage(12000);
 		}
 		if (intake->getColour() == RingColour::NONE) {
 			ring = false;
@@ -60,21 +58,23 @@ void Intake::intakeManager(void* param) {
 			state = intake->getState();
 		}
 
-		double ejectHookPos = encPos - intake->HOOK_TICKS[hookNum + 1] + intake->HOOK_TICKS[hookNum];
+		double ejectHookPos = intake->HOOK_TICKS[hookNum] - encPos;
 		// intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] == intake->filteredRing && 
 		// std::cout << ejectHookPos << " " << intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET << "\n";
-		if (!stop && ejectHookPos > intake->HOOK_TICKS[hookNum] - intake->EJECT_OFFSET) {
-			stop = true;
-			// std::cout << "stop\n";
+		// std::cout << encPos << " " << intake->HOOK_TICKS[hookNum] << " " << hookNum << "\n";
+		if (intake->filteredRing != RingColour::NONE && intake->hookRings[prevHook] != RingColour::NONE && encPos - intake->EJECT_POS[prevHook] < 500 && encPos - intake->EJECT_POS[prevHook] > 0) {
 			// intake->secondStage.moveVoltage(0);
 			// pros::delay(1000);
+			// encPos = ReduceAngle::reduce(intake->enc.get(), intake->TPR, 0.0);
+			// std::cout << "stop " << encPos - intake->HOOK_TICKS[hookNum] - ejectHookPos << "\n";
 			// intake->secondStage.moveVoltage(12000);
-			// intake->secondStage.moveVoltage(-12000);
-			// pros::delay(300);
-			// intake->state = state;
-			// intake->update();
-			// std::cout << "eject " << ejectHookPos << "\n";
-			// intake->hookRings[prevHook] = RingColour::NONE;
+			// pros::delay(200);
+			std::cout << "eject " << encPos << " " << intake->EJECT_POS[prevHook] << "\n";
+			intake->secondStage.moveVoltage(-12000);
+			pros::delay(200);
+			intake->state = state;
+			intake->update();
+			intake->hookRings[prevHook] = RingColour::NONE;
 		} else {
 			// intake->secondStage.moveVoltage(12000);
 		}
@@ -104,7 +104,7 @@ void Intake::intakeManager(void* param) {
 		// 	intake->update();
 		// }
 
-		// std::cout << ejectHookPos << " " << intake->HOOK_TICKS[hookNum]<< "\n";
+		// std::cout << ejectHookPos << " " << intake->HOOK_TICKS[hookNum] << "\n";
 		pros::Task::delay_until(&time, 20);
 	}
 }
