@@ -21,6 +21,7 @@ void initialize() {
 	auton.add(7, "redSoloAWP", redSoloAWP);
 	auton.add(8, "blueSoloAWP", blueSoloAWP);
 	auton.add(9, "redGoalCorner", redGoalCorner); //skills
+	auton.add(10, "redRingAWPNoStake", redRingAWPNoStake);
 	auton.start();
 
 	armEnc.resetZero();

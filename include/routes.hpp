@@ -1,6 +1,7 @@
 #pragma once
 
 void redRingAWP();
+void redRingAWPNoStake();
 void blueRingAWP();
 
 void redGoalAWP();
