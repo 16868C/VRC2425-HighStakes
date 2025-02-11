@@ -420,19 +420,19 @@ void blueGoalAWP() {
 }
 
 void redSoloAWP() {
-	odometry.update({80_in, 20_in, -130_deg});
+	odometry.update({81_in, 21_in, -130_deg});
 	inertial.set_rotation(-130_deg);
 	intake.setTargetRing(RingColour::RED);
 
 	pto.retract();
-	pros::delay(500);
+	pros::delay(400);
 	arm.allianceStake();
 	uint t = pros::millis();
 	do {
 		pros::delay(100);
 		std::cout << arm.getError() << "\n";
-	} while (arm.getError() > 0 && pros::millis() - t < 1000);
-	chassis.moveDistance(8.5_in, -130_deg, 600, {.maxRPM=300_rpm, .distGains={0.4, 0, 1.5}, .headingGains={0.2, 0, 1.5}});
+	} while (arm.getError() > 3 && pros::millis() - t < 1000);
+	chassis.moveDistance(8.5_in, -130_deg, 700, {.maxRPM=300_rpm, .distGains={0.15, 0, 0.011}, .headingGains={0.6, 0, 0.01}});
 	arm.defaultPos();
 	pros::delay(200);
 	pto.extend();
@@ -447,37 +447,37 @@ void redSoloAWP() {
 		intake.mogo();
 	});
 
-	chassis.moveToPoint({97_in, 40_in}, 1100, {.minRPM=400_rpm, .earlyExitRadius=2_in, .reverse=true});
-	chassis.moveToPoint({99_in, 52_in}, 750, {.maxRPM=400_rpm, .reverse=true});
+	chassis.moveToPoint({95_in, 40_in}, 0, {.minRPM=300_rpm, .earlyExitRadius=2_in, .reverse=true});
+	chassis.moveToPoint({96_in, 52_in}, 0, {.maxRPM=400_rpm, .reverse=true});
+	// chassis.moveDistance(-13_in, -90_deg, 0, {.maxRPM=400_rpm, .minRPM=100_rpm, .distGains={0.13, 0, 0.011}});
 	clamp.extend();
 	pros::delay(50);
 
 	intake.mogo();
-	chassis.turnAbsolute(-10_deg, 1000, {.gains={0.4, 0, 2}});
-	chassis.moveToPoint({113_in, 50_in}, 950, {});
+	chassis.turnAbsolute(-10_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	chassis.moveToPoint({114_in, 50_in}, 0, {});
 
-	chassis.turnAbsolute(-145_deg, 1100, {.gains={0.35, 0, 2}});
+	chassis.turnAbsolute(-145_deg, 0, {.gains={1.2, 0.2, 0.1}});
 	intakeRaiser.retract();
-	chassis.moveToPoint({80_in, 24_in}, 1100, {});
-	chassis.moveToPoint({77_in, 23_in}, 700, {.maxRPM=200_rpm});
+	chassis.moveToPoint({78_in, 23_in}, 0, {});
 	intakeRaiser.extend();
 
-	chassis.turnAbsolute(0_deg, 1400, {.gains={0.38, 0, 2}});
-	chassis.moveToPoint({46_in, 21_in}, 1200, {.reverse=true});
+	chassis.turnAbsolute(0_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	chassis.moveToPoint({46_in, 21_in}, 0, {.reverse=true});
 	clamp.retract();
 	intake.stop();
 	pros::delay(50);
 
-	chassis.turnAbsolute(-80_deg, 1000, {.gains={0.75, 0, 2}, .turnWheel=TurnWheel::LEFT});
-	chassis.moveToPoint({47_in, 50_in}, 1400, {.maxRPM=400_rpm, .reverse=true});
+	chassis.turnAbsolute(-70_deg, 0, {.gains={1.1, 0.1, 0.085}, .turnWheel=TurnWheel::LEFT});
+	chassis.moveToPoint({47_in, 50_in}, 0, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
 	intake.mogo();
 	pros::delay(50);
 
-	chassis.turnAbsolute(-170_deg, 1100, {.gains={0.4, 0, 2}});
-	chassis.moveToPoint({24_in, 43_in}, 0, {});
+	chassis.turnAbsolute(-165_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	chassis.moveToPoint({24_in, 42_in}, 0, {});
 	pros::delay(300);
-	chassis.moveToPoint({70_in, 55_in}, 0, {.minRPM=400_rpm, .reverse=true});
+	chassis.moveToPoint({60_in, 60_in}, 0, {.minRPM=400_rpm, .reverse=true});
 }
 void blueSoloAWP() {
 	odometry.update({80_in, 20_in, -130_deg});

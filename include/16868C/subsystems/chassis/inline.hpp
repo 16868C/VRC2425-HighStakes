@@ -31,7 +31,7 @@ struct TurnAbsoluteParams {
 	okapi::QAngularSpeed maxRPM = 600_rpm;
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
-	PIDGains gains = {0.8, 0.2, 0.06}; // {1.2, 0.2, 0.1}
+	PIDGains gains = {0.8, 0.2, 0.06}; // w/ goal: {1.2, 0.2, 0.1}, one wheel w/o goal: {1.1, 0.1, 0.08}
 
 	okapi::QAngle errorMargin = 1_deg;
 	okapi::QAngle angularVelThreshold = 5_deg; // per second
