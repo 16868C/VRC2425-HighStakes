@@ -8,7 +8,7 @@ void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A)
 	while (!master.getDigital(btn)) pros::delay(10);
 }
 void redRingAWPNoStake(){
-	odometry.update({46_in, 21_in, -90_deg});
+	odometry.update({46_in, 21_in, -90_deg});//for blue side it is 
 	inertial.set_rotation(-90_deg);
 	intake.setTargetRing(RingColour::RED);
 
@@ -16,13 +16,14 @@ void redRingAWPNoStake(){
 	clamp.extend();//clampontomogo
 	chassis.moveDistance(-4_in, -90_deg, 0, {.maxRPM=400_rpm, .distGains{0.15, 0, 0.009}});//backuppastthemogo
 	
-	pros::delay(200);
+	//pros::delay(200);
 	chassis.turnAbsolute(145_deg, 0, {.gains{1.2, 0.2, 0.1}});//turntopile
 	
 	intake.intake();//intakeon
 	
 	chassis.moveToPoint({26_in, 60_in}, 0, {.maxRPM=400_rpm});//intakerings
-	//chassis.moveToPoint()//backup
+	intake.stop();//intakeoff
+	chassis.moveToPoint()//backup
 	/*
 	chassis.moveToPoint()//gotolonelyring
 	chassis.turnAbsolute()//turntostakering
