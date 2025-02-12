@@ -3,6 +3,7 @@
 void redRingAWP();
 void redRingAWPNoStake();
 void blueRingAWP();
+void blueRingAWPNoStake();
 
 void redGoalAWP();
 void blueGoalAWP();

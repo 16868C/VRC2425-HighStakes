@@ -41,6 +41,38 @@ void redRingAWPNoStake(){
 	chassis.moveDistance(13_in, 90_deg, 0, {.maxRPM=300_rpm});//ram
 	*/
 }
+void blueRingAWPNoStake(){
+	odometry.update({46_in, 21_in, -90_deg});
+	inertial.set_rotation(-90_deg);
+	intake.setTargetRing(RingColour::BLUE);
+	 
+	chassis.moveDistance(-30_in, -90_deg, 0, {.minRPM=200_rpm, .distGains{0.15, 0, 0.009}, .exitDist=1.5_in});
+	clamp.extend();//clampontomogo
+	chassis.moveDistance(-4_in, -90_deg, 0, {.maxRPM=400_rpm, .distGains{0.15, 0, 0.009}});//backuppastthemogo
+	chassis.turnAbsolute(145_deg, 0, {.gains{1.2, 0.2, 0.1}});//turntopile
+	
+	intake.intake();//intakeon
+	
+	chassis.moveToPoint({26_in, 60_in}, 0, {.maxRPM=400_rpm});//intakerings
+	intake.stop();//intakeoff
+	chassis.moveToPoint()//backup
+	/*
+	chassis.moveToPoint()//gotolonelyring
+	chassis.turnAbsolute()//turntostakering
+
+	chassis.moveDistance()//gotostakering
+
+	pros::Task([&]{
+		intakeRaiser=retract();
+	});
+
+	intake.stop();
+	intakeRaiser=extend();
+
+	chassis.turnAbsolute(90_deg, 1000, {.gains={0.34, 0, 2}});//turntoladder
+	chassis.moveDistance(13_in, 90_deg, 0, {.maxRPM=300_rpm});//ram
+	*/
+}
 void redRingAWP() {
 	odometry.update({30_in, 21.5_in, 90_deg});
 	inertial.set_rotation(90_deg);
