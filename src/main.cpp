@@ -57,7 +57,7 @@ void opcontrol() {
 
 	// chassis.turnAbsolute(180_deg, 0, {.gains={1.2, 0.2, 0.1}});
 
-	// chassis.turnAbsolute(45_deg, 0, {.gains={1.1, 0.1, 0.08}, .turnWheel=TurnWheel::LEFT});
+	// chassis.turnAbsolute(90_deg, 0, {.gains={1.25, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 
 	// for (int i = 1; i <= 4; i++) {
 	// 	double t, a, v;
