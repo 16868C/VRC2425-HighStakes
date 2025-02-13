@@ -60,7 +60,7 @@ void Intake::intakeManager(void* param) {
 		}
 
 		if (intake->state == IntakeState::HOLDING) {
-			intakePID.setGains({0.004, 0, 0});
+			intakePID.setGains({0.004, 0, 0.001});
 		} else {
 			tgtHook = -1;
 		}

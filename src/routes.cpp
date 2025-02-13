@@ -23,7 +23,7 @@ void redRingAWPNoStake(){
 	
 	chassis.moveToPoint({26_in, 60_in}, 0, {.maxRPM=400_rpm});//intakerings
 	intake.stop();//intakeoff
-	chassis.moveToPoint()//backup
+	// chassis.moveToPoint()//backup
 	/*
 	chassis.moveToPoint()//gotolonelyring
 	chassis.turnAbsolute()//turntostakering
@@ -55,7 +55,7 @@ void blueRingAWPNoStake(){
 	
 	chassis.moveToPoint({26_in, 60_in}, 0, {.maxRPM=400_rpm});//intakerings
 	intake.stop();//intakeoff
-	chassis.moveToPoint()//backup
+	// chassis.moveToPoint()//backup
 	/*
 	chassis.moveToPoint()//gotolonelyring
 	chassis.turnAbsolute()//turntostakering

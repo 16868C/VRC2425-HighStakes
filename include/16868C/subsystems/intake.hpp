@@ -60,7 +60,7 @@ class Intake {
 		const double TPR = 4199.2; // 10.74 * 360;
 		const std::array<double, 5> HOOK_TICKS = {0, 1079.8, 2 * 1079.8, 2 * 1079.8 + 1019.8, 2 * (1079.8 + 1019.8)};
 		const std::array<double, 4> EJECT_POS = {2050, 3070, 4070, 1010};
-		const double REDIRECT_POS = 370;
+		const double REDIRECT_POS = 340;
 		const std::array<double, 4> HOLD_POS = {1650, 2820, 3830, 660};
 		const double ERROR_MARGIN = 0;
 
