@@ -7,7 +7,7 @@ using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
-	PIDController intakePID({0.004, 0, 0});
+	PIDController intakePID({0.002, 0, 0.001});
 
 	intake->color.setLedPWM(100);
 	
@@ -65,7 +65,7 @@ void Intake::intakeManager(void* param) {
 			tgtHook = -1;
 		}
 		if (intake->state == IntakeState::REDIRECT) {
-			intakePID.setGains({0.03, 0, 0.005});
+			intakePID.setGains({0.03, 0, 0.001});
 		}
 
 		// if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {

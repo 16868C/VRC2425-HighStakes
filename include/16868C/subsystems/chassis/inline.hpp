@@ -32,7 +32,7 @@ struct TurnAbsoluteParams {
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
 	/*
-	two wheel w/ goal: {0.8, 0.2, 0.06}
+	two wheel w/o goal: {0.8, 0.2, 0.06}
 	two wheel w/ goal: {1.2, 0.2, 0.1}
 	one wheel w/o goal: {1.1, 0.1, 0.08}
 	one wheel w/ goal: {1.25, 0.1, 0.12}
