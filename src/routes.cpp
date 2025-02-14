@@ -12,21 +12,26 @@ void redRingAWPNoStake(){
 	inertial.set_rotation(-90_deg);
 	intake.setTargetRing(RingColour::RED);
 
-	chassis.moveDistance(-30_in, -90_deg, 0, {.minRPM=200_rpm, .distGains{0.15, 0, 0.009}, .exitDist=1.5_in});
+	chassis.moveDistance(-31_in, -90_deg, 0, {.minRPM=200_rpm, .distGains{0.15, 0, 0.009}, .exitDist=1.5_in});
 	clamp.extend();//clampontomogo
-	chassis.moveDistance(-4_in, -90_deg, 0, {.maxRPM=400_rpm, .distGains{0.15, 0, 0.009}});//backuppastthemogo
+	chassis.moveDistance(-3_in, -90_deg, 0, {.maxRPM=400_rpm, .distGains{0.15, 0, 0.009}});//backuppastthemogo
 	
 	//pros::delay(200);
 	chassis.turnAbsolute(145_deg, 0, {.gains{1.2, 0.2, 0.1}});//turntopile
-	
-	intake.intake();//intakeon
-	
-	chassis.moveToPoint({26_in, 60_in}, 0, {.maxRPM=400_rpm});//intakerings
-	intake.stop();//intakeoff
-	// chassis.moveToPoint()//backup
-	/*
-	chassis.moveToPoint()//gotolonelyring
-	chassis.turnAbsolute()//turntostakering
+	chassis.moveDistance(7_in, 145_deg, 0, {.distGains{0.15, 0, 0.009}});//intakerings
+	chassis.turnAbsolute(180_deg, 0, {.gains{1.2, 0.2, 0.1}, .turnWheel=TurnWheel::RIGHT});//turntopile
+	intake.mogo();//intakeon
+	chassis.moveDistance(22_in, 180_deg, 0, {.maxRPM=300_rpm, .distGains{0.19, 0, 0.009}});//intakerings
+	pros::Task([&]{
+		pros::delay(4000);
+		intake.stop();
+	});//intakeoff
+
+	chassis.turnAbsolute(170_deg, 0, {.gains{1.2, 0.2, 0.1}});//turnback
+	chassis.moveDistance(22_in, 170_deg, 0, {.distGains{0.19, 0, 0.009}});//backtfupforthelonelyring
+	intake.mogo();//intakeon
+	chassis.moveToPoint({23_in, 47_in}, 0, {.maxRPM=400_rpm, });//intakerings
+	/*chassis.turnAbsolute()//turntostakering
 
 	chassis.moveDistance()//gotostakering
 
