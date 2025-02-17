@@ -60,7 +60,7 @@ void Intake::intakeManager(void* param) {
 		}
 
 		if (intake->state == IntakeState::HOLDING) {
-			intakePID.setGains({0.004, 0, 0.001});
+			intakePID.setGains({0.0035, 0, 0.001});
 		} else {
 			tgtHook = -1;
 		}
@@ -222,7 +222,7 @@ RingColour Intake::getColour() {
 	if (color.getProximity() < 150) return RingColour::NONE;
 
 	if (color.getHue() > 200) return RingColour::BLUE;
-	if (color.getHue() < 50) return RingColour::RED;
+	if (color.getHue() < 80) return RingColour::RED;
 	return RingColour::NONE;
 }
 int Intake::getCurrHook() {

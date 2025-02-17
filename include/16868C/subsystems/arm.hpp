@@ -10,7 +10,7 @@ enum class ArmPosition {
 	DEFAULT = 0,
 	DESECORE_STAKE = 20,
 	ALLIANCE_STAKE = 36,
-	WALL_STAKE = 53
+	WALL_STAKE = 54
 };
 
 class Arm {

@@ -1,19 +1,16 @@
 #pragma once
 
-void redRingAWP();
-void redRingAWPNoStake();
-void blueRingAWP();
-void blueRingAWPNoStake();
+void redRingStake();
+void blueRingStake();
+void redRingRush();
+void blueRingRush();
 
-void redGoalAWP();
-void blueGoalAWP();
+void redGoalStake();
+void blueGoalStake();
+void redGoalRush();
+void blueGoalRush();
 
 void redSoloAWP();
 void blueSoloAWP();
-
-void redGoalSide();
-void blueGoalSide();
-
-void redGoalCorner();
 
 void skills();

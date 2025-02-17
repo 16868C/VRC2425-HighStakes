@@ -12,17 +12,16 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	auton.add(1, "redGoalAWP", redGoalAWP);
-	auton.add(2, "blueGoalAWP", blueGoalAWP);
-	auton.add(3, "redRingAWP", redRingAWP);
-	auton.add(4, "blueRingAWP", blueRingAWP);
-	auton.add(5, "redGoalSide", redGoalSide);
-	auton.add(6, "blueGoalSide", blueGoalSide);
-	auton.add(7, "redSoloAWP", redSoloAWP);
-	auton.add(8, "blueSoloAWP", blueSoloAWP);
-	auton.add(9, "redGoalCorner", redGoalCorner); //skills
-	auton.add(10, "redRingAWPNoStake", redRingAWPNoStake);
-	//auton.add(#, "blueRingAWPNoStake", blueRingAWPNoStake);
+	auton.add(1, "redSoloAWP", redSoloAWP);
+	auton.add(2, "blueSoloAWP", blueSoloAWP);
+	auton.add(3, "redGoalRush", redGoalRush);
+	auton.add(4, "blueGoalRush", blueGoalRush);
+	auton.add(5, "redGoalStake", redGoalStake);
+	auton.add(6, "blueGoalStake", blueGoalStake);
+	auton.add(7, "redRingRush", redRingRush);
+	auton.add(8, "blueRingRush", blueRingRush);
+	auton.add(9, "redRingStake", redRingStake);
+	auton.add(10, "blueRingStake", blueRingStake);
 	auton.start();
 
 	armEnc.resetZero();
@@ -98,6 +97,9 @@ void opcontrol() {
 		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
 		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
 		chassis.driveTank(left, right);
+		// double fwd = master.getAnalog(okapi::ControllerAnalog::leftY);
+		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
+		// chassis.driveArcade(fwd, turn);
 
 		if (!shift.isPressed()) {
 			if (intakeTgl.changedToPressed()) {
@@ -213,7 +215,7 @@ void opcontrol() {
 		std::string rightDriveTemp = std::to_string((int) std::max(rightDrive.getTemperature() / 5 - 7, 0.0));
 		std::string intakeFirstTemp = std::to_string((int) std::max(intakeFirst.getTemperature() / 5 - 7, 0.0));
 		std::string intakeSecondTemp = std::to_string((int) std::max(intakeSecond.getTemperature() / 5 - 7, 0.0));
-		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
+		// master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
 
 		pros::delay(20);
 	}
