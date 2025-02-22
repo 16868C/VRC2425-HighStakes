@@ -215,7 +215,7 @@ void opcontrol() {
 		std::string rightDriveTemp = std::to_string((int) std::max(rightDrive.getTemperature() / 5 - 7, 0.0));
 		std::string intakeFirstTemp = std::to_string((int) std::max(intakeFirst.getTemperature() / 5 - 7, 0.0));
 		std::string intakeSecondTemp = std::to_string((int) std::max(intakeSecond.getTemperature() / 5 - 7, 0.0));
-		// master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
+		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
 
 		pros::delay(20);
 	}

@@ -60,12 +60,12 @@ void Intake::intakeManager(void* param) {
 		}
 
 		if (intake->state == IntakeState::HOLDING) {
-			intakePID.setGains({0.0035, 0, 0.001});
+			intakePID.setGains({0.0038, 0, 0.001});
 		} else {
 			tgtHook = -1;
 		}
 		if (intake->state == IntakeState::REDIRECT) {
-			intakePID.setGains({0.03, 0, 0.001});
+			intakePID.setGains({0.032, 0, 0});
 		}
 
 		// if (intake->state == IntakeState::INTAKE && intake->ring.get_value() < 2000) {
@@ -76,7 +76,7 @@ void Intake::intakeManager(void* param) {
 			tgtHook = prevHook;
 		}
 
-		double redirectError = encPos - intake->HOOK_TICKS[intake->getRedirectHook()] - intake->REDIRECT_POS;
+		double redirectError = encPos - intake->REDIRECT_POS[intake->getRedirectHook()];
 		double holdError = encPos - (tgtHook == -1 ? 0 : intake->HOLD_POS[tgtHook]);
 		// std::cout << encPos << " " << intake->getRedirectHook() << " " << intake->HOOK_TICKS[intake->getRedirectHook()] << "\n";
 		if (intake->state == IntakeState::REDIRECT && abs(redirectError) > intake->ERROR_MARGIN) {
@@ -86,6 +86,7 @@ void Intake::intakeManager(void* param) {
 		} else if (intake->state == IntakeState::REDIRECT || intake->state == IntakeState::HOLDING) {
 			intake->secondStage.moveVoltage(0);
 		}
+		std::cout << redirectError << "\n";
 
 		if (intake->isJamming()) n++;
 		else n = 0;
@@ -143,10 +144,10 @@ void Intake::stop() {
 		});
 		return;
 	}
-	if (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100) {
+	if (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS[getRedirectHook()]) < 100) {
 		pros::Task([&] {
 			do pros::delay(50);
-			while (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS) < 100);
+			while (std::abs(ReduceAngle::reduce(enc.get(), TPR, 0.0) - HOOK_TICKS[getRedirectHook()] + REDIRECT_POS[getRedirectHook()]) < 100);
 			stop();
 		});
 		return;
