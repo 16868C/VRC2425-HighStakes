@@ -472,5 +472,19 @@ void blueRingStake() {
 }
 
 void skills() {
+	odometry.init({72_in, 10_in, 90_deg});
+	intake.setTargetRing(RingColour::RED);
 
+	intake.mogo();
+	pros::delay(700);
+	intake.outtake();
+	chassis.moveDistance(14_in, 90_deg, 0, {});
+	intake.stop();
+	std::cout << odometry.getPose().toStr() << "\n";
+	chassis.turnAbsolute(0_deg, 0, {.gains={0.7, 0.2, 0.06}});
+	std::cout << odometry.getPose().toStr() << "\n";
+
+	chassis.moveToPoint({48_in, 26_in}, 0, {.minRPM=300_rpm, .earlyExitRadius=3_in, .reverse=true});
+	clamp.extend();
+	chassis.moveDistance(-4_in, 0_deg, 0, {});
 }

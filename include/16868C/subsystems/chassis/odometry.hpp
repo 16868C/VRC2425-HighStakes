@@ -32,6 +32,8 @@ class Odometry {
 		Odometry(DistanceSensor front, DistanceSensor right, DistanceSensor rear, DistanceSensor left, Inertial* inertial);
 		Odometry(Odometry& odom);
 
+		void calibrate();
+
 		void init();
 		void init(Pose pose);
 

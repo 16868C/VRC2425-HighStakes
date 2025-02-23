@@ -26,7 +26,7 @@ void initialize() {
 
 	armEnc.resetZero();
 	intakeEnc.resetZero();
-	odometry.init();
+	odometry.calibrate();
 }
 
 void disabled() {}
@@ -36,7 +36,8 @@ void competition_initialize() {}
 void autonomous() {
 	uint st = pros::millis();
 
-	auton.run();
+	// auton.run();
+	skills();
 	
 	printDebug("Auton took %d ms\n", pros::millis() - st);
 }
@@ -100,6 +101,11 @@ void opcontrol() {
 		// double fwd = master.getAnalog(okapi::ControllerAnalog::leftY);
 		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
 		// chassis.driveArcade(fwd, turn);
+
+		if (okapi::ControllerButton(okapi::ControllerDigital::A).changedToPressed()) {
+			std::cout << vertEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << vertEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) / 10 << "\n";
+			std::cout << hortEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << hortEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) / 10 << "\n";
+		}
 
 		if (!shift.isPressed()) {
 			if (intakeTgl.changedToPressed()) {

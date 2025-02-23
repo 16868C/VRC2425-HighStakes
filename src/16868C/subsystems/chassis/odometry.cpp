@@ -32,10 +32,14 @@ double DistanceSensor::getConfidence() const {
 
 /* -------------------------------- Main Loop ------------------------------- */
 void Odometry::odomManager(void* param) {
-	std::array<double, 4> prev;
-	prev.fill(0);
+	while (!pros::Task::notify_take(true, 0)) pros::delay(50);
 
 	Odometry* odom = static_cast<Odometry*>(param);
+
+	std::array<double, 4> prev;
+	for (int i = 0; i < 3; i++) prev[i] = odom->trackingWheels[i]->getDist();
+	if (!odom->inertial) prev[3] = (prev[1] - prev[0]) / (odom->trackingWheels[0]->getOffset() + odom->trackingWheels[1]->getOffset());
+	else prev[3] = odom->inertial->get_rotation(AngleUnit::RAD);
 	
 	uint32_t time = pros::millis();
 	int n = 1;
@@ -88,26 +92,18 @@ Odometry::Odometry(std::array<TrackingWheel, 3> trackingWheels, std::array<Dista
 	rearDist = distanceSensors[2];
 	leftDist = distanceSensors[3];
 	this->distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
-
-	odomTask.suspend();
 }
 Odometry::Odometry(TrackingWheel left, TrackingWheel right, TrackingWheel middle)
 	: leftEnc(left), rightEnc(right), middleEnc(middle) {
 	this->trackingWheels = { &leftEnc, &rightEnc, &middleEnc };
-
-	odomTask.suspend();
 }
 Odometry::Odometry(TrackingWheel left, TrackingWheel right, TrackingWheel middle, Inertial* inertial)
 	: leftEnc(left), rightEnc(right), middleEnc(middle), inertial(inertial) {
 	this->distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
-
-	odomTask.suspend();
 }
 Odometry::Odometry(DistanceSensor front, DistanceSensor right, DistanceSensor rear, DistanceSensor left, Inertial* inertial)
 	: frontDist(front), rightDist(right), rearDist(rear), leftDist(left), inertial(inertial) {
 	this->distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
-
-	odomTask.suspend();
 }
 Odometry::Odometry::Odometry(Odometry& odom) {
 	leftEnc = odom.leftEnc;
@@ -122,26 +118,26 @@ Odometry::Odometry::Odometry(Odometry& odom) {
 	this->distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
 
 	inertial = odom.inertial;
-
-	odomTask.suspend();
 }
 
 /* --------------------------- Initialize Methods --------------------------- */
-void Odometry::init() {
-	init({ 0_in, 0_in, 0_rad, 0 });
-}
-void Odometry::init(Pose pose) {
+void Odometry::calibrate() {
 	// Resetting sensors
 	pros::delay(500); // Just in case the sensors have not been initialized yet
 	for (int i = 0; i < 3; i++) trackingWheels[i]->reset();
 	inertial->calibrate();
+}
 
+void Odometry::init() {
+	init({ 0_in, 0_in, 0_rad, 0 });
+}
+void Odometry::init(Pose pose) {
 	// Resetting pose
 	update(pose);
 	inertial->set_rotation(pose.theta * okapi::radian);
 
 	// Starting task
-	odomTask.resume();
+	odomTask.notify();
 }
 
 /* -------------------------- Pose Related Methods -------------------------- */
@@ -269,11 +265,15 @@ void Odometry::resetSensors() {
 
 /* ---------------------------- Main calculations --------------------------- */
 void Odometry::step(std::array<double, 4> deltas) {
-	for (double d : deltas) {
-		if (std::abs(d) > MAX_DELTA) {
-			std::cerr << "Odometry delta too large: " << d << "\n";
+	for (int i = 0; i < 3; i++) {
+		if (std::abs(deltas[i]) > MAX_DELTA) {
+			std::cerr << "Odometry delta too large: " << deltas[i] << "\"\n";
 			return;
 		}
+	}
+	if (std::abs(deltas[4]) > (20_deg).convert(okapi::radian)) {
+		std::cerr << "Odometry delta too large: " << deltas[4] << " deg\n";
+		return;
 	}
 
 	// Delta Distances
@@ -307,5 +307,6 @@ void Odometry::step(std::array<double, 4> deltas) {
 	double globalX = pose.x + globalDeltaX;
 	double globalY = pose.y + globalDeltaY;
 	double globalTheta = inertial->get_rotation(AngleUnit::RAD);
+	// std::cout << deltaL << " " << deltaM << " " << deltaA << " " << localOffsetX << " " << localOffsetY << " " << globalDeltaX << " " << globalDeltaY << " " << pose.x << " " << pose.y << "\n";
 	update({globalX, globalY, globalTheta, pros::millis()});
 }

@@ -80,6 +80,7 @@ extern pros::adi::Pneumatics claw;
 // Sensors
 extern lib16868C::Inertial inertial;
 extern lib16868C::Rotation hortRot;
+extern lib16868C::TrackingWheel vertEnc;
 extern lib16868C::TrackingWheel hortEnc;
 
 extern lib16868C::Rotation intakeEnc;
