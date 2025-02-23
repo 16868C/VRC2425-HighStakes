@@ -86,7 +86,7 @@ void Intake::intakeManager(void* param) {
 		} else if (intake->state == IntakeState::REDIRECT || intake->state == IntakeState::HOLDING) {
 			intake->secondStage.moveVoltage(0);
 		}
-		std::cout << redirectError << "\n";
+		// std::cout << redirectError << "\n";
 
 		if (intake->isJamming()) n++;
 		else n = 0;

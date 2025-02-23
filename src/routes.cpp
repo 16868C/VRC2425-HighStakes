@@ -136,12 +136,12 @@ void redGoalRush() {
 	odometry.update({104_in, 19_in, 56_deg});
 	inertial.set_rotation(56_deg);
 	intake.setTargetRing(RingColour::RED);
-
+	int st = pros::millis();
 	intake.intake();
 	doinker.extend();
 	claw.extend();
-	chassis.moveToPoint({116_in, 44_in}, 750, {.minRPM=600_rpm, .earlyExitRadius=3_in});
-	chassis.moveToPoint({123_in, 63_in}, 450, {.minRPM=200_rpm, .headingGains={0.7, 0, 0.01}});
+	chassis.moveToPoint({118_in, 44_in}, 750, {.minRPM=600_rpm, .earlyExitRadius=3_in});
+	chassis.moveToPoint({124_in, 63_in}, 450, {.minRPM=200_rpm, .headingGains={0.7, 0, 0.01}});
 	claw.retract();
 
 	pros::Task([&] {
@@ -154,7 +154,7 @@ void redGoalRush() {
 	doinker.retract();
 	claw.retract();
 	
-	chassis.moveToPoint({127_in, 60_in}, 1250, {.maxRPM=400_rpm, .reverse=true});
+	chassis.moveToPoint({125_in, 60_in}, 1250, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
 	intake.mogo();
 	pros::delay(600);
@@ -170,29 +170,30 @@ void redGoalRush() {
 
 	// intakeRaiser.retract();
 	// chassis.turnAbsolute(223_deg, 1150, {.gains={1.2, 0.2, 0.1}});
-	// intake.mogo();
+	// intake.mogo()
 	// chassis.moveDistance(24_in, 225_deg, 850, {});
 	// chassis.moveToPoint({81_in, 32_in}, 0, {});
 	// pros::delay(300);
 	// intakeRaiser.extend();
 
-	chassis.moveToPoint({125_in, 34_in}, 1300, {.minRPM=200_rpm, .earlyExitRadius=2_in});
+	chassis.moveToPoint({128_in, 34_in}, 1300, {.minRPM=200_rpm, .earlyExitRadius=2_in});
 	// chassis.moveToPoint({138_in, 40_in}, 1150, {.reverse=true});
 	doinker.extend();
 	claw.extend();
-	chassis.turnAbsolute(-80_deg, 1100, {.gains={1.5, 0.1, 0.12}, .errorMargin=2_deg, .turnWheel=TurnWheel::RIGHT});
+	chassis.turnAbsolute(-70_deg, 1100, {.gains={1.2, 0.1, 0.12}, .errorMargin=2_deg, .turnWheel=TurnWheel::RIGHT});
 	chassis.moveToPoint({150_in, 20_in}, 900, {.minRPM=600_rpm});
 	chassis.turnAbsolute(250_deg, 1200, {.minRPM=300_rpm, .gains={1.6, 0.1, 0.12}, .errorMargin=3_deg, .turnWheel=TurnWheel::RIGHT});
 	doinker.retract();
 	claw.retract();
 	chassis.turnAbsolute(160_deg, 1500, {.gains={1.2, 0.2, 0.1}, .errorMargin=3_deg, .turnWheel=TurnWheel::LEFT});
 	clamp.retract();
-	// intake.intake();
-	// chassis.moveToPoint({92_in, 51_in}, 0, {.maxRPM=400_rpm});
+	intake.intake();
+	std::cout << pros::millis()-st << "\n";
+	chassis.moveToPoint({87_in, 63_in}, 0, {.maxRPM=400_rpm});
 
-	chassis.turnAbsolute(-90_deg, 1500, {.gains={1.25, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
-	chassis.moveToPoint({127_in, 60_in}, 1500, {.maxRPM=400_rpm, .reverse=true});
-	clamp.extend();
+	// chassis.turnAbsolute(-90_deg, 1500, {.gains={1.25, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
+	// chassis.moveToPoint({127_in, 60_in}, 1500, {.maxRPM=400_rpm, .reverse=true});
+	// clamp.extend();
 }
 void blueGoalRush() {
 	odometry.update({12_in, 20_in, 67_deg});
