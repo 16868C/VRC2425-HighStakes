@@ -9,6 +9,7 @@ void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A)
 }
 
 void redSoloAWP() {
+	//initialize
 	odometry.update({81_in, 21_in, -130_deg});
 	inertial.set_rotation(-130_deg);
 	intake.setTargetRing(RingColour::RED);
@@ -133,10 +134,13 @@ void blueSoloAWP() {
 }
 
 void redGoalRush() {
+	//initialize
 	odometry.update({104_in, 19_in, 56_deg});
 	inertial.set_rotation(56_deg);
 	intake.setTargetRing(RingColour::RED);
 	int st = pros::millis();
+
+	//goal rush
 	intake.intake();
 	doinker.extend();
 	claw.extend();
@@ -148,26 +152,31 @@ void redGoalRush() {
 		pros::delay(900);
 		claw.extend();
 	});
+
+	//move goal back and clamp
 	chassis.moveToPoint({110_in, 38_in}, 1300, {.reverse=true});//30_in
 	intake.stop();
 	chassis.turnAbsolute(230_deg, 1150, {.dir=TurnDirection::CW});
 	doinker.retract();
 	claw.retract();
-	
 	chassis.moveToPoint({125_in, 60_in}, 1250, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
+
+	//ring intake 1
 	intake.mogo();
 	pros::delay(600);
 	intake.intake();
-
 	clamp.retract();
 	intake.stop();
+
+	//grab other mogo ring intake 2
 	chassis.turnAbsolute(-15_deg, 1100, {.gains={1.1, 0.1, 0.08}, .turnWheel=TurnWheel::RIGHT});
 	chassis.moveToPoint({95_in, 55_in}, 1150, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
 	pros::delay(50);
 	intake.mogo();
 
+	//grab stake ring intake
 	// intakeRaiser.retract();
 	// chassis.turnAbsolute(223_deg, 1150, {.gains={1.2, 0.2, 0.1}});
 	// intake.mogo()
@@ -176,6 +185,7 @@ void redGoalRush() {
 	// pros::delay(300);
 	// intakeRaiser.extend();
 
+	//corner clear
 	chassis.moveToPoint({128_in, 34_in}, 1300, {.minRPM=200_rpm, .earlyExitRadius=2_in});
 	// chassis.moveToPoint({138_in, 40_in}, 1150, {.reverse=true});
 	doinker.extend();
@@ -185,6 +195,8 @@ void redGoalRush() {
 	chassis.turnAbsolute(250_deg, 1200, {.minRPM=300_rpm, .gains={1.6, 0.1, 0.12}, .errorMargin=3_deg, .turnWheel=TurnWheel::RIGHT});
 	doinker.retract();
 	claw.retract();
+
+	//ladder touch
 	chassis.turnAbsolute(160_deg, 1500, {.gains={1.2, 0.2, 0.1}, .errorMargin=3_deg, .turnWheel=TurnWheel::LEFT});
 	clamp.retract();
 	intake.intake();
@@ -196,10 +208,12 @@ void redGoalRush() {
 	// clamp.extend();
 }
 void blueGoalRush() {
+	//initialize
 	odometry.update({12_in, 20_in, 67_deg});
 	inertial.set_rotation(67_deg);
 	intake.setTargetRing(RingColour::BLUE);
 
+	//goal rush
 	intake.intake();
 	doinker.extend();
 	claw.extend();
@@ -211,26 +225,31 @@ void blueGoalRush() {
 		pros::delay(900);
 		claw.extend();
 	});
+
+	//move goal back and clamp
 	chassis.moveToPoint({21_in, 38_in}, 1300, {.reverse=true});//30_in
 	intake.stop();
 	chassis.turnAbsolute(-80_deg, 1150, {.dir=TurnDirection::CW});
 	doinker.retract();
 	claw.retract();
-	
 	chassis.moveToPoint({21_in, 63_in}, 1250, {.maxRPM=400_rpm, .reverse=true});
+
+	//ring intake 1
 	clamp.extend();
 	intake.mogo();
 	pros::delay(600);
 	intake.intake();
-
 	clamp.retract();
 	intake.stop();
+
+	//grab other mogo ring intake 2
 	chassis.turnAbsolute(200_deg, 1100, {.gains={1.1, 0.1, 0.08}, .turnWheel=TurnWheel::LEFT});
 	chassis.moveToPoint({50_in, 55_in}, 1150, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
 	pros::delay(50);
 	intake.mogo();
 
+	//grab stake ring intake
 	// intakeRaiser.retract();
 	// chassis.turnAbsolute(-35_deg, 1150, {.gains={1.2, 0.2, 0.1}});
 	// intake.mogo();
@@ -239,6 +258,7 @@ void blueGoalRush() {
 	// pros::delay(300);
 	// intakeRaiser.extend();
 
+	//corner clear
 	chassis.turnAbsolute(-90_deg, 0, {.gains={1.2, 0.2, 0.1}});
 	doinker.extend();
 	claw.extend();
@@ -250,6 +270,8 @@ void blueGoalRush() {
 	chassis.turnAbsolute(90_deg, 0, {.gains={1.2, 0.2, 0.12}, .errorMargin=3_deg, .turnWheel=TurnWheel::LEFT});
 	clamp.retract();
 	intake.intake();
+
+	//ladder touch
 	// chassis.moveToPoint({52_in, 51_in}, 0, {.maxRPM=400_rpm});
 	chassis.turnAbsolute(-90_deg, 1500, {.gains={0.8, 0.2, 0.06}});
 	chassis.moveToPoint({21_in, 63_in}, 1500, {.reverse=true});
@@ -257,10 +279,12 @@ void blueGoalRush() {
 }
 
 void redGoalStake() {
+	//initialize
 	odometry.update({81_in, 21_in, -130_deg});
 	inertial.set_rotation(-130_deg);
 	intake.setTargetRing(RingColour::RED);
 
+	//stake
 	pto.retract();
 	pros::delay(300);
 	arm.allianceStake();
