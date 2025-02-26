@@ -519,7 +519,7 @@ void skills() {
 	chassis.turnAbsolute(90_deg, 0, {.gains={0.82, 0.2, 0.07}});
 	//intake.redirect();
 	intake.mogo();
-	chassis.moveDistance(25_in, 90_deg, 0, {.minRPM=200_rpm, .headingGains={0.6, 0, 0}, .exitDist=1_in});
+	chassis.moveDistance(23_in, 90_deg, 0, {.minRPM=200_rpm, .headingGains={0.2, 0, 0}, .exitDist=1_in});
 
 	chassis.turnAbsolute(154_deg, 0, {.gains={1.5, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 	intake.mogo();
@@ -534,7 +534,7 @@ void skills() {
 	// arm.wallStake();
 	chassis.turnAbsolute(-90_deg, 0, {.gains={1.2, 0.2, 0.1}});
 	chassis.moveDistance(35_in, -90_deg, 0, {.maxRPM=400_rpm, .minRPM=200_rpm, .distGains{0.17, 0, 0.01}, .headingGains={0, 0, 0}, .exitDist=2_in});
-	chassis.moveDistance(17_in, -90_deg, 0, {.maxRPM=200_rpm, .distGains{0.25, 0, 0.01}, .headingGains={0, 0, 0}});
+	chassis.moveDistance(19_in, -90_deg, 0, {.maxRPM=200_rpm, .distGains{0.25, 0, 0.01}, .headingGains={0, 0, 0}});
 	pros::delay(200);
 	chassis.turnAbsolute(180_deg, 0, {.gains={1.24, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 	chassis.moveDistance(16_in, 180_deg, 0, {});
@@ -556,7 +556,7 @@ void skills() {
 
 	//2/4
 	chassis.moveToPoint({88_in, 23_in},0, {.minRPM=100_rpm, .earlyExitRadius=2_in, .reverse=true});
-	chassis.moveDistance(-5_in, 180_deg, 0, {.maxRPM=300_rpm});
+	chassis.moveDistance(-5_in, 180_deg, 0, {.maxRPM=300_rpm, .distGains={0.15, 0, 0.01}});
 
 	// chassis.moveDistance(-73_in, 180_deg, 0, {.maxRPM=450_rpm, .minRPM=200_rpm, .headingGains={0.05, 0.05, 0.01}, .exitDist=2.5_in});
 	clamp.extend();
@@ -570,6 +570,18 @@ void skills() {
 
 	chassis.turnAbsolute(-90_deg, 0, {.gains={1.2, 0.2, 0.1}});
 	chassis.moveDistance(35_in, -90_deg, 0, {.maxRPM=400_rpm, .minRPM=200_rpm, .distGains{0.17, 0, 0.01}, .headingGains={0, 0, 0}, .exitDist=2_in});
-	chassis.moveDistance(17_in, -90_deg, 0, {.maxRPM=200_rpm, .distGains{0.25, 0, 0.01}, .headingGains={0, 0, 0}});
+	chassis.moveDistance(19_in, -90_deg, 0, {.maxRPM=200_rpm, .distGains{0.25, 0, 0.01}, .headingGains={0, 0, 0}});
 	pros::delay(200);
+	chassis.turnAbsolute(0_deg, 0, {.gains={1.24, 0.1, 0.12}, .turnWheel=TurnWheel::LEFT});
+	chassis.moveDistance(16_in, 0_deg, 0, {});
+	
+	pros::delay(400);
+	chassis.turnAbsolute(130_deg, 0, {.gains={1.24, 0.1, 0.12}});
+	//intake.stop();
+	chassis.moveDistance(-13_in, 130_deg, 500, {});//can be tuned if no time currently using timeout 
+	intake.outtake();
+	pros::delay(100);
+	clamp.retract();
+
+	chassis.moveDistance(10_in, 130_deg, 0, {.distGains={0.17, 0, 0.01}});
 }
