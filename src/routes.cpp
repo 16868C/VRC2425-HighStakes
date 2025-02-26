@@ -499,6 +499,7 @@ void skills() {
 	odometry.init({72_in, 10_in, 90_deg});
 	intake.setTargetRing(RingColour::RED);
 
+	//1/4
 	intake.mogo();
 	pros::delay(700);
 	intake.outtake();
@@ -518,7 +519,7 @@ void skills() {
 	intake.mogo();
 	chassis.moveDistance(24_in, 90_deg, 0, {});
 
-	chassis.turnAbsolute(149_deg, 0, {.gains={1.25, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
+	chassis.turnAbsolute(149_deg, 0, {.gains={1.24, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 	intake.mogo();
 	chassis.moveDistance(34_in, 149_deg, 0, {});
 
@@ -529,28 +530,32 @@ void skills() {
 	// intake.stop();
 	// pto.retract();
 	// arm.wallStake();
-	chassis.turnAbsolute(-90_deg, 0, {.gains={1.25, 0.1, 0.12}});
+	chassis.turnAbsolute(-90_deg, 0, {.gains={1.2, 0.2, 0.1}});
 	chassis.moveDistance(53_in, -90_deg, 0, {.maxRPM=230_rpm, .distGains{0.17, 0, 0.01}});
 	pros::delay(200);
-	chassis.turnAbsolute(180_deg, 0, {.gains={1.25, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
+	chassis.turnAbsolute(180_deg, 0, {.gains={1.24, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 	chassis.moveDistance(12_in, 180_deg, 0, {});
 	// pros::Task([&] {
 	// 	pros::delay(500);
 	// 	intake.stop();
 	// });
 	pros::delay(1200);
-	chassis.turnAbsolute(70_deg, 0, {.gains={1.25, 0.1, 0.12}});
+	chassis.turnAbsolute(70_deg, 0, {.gains={1.24, 0.1, 0.12}});
 	//intake.stop();
 	chassis.moveDistance(-18_in, 70_deg, 500, {});//can be tuned if no time currently using timeout 
 	clamp.retract();
 
-	chassis.moveDistance(10_in, 70_deg, 0, {});
+	chassis.moveDistance(10_in, 70_deg, 0, {.distGains={0.14, 0, 0.01}});
 	chassis.turnAbsolute(180_deg, 0, {});
 
 	//2/4
-	chassis.moveToPoint({95_in, 23_in},0, {.earlyExitRadius=3_in, .reverse=true});
+	chassis.moveToPoint({92_in, 23_in},0, {.maxRPM=450_rpm, .earlyExitRadius=3_in, .reverse=true});
 
 	// chassis.moveDistance(-73_in, 180_deg, 0, {.maxRPM=450_rpm, .minRPM=200_rpm, .headingGains={0.05, 0.05, 0.01}, .exitDist=2.5_in});
 	clamp.extend();
-	chassis.moveDistance(-3_in, 180_deg, 0, {.headingGains={0, 0, 0}});
+	//chassis.moveDistance(-3_in, 180_deg, 0, {.headingGains={0, 0, 0}});
+	chassis.turnAbsolute(90_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	intake.mogo();
+	chassis.moveDistance(15_in, 90_deg, 0, {});
+	chassis.turnAbsolute(45_deg, 0, {.gains={1.2, 0.2, 0.1}});
 }
