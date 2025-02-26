@@ -499,63 +499,77 @@ void skills() {
 	odometry.init({72_in, 10_in, 90_deg});
 	intake.setTargetRing(RingColour::RED);
 
+	uint st = pros::millis();
+
 	//1/4
 	intake.mogo();
 	pros::delay(700);
 	intake.outtake();
-	chassis.moveDistance(14.5_in, 90_deg, 0, {});
+	chassis.moveDistance(15_in, 90_deg, 0, {});
 	intake.stop();
 	std::cout << odometry.getPose().toStr() << "\n";
-	chassis.turnAbsolute(0_deg, 0, {.gains={0.8, 0.2, 0.06}});
+	chassis.turnAbsolute(0_deg, 0, {.gains={0.82, 0.2, 0.07}});
 	std::cout << odometry.getPose().toStr() << "\n";
 
 	//chassis.moveToPoint({48_in, 27_in}, 0, {.minRPM=300_rpm, .earlyExitRadius=3_in, .reverse=true});
 	chassis.moveDistance(-23_in, 0_deg, 0, {.maxRPM=400_rpm, .minRPM=200_rpm, .headingGains={0, 0, 0}, .exitDist=2.5_in});
 	clamp.extend();
-	chassis.moveDistance(-3_in, 0_deg, 0, {.headingGains={0, 0, 0}});
+	chassis.moveDistance(-1_in, 0_deg, 0, {.headingGains={0, 0, 0}});
 	//pros::delay(100);
-	chassis.turnAbsolute(90_deg, 0, {.gains={0.8, 0.2, 0.06}});
+	chassis.turnAbsolute(90_deg, 0, {.gains={0.82, 0.2, 0.07}});
 	//intake.redirect();
 	intake.mogo();
-	chassis.moveDistance(24_in, 90_deg, 0, {});
+	chassis.moveDistance(25_in, 90_deg, 0, {.minRPM=200_rpm, .headingGains={0.6, 0, 0}, .exitDist=1_in});
 
-	chassis.turnAbsolute(149_deg, 0, {.gains={1.24, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
+	chassis.turnAbsolute(154_deg, 0, {.gains={1.5, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 	intake.mogo();
-	chassis.moveDistance(34_in, 149_deg, 0, {});
+	chassis.moveDistance(34_in, 154_deg, 0, {});
 
 	//chassis.turnAbsolute(180_deg, 0, {.gains={1.25, 0.1, 0.12}});
-	chassis.moveDistance(-10_in, 149_deg, 0, {});
+	chassis.moveDistance(-11.5_in, 154_deg, 0, {});
 
 	// pros::delay(200);
 	// intake.stop();
 	// pto.retract();
 	// arm.wallStake();
 	chassis.turnAbsolute(-90_deg, 0, {.gains={1.2, 0.2, 0.1}});
-	chassis.moveDistance(53_in, -90_deg, 0, {.maxRPM=230_rpm, .distGains{0.17, 0, 0.01}});
+	chassis.moveDistance(35_in, -90_deg, 0, {.maxRPM=400_rpm, .minRPM=200_rpm, .distGains{0.17, 0, 0.01}, .headingGains={0, 0, 0}, .exitDist=2_in});
+	chassis.moveDistance(17_in, -90_deg, 0, {.maxRPM=200_rpm, .distGains{0.25, 0, 0.01}, .headingGains={0, 0, 0}});
 	pros::delay(200);
 	chassis.turnAbsolute(180_deg, 0, {.gains={1.24, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
-	chassis.moveDistance(12_in, 180_deg, 0, {});
+	chassis.moveDistance(16_in, 180_deg, 0, {});
 	// pros::Task([&] {
 	// 	pros::delay(500);
 	// 	intake.stop();
 	// });
-	pros::delay(1200);
+	pros::delay(400);
 	chassis.turnAbsolute(70_deg, 0, {.gains={1.24, 0.1, 0.12}});
 	//intake.stop();
-	chassis.moveDistance(-18_in, 70_deg, 500, {});//can be tuned if no time currently using timeout 
+	chassis.moveDistance(-13_in, 70_deg, 500, {});//can be tuned if no time currently using timeout 
+	intake.outtake();
+	pros::delay(100);
 	clamp.retract();
 
-	chassis.moveDistance(10_in, 70_deg, 0, {.distGains={0.14, 0, 0.01}});
+	chassis.moveDistance(10_in, 70_deg, 0, {.distGains={0.17, 0, 0.01}});
 	chassis.turnAbsolute(180_deg, 0, {});
+	std::cout << "Q1: " << pros::millis() - st << " ms\n";
 
 	//2/4
-	chassis.moveToPoint({92_in, 23_in},0, {.maxRPM=450_rpm, .earlyExitRadius=3_in, .reverse=true});
+	chassis.moveToPoint({88_in, 23_in},0, {.minRPM=100_rpm, .earlyExitRadius=2_in, .reverse=true});
+	chassis.moveDistance(-5_in, 180_deg, 0, {.maxRPM=300_rpm});
 
 	// chassis.moveDistance(-73_in, 180_deg, 0, {.maxRPM=450_rpm, .minRPM=200_rpm, .headingGains={0.05, 0.05, 0.01}, .exitDist=2.5_in});
 	clamp.extend();
 	//chassis.moveDistance(-3_in, 180_deg, 0, {.headingGains={0, 0, 0}});
 	chassis.turnAbsolute(90_deg, 0, {.gains={1.2, 0.2, 0.1}});
 	intake.mogo();
-	chassis.moveDistance(15_in, 90_deg, 0, {});
-	chassis.turnAbsolute(45_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	chassis.moveDistance(24_in, 90_deg, 0, {.minRPM=200_rpm, .exitDist=1_in});
+	chassis.turnAbsolute(27_deg, 0, {.gains={1.5, 0.1, 0.12}, .turnWheel=TurnWheel::LEFT});
+	chassis.moveDistance(33_in, 27_deg, 0, {});
+	chassis.moveDistance(-11_in, 27_deg, 0, {});
+
+	chassis.turnAbsolute(-90_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	chassis.moveDistance(35_in, -90_deg, 0, {.maxRPM=400_rpm, .minRPM=200_rpm, .distGains{0.17, 0, 0.01}, .headingGains={0, 0, 0}, .exitDist=2_in});
+	chassis.moveDistance(17_in, -90_deg, 0, {.maxRPM=200_rpm, .distGains{0.25, 0, 0.01}, .headingGains={0, 0, 0}});
+	pros::delay(200);
 }

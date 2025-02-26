@@ -102,11 +102,6 @@ void opcontrol() {
 		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
 		// chassis.driveArcade(fwd, turn);
 
-		if (okapi::ControllerButton(okapi::ControllerDigital::A).changedToPressed()) {
-			std::cout << vertEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << vertEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) / 10 << "\n";
-			std::cout << hortEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << hortEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) / 10 << "\n";
-		}
-
 		if (!shift.isPressed()) {
 			if (intakeTgl.changedToPressed()) {
 				pros::Task([&] {
