@@ -88,9 +88,9 @@ Odometry::Odometry(std::array<TrackingWheel, 3> trackingWheels, std::array<Dista
 	this->trackingWheels = { &leftEnc, &rightEnc, &middleEnc };
 
 	frontDist = distanceSensors[0];
-	rightDist = distanceSensors[1];
+	leftDist = distanceSensors[1];
 	rearDist = distanceSensors[2];
-	leftDist = distanceSensors[3];
+	rightDist = distanceSensors[3];
 	this->distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
 }
 Odometry::Odometry(TrackingWheel left, TrackingWheel right, TrackingWheel middle)
@@ -101,8 +101,8 @@ Odometry::Odometry(TrackingWheel left, TrackingWheel right, TrackingWheel middle
 	: leftEnc(left), rightEnc(right), middleEnc(middle), inertial(inertial) {
 	this->distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
 }
-Odometry::Odometry(DistanceSensor front, DistanceSensor right, DistanceSensor rear, DistanceSensor left, Inertial* inertial)
-	: frontDist(front), rightDist(right), rearDist(rear), leftDist(left), inertial(inertial) {
+Odometry::Odometry(DistanceSensor front, DistanceSensor left, DistanceSensor rear, DistanceSensor right, Inertial* inertial)
+	: frontDist(front), leftDist(left), rightDist(right), rearDist(rear), inertial(inertial) {
 	this->distanceSensors = { &frontDist, &leftDist, &rearDist, &rightDist };
 }
 Odometry::Odometry::Odometry(Odometry& odom) {
@@ -168,8 +168,8 @@ Pose Odometry::getVel() {
 	return prevVel = vel;
 }
 
-void Odometry::update(bool front, bool right, bool rear, bool left) {
-	std::array<bool, 4> snsrUse = {front, right, rear, left};
+void Odometry::update(bool front, bool left, bool rear, bool right) {
+	std::array<bool, 4> snsrUse = {front, left, rear, right};
 
 	double theta = std::abs(ReduceAngle::radPi2(getPose().theta));
 	if (theta > M_PI / 12.0 && theta < M_PI * 5 / 12.0) { // Not perpendicular to wall
@@ -195,9 +195,9 @@ void Odometry::update(bool front, bool right, bool rear, bool left) {
 	std::pair<double, double> x1, x2, y1, y2;
 	if (dirDists[0]) x1 = {(12_ft).convert(okapi::millimeter) - dirDists[0]->getDist() * std::abs(std::cos(theta)), dirDists[0]->getConfidence()};
 	if (dirDists[2]) x2 = {dirDists[2]->getDist() * std::abs(std::cos(theta)), dirDists[2]->getConfidence()};
-	if (dirDists[1]) y1 = {dirDists[1]->getDist() * std::abs(std::cos(theta)), dirDists[1]->getConfidence()};
-	if (dirDists[3]) y2 = {(12_ft).convert(okapi::millimeter) - dirDists[3]->getDist() * std::abs(std::cos(theta)), dirDists[3]->getConfidence()};
-	std::cout << dirDists[0]->getDist() << " " << dirDists[2]->getDist() << " " << dirDists[1]->getDist() << " " << dirDists[3]->getDist() << "\n";
+	if (dirDists[1]) y1 = {(12_ft).convert(okapi::millimeter) - dirDists[1]->getDist() * std::abs(std::cos(theta)), dirDists[1]->getConfidence()};
+	if (dirDists[3]) y2 = {dirDists[3]->getDist() * std::abs(std::cos(theta)), dirDists[3]->getConfidence()};
+	// std::cout << dirDists[0]->getDist() << " " << dirDists[2]->getDist() << " " << dirDists[1]->getDist() << " " << dirDists[3]->getDist() << "\n";
 
 	// Use the most accurate readings
 	Pose newPose(x1.first * okapi::millimeter, y1.first * okapi::millimeter, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());

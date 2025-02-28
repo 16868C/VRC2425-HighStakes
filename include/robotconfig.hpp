@@ -21,9 +21,9 @@ extern okapi::Controller master;
 const int LEFT_FRONT = -11;
 const int LEFT_MIDDLE = -12;
 const int LEFT_REAR = 13;
-const int RIGHT_FRONT = 17;
+const int RIGHT_FRONT = 14;
 const int RIGHT_MIDDLE = -16;
-const int RIGHT_REAR = 18;
+const int RIGHT_REAR = 15;
 
 const int INTAKE_FIRST = -1;
 const int INTAKE_SECOND = -2;
@@ -40,6 +40,13 @@ const char CLAW = 'B';
 
 const int INERTIAL = 20;
 const int HORT_ENC = 5;
+
+const int DIST_LEFT = 17;
+const int DIST_RIGHT = 9;
+const int DIST_FRONT = 8;
+const int DIST_REAR = 7;
+
+const int DIST_INTAKE = 10;
 
 const int INTAKE_ENC = 21;
 const int RING_OPTICAL = 6;
@@ -82,6 +89,15 @@ extern lib16868C::Inertial inertial;
 extern lib16868C::Rotation hortRot;
 extern lib16868C::TrackingWheel vertEnc;
 extern lib16868C::TrackingWheel hortEnc;
+
+extern okapi::DistanceSensor frontDistance;
+extern okapi::DistanceSensor rearDistance;
+extern okapi::DistanceSensor leftDistance;
+extern okapi::DistanceSensor rightDistance;
+extern lib16868C::DistanceSensor frontDist;
+extern lib16868C::DistanceSensor rearDist;
+extern lib16868C::DistanceSensor leftDist;
+extern lib16868C::DistanceSensor rightDist;
 
 extern lib16868C::Rotation intakeEnc;
 extern okapi::OpticalSensor ringOptical;

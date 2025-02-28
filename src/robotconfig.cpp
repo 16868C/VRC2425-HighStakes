@@ -38,6 +38,15 @@ lib16868C::Rotation hortRot(HORT_ENC);
 lib16868C::TrackingWheel vertEnc(&leftDrive, WHEEL_DIAM, 6.15813_in, GEAR_RATIO);
 lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 1.2449_in);
 
+okapi::DistanceSensor frontDistance(DIST_FRONT);
+okapi::DistanceSensor rearDistance(DIST_REAR);
+okapi::DistanceSensor leftDistance(DIST_LEFT);
+okapi::DistanceSensor rightDistance(DIST_RIGHT);
+lib16868C::DistanceSensor frontDist(&frontDistance, 2_in);
+lib16868C::DistanceSensor rearDist(&rearDistance, 6.5_in);
+lib16868C::DistanceSensor leftDist(&leftDistance, 6.375_in);
+lib16868C::DistanceSensor rightDist(&rightDistance, 6.375_in);
+
 lib16868C::Rotation intakeEnc(INTAKE_ENC);
 okapi::OpticalSensor ringOptical(RING_OPTICAL);
 pros::adi::LineSensor ringIR(RING_IR);
@@ -49,7 +58,7 @@ lib16868C::AutonSelector auton(autonSelector);
 // Subsystems
 lib16868C::Odometry odometry(
 	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
-	std::array<lib16868C::DistanceSensor, 4>{{{}, {}, {}, {}}},
+	std::array<lib16868C::DistanceSensor, 4>{{frontDist, leftDist, rearDist, rightDist}},
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
