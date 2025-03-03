@@ -41,7 +41,7 @@ const char CLAW = 'B';
 const int INERTIAL = 20;
 const int HORT_ENC = 5;
 
-const int DIST_LEFT = 17;
+const int DIST_LEFT = 18;
 const int DIST_RIGHT = 9;
 const int DIST_FRONT = 8;
 const int DIST_REAR = 7;

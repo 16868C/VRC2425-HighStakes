@@ -183,7 +183,7 @@ void Odometry::update(bool front, bool left, bool rear, bool right) {
 
 	// Determine which distance sensor corresponds to which direction
 	std::array<DistanceSensor*, 4> dirDists { nullptr, nullptr, nullptr, nullptr };
-	int j = dir;
+	int j = 4 - dir;
 	for (int i = 0; i < 4; i++, j++) {
 		if (j == 4) j = 0;
 
@@ -197,7 +197,7 @@ void Odometry::update(bool front, bool left, bool rear, bool right) {
 	if (dirDists[2]) x2 = {dirDists[2]->getDist() * std::abs(std::cos(theta)), dirDists[2]->getConfidence()};
 	if (dirDists[1]) y1 = {(12_ft).convert(okapi::millimeter) - dirDists[1]->getDist() * std::abs(std::cos(theta)), dirDists[1]->getConfidence()};
 	if (dirDists[3]) y2 = {dirDists[3]->getDist() * std::abs(std::cos(theta)), dirDists[3]->getConfidence()};
-	// std::cout << dirDists[0]->getDist() << " " << dirDists[2]->getDist() << " " << dirDists[1]->getDist() << " " << dirDists[3]->getDist() << "\n";
+	std::cout << dirDists[0]->getDist() << " " << dirDists[2]->getDist() << " " << dirDists[1]->getDist() << " " << dirDists[3]->getDist() << "\n";
 
 	// Use the most accurate readings
 	Pose newPose(x1.first * okapi::millimeter, y1.first * okapi::millimeter, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());
