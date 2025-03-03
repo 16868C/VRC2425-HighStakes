@@ -679,4 +679,5 @@ void skills() {
 	chassis.turnAbsolute(-135_deg, 0, {.errorMargin=5_deg});
 	intake.stop();
 	chassis.moveDistance(40_in, -135_deg, 0, {.maxRPM=300_rpm});
+	std::cout << "We did it we are worlds bound" << "\n";
 }
