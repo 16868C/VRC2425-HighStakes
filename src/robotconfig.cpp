@@ -61,5 +61,5 @@ lib16868C::Odometry odometry(
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
 // lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
-lib16868C::Intake intake(intakeMtr, intakeEnc, ringOptical);
+lib16868C::Intake intake(intakeMtr, intakeEnc, ringOptical, {0.02, 0, 0.001}, 2);
 lib16868C::Arm arm(armMtrs, armEnc, {0.05, 0, 0.0001});

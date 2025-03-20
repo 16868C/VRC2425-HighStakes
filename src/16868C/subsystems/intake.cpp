@@ -1,11 +1,10 @@
 #include "16868C/subsystems/intake.hpp"
-#include "16868C/controllers/pidController.hpp"
 
 using namespace lib16868C;
 
 void Intake::intakeManager(void* param) {
 	Intake* intake = static_cast<Intake*>(param);
-	PIDController intakePID({0.002, 0, 0.001});
+	PIDController intakePID(intake->gains);
 
 	intake->color.setLedPWM(100);
 	
@@ -21,13 +20,12 @@ void Intake::intakeManager(void* param) {
 		double encPos = ReduceAngle::reduce(intake->enc.get(), intake->TPR, 0.0);
 		int hookNum = intake->getCurrHook();
 		intake->hookRings[hookNum] = intake->getColour();
-		pros::lcd::print(0, "%f", encPos);
 
 		filteredRing = static_cast<RingColour>(-static_cast<int>(intake->getTargetRing()));
 		if (intake->getColour() != RingColour::NONE && !ring) {
 			ring = true;
 			std::cout << "#" << hookNum << " " << encPos << " Ring Detected: " << (intake->getColour() == RingColour::BLUE ? "Blue" : "Red") << " { ";
-			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i < intake->hookRings.size(); i++) {
 				std::cout << (intake->hookRings[i] == RingColour::NONE ? "None" : intake->hookRings[i] == RingColour::BLUE ? "Blue" : "Red") << ", ";
 			}
 			std::cout << "}\n";
@@ -41,8 +39,11 @@ void Intake::intakeManager(void* param) {
 		}
 
 		if (filteredRing != RingColour::NONE) {
-			for (int i = 0; i < 2; i++) {
-				if (intake->hookRings[i] == filteredRing && encPos > intake->EJECT_POS[i]) {
+			for (int i = 0; i < intake->hookRings.size(); i++) {
+				bool inEjectPos = encPos > intake->EJECT_POS[i];
+				if (i == intake->hookRings.size() - 1) inEjectPos = inEjectPos || encPos < intake->HOOK_TICKS[1];
+				
+				if (intake->hookRings[i] == filteredRing && inEjectPos) {
 					std::cout << "eject " << i << " " << encPos << " " << intake->EJECT_POS[i] << "\n";
 					intake->eject();
 					pros::delay(200);
@@ -75,7 +76,8 @@ void Intake::intakeManager(void* param) {
 	}
 }
 
-Intake::Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color) : mtr(mtr), enc(enc), color(color) {}
+Intake::Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color, PIDGains gains, int numHook)
+			: mtr(mtr), enc(enc), color(color), gains(gains), numHook(numHook) {}
 
 void Intake::intake() {
 	state = IntakeState::INTAKING;
@@ -160,7 +162,7 @@ RingColour Intake::getColour() {
 }
 int Intake::getCurrHook() {
 	double encPos = fmod(enc.get(), TPR);
-	for (int i = 1; i <= 2; i++) {
+	for (int i = 1; i <= HOOK_TICKS.size(); i++) {
 		if (encPos < HOOK_TICKS[i]) return i - 1;
 	}
 	return 0;

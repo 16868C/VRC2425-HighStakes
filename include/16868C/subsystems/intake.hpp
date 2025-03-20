@@ -1,4 +1,5 @@
 #pragma once
+#include "16868C/controllers/pidController.hpp"
 #include "16868C/devices/rotation.hpp"
 #include "okapi/impl/device/opticalSensor.hpp"
 #include "okapi/impl/device/motor/motor.hpp"
@@ -21,7 +22,7 @@ enum class RingColour {
 
 class Intake {
 	public:
-		Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color);
+		Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color, PIDGains gains, int numHook);
 
 		void intake();
 		void outtake();
@@ -49,6 +50,10 @@ class Intake {
 		okapi::Motor& mtr;
 		lib16868C::Rotation& enc;
 		okapi::OpticalSensor& color;
+
+		PIDGains gains;
+
+		int numHook;
 
 		const double TPR = 1050.09;
 		const std::array<double, 3> HOOK_TICKS = {0, 530, 1050.09};
