@@ -27,8 +27,8 @@ const int RIGHT_REAR = 7;
 
 const int INTAKE = 13;
 
-const int ARM_LEFT = -11;
-const int ARM_RIGHT = 12;
+const int ARM_LEFT = 11;
+const int ARM_RIGHT = -12;
 
 const char MOGO_CLAMP = 'C';
 const char HANG = 'A';
@@ -50,7 +50,7 @@ const int DIST_INTAKE = 10;
 
 const int INTAKE_ENC = -2;
 const int RING_OPTICAL = 6;
-const int ARM_ENC = 16;
+const int ARM_ENC = -16;
 
 const char AUTON_SELECTOR = 'F';
 

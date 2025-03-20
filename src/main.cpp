@@ -24,7 +24,7 @@ void initialize() {
 	// auton.add(10, "blueRingStake", blueRingStake);
 	auton.start();
 
-	// armEnc.resetZero();
+	armEnc.resetZero();
 	intakeEnc.resetZero();
 	// odometry.calibrate();
 }
