@@ -50,7 +50,7 @@ const int DIST_INTAKE = 10;
 
 const int INTAKE_ENC = -2;
 const int RING_OPTICAL = 6;
-const int ARM_ENC = 3;
+const int ARM_ENC = 16;
 
 const char AUTON_SELECTOR = 'F';
 

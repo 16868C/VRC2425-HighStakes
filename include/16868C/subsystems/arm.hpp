@@ -7,11 +7,11 @@
 namespace lib16868C {
 enum class ArmPosition {
 	IDLE = -1,
-	DEFAULT = 0,
+	DEFAULT = 15,
 	LOAD = 5,
 	LOAD2 = 10,
-	WALL_STAKE = 150,
-	ALLIANCE_STAKE = 240,
+	WALL_STAKE = -115,
+	ALLIANCE_STAKE = -200,
 	DESECORE_STAKE = 300
 };
 

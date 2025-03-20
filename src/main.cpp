@@ -158,7 +158,8 @@ void opcontrol() {
 		std::string armLeftTemp = std::to_string((int) std::max(armLeft.getTemperature() / 5 - 7, 0.0));
 		std::string armRightTemp = std::to_string((int) std::max(armRight.getTemperature() / 5 - 7, 0.0));
 		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeTemp + " " + armLeftTemp + " " + armRightTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
-
+		std::cout << static_cast<int> (arm.getState()) << "\n";
+		//std::cout << armEnc.get() << "\n";
 		pros::delay(20);
 	}
 }
