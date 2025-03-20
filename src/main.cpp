@@ -12,21 +12,21 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	auton.add(1, "redSoloAWP", redSoloAWP);
-	auton.add(2, "blueSoloAWP", blueSoloAWP);
-	auton.add(3, "redGoalRush", redGoalRush);
-	auton.add(4, "blueGoalRush", blueGoalRush);
-	auton.add(5, "redGoalStake", redGoalStake);
-	auton.add(6, "blueGoalStake", blueGoalStake);
-	auton.add(7, "redRingRush", redRingRush);
-	auton.add(8, "blueRingRush", blueRingRush);
-	auton.add(9, "redRingStake", redRingStake);
-	auton.add(10, "blueRingStake", blueRingStake);
+	// auton.add(1, "redSoloAWP", redSoloAWP);
+	// auton.add(2, "blueSoloAWP", blueSoloAWP);
+	// auton.add(3, "redGoalRush", redGoalRush);
+	// auton.add(4, "blueGoalRush", blueGoalRush);
+	// auton.add(5, "redGoalStake", redGoalStake);
+	// auton.add(6, "blueGoalStake", blueGoalStake);
+	// auton.add(7, "redRingRush", redRingRush);
+	// auton.add(8, "blueRingRush", blueRingRush);
+	// auton.add(9, "redRingStake", redRingStake);
+	// auton.add(10, "blueRingStake", blueRingStake);
 	auton.start();
 
-	armEnc.resetZero();
+	// armEnc.resetZero();
 	intakeEnc.resetZero();
-	odometry.calibrate();
+	// odometry.calibrate();
 }
 
 void disabled() {}
@@ -37,7 +37,7 @@ void autonomous() {
 	uint st = pros::millis();
 
 	// auton.run();
-	skills();
+	// skills();
 	
 	printDebug("Auton took %d ms\n", pros::millis() - st);
 }
@@ -76,10 +76,8 @@ void opcontrol() {
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
-	okapi::ControllerButton intakeRedirect(okapi::ControllerDigital::Y);
-	okapi::ControllerButton targetRingTgl(okapi::ControllerDigital::X);
-
 	okapi::ControllerButton intakeHoldTgl(okapi::ControllerDigital::left);
+	okapi::ControllerButton targetRingTgl(okapi::ControllerDigital::X);
 
 	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
 	okapi::ControllerButton doinkerCtrl(okapi::ControllerDigital::right);
@@ -95,54 +93,23 @@ void opcontrol() {
 	int i = 0;
 
 	while (true) {
-		double left = master.getAnalog(okapi::ControllerAnalog::leftY);
-		double right = master.getAnalog(okapi::ControllerAnalog::rightY);
-		chassis.driveTank(left, right);
-		// double fwd = master.getAnalog(okapi::ControllerAnalog::leftY);
-		// double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
-		// chassis.driveArcade(fwd, turn);
+		// double left = master.getAnalog(okapi::ControllerAnalog::leftY);
+		// double right = master.getAnalog(okapi::ControllerAnalog::rightY);
+		// chassis.driveTank(left, right);
+		double fwd = master.getAnalog(okapi::ControllerAnalog::leftY);
+		double turn = master.getAnalog(okapi::ControllerAnalog::rightX);
+		chassis.driveArcade(fwd, turn);
 
 		if (!shift.isPressed()) {
 			if (intakeTgl.changedToPressed()) {
-				pros::Task([&] {
-					if (!pto.is_extended()) {
-						pto.extend();
-						arm.move(0);
-						pros::delay(500);
-					}
-					if (intake.getState() == IntakeState::MOGO) intake.stop();
-					else intake.mogo();
-				});
+				if (intake.getState() == IntakeState::INTAKING) intake.stop();
+				else intake.intake();
 			} else if (outtakeTgl.changedToPressed()) {
-				pros::Task([&] {
-					if (!pto.is_extended()) {
-						pto.extend();
-						arm.move(0);
-						pros::delay(500);
-					}
-					if (intake.getState() == IntakeState::OUTTAKE) intake.stop();
-					else intake.outtake();
-				});
-			} else if (intakeRedirect.changedToPressed()) {
-				pros::Task([&] {
-					if (!pto.is_extended()) {
-						pto.extend();
-						arm.move(0);
-						pros::delay(500);
-					}
-					if (intake.getState() == IntakeState::REDIRECT) intake.stop();
-					else intake.redirect();
-				});
+				if (intake.getState() == IntakeState::OUTTAKING) intake.stop();
+				else intake.outtake();
 			} else if (intakeHoldTgl.changedToPressed()) {
-				pros::Task([&] {
-					if (!pto.is_extended()) {
-						pto.extend();
-						arm.move(0);
-						pros::delay(500);
-					}
-					if (intake.getState() == IntakeState::INTAKE || intake.getState() == IntakeState::HOLDING) intake.stop();
-					else intake.intake();
-				});
+				if (intake.getState() == IntakeState::HOLDING) intake.stop();
+				else intake.hold();
 			}
 
 			if (clampTgl.changedToPressed()) clamp.toggle();
@@ -158,51 +125,24 @@ void opcontrol() {
 			}
 
 			if (hangRelease.changedToPressed()) {
-				arm.defaultPos();
+				// arm.defaultPos();
 				hang.toggle();
+				std::cout << intakeEnc.get() / 10.0 << "\n";
 			}
 
 			if (intakeRaiserTgl.changedToPressed()) intakeRaiser.toggle();
 		} else {
 			if (armIdle.changedToPressed()) {
-				pros::Task([&] {
-					if (pto.is_extended()) {
-						pto.retract();
-						intake.stop();
-						pros::delay(500);
-					}
-					arm.defaultPos();
-				});
+				arm.defaultPos();
 			}
 			if (armWallStake.changedToPressed()) {
-				pros::Task([&] {
-					if (pto.is_extended()) {
-						pto.retract();
-						intake.stop();
-						pros::delay(500);
-					}
-					arm.wallStake();
-				});
+				arm.wallStake();
 			}
 			if (armAllianceStake.changedToPressed()) {
-				pros::Task([&] {
-					if (pto.is_extended()) {
-						pto.retract();
-						intake.stop();
-						pros::delay(500);
-					}
-					arm.allianceStake();
-				});
+				arm.allianceStake();
 			}
 			if (armDescoreStake.changedToPressed()) {
-				pros::Task([&] {
-					if (pto.is_extended()) {
-						pto.retract();
-						intake.stop();
-						pros::delay(500);
-					}
-					arm.descoreStake();
-				});
+				arm.descoreStake();
 			}
 		}
 		
@@ -214,9 +154,10 @@ void opcontrol() {
 
 		std::string leftDriveTemp = std::to_string((int) std::max(leftDrive.getTemperature() / 5 - 7, 0.0));
 		std::string rightDriveTemp = std::to_string((int) std::max(rightDrive.getTemperature() / 5 - 7, 0.0));
-		std::string intakeFirstTemp = std::to_string((int) std::max(intakeFirst.getTemperature() / 5 - 7, 0.0));
-		std::string intakeSecondTemp = std::to_string((int) std::max(intakeSecond.getTemperature() / 5 - 7, 0.0));
-		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeFirstTemp + " " + intakeSecondTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
+		std::string intakeTemp = std::to_string((int) std::max(intakeMtr.getTemperature() / 5 - 7, 0.0));
+		std::string armLeftTemp = std::to_string((int) std::max(armLeft.getTemperature() / 5 - 7, 0.0));
+		std::string armRightTemp = std::to_string((int) std::max(armRight.getTemperature() / 5 - 7, 0.0));
+		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeTemp + " " + armLeftTemp + " " + armRightTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
 
 		pros::delay(20);
 	}

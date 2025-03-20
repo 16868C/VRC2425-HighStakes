@@ -17,8 +17,7 @@ lib16868C::Motor rightRear(RIGHT_REAR, okapi::AbstractMotor::gearset::blue);
 lib16868C::MotorGroup leftDrive({leftFront, leftMiddle, leftRear});
 lib16868C::MotorGroup rightDrive({rightFront, rightMiddle, rightRear});
 
-lib16868C::Motor intakeFirst(INTAKE_FIRST, okapi::AbstractMotor::gearset::green);
-lib16868C::Motor intakeSecond(INTAKE_SECOND, okapi::AbstractMotor::gearset::green);
+lib16868C::Motor intakeMtr(INTAKE, okapi::AbstractMotor::gearset::blue);
 
 lib16868C::Motor armLeft(ARM_LEFT, okapi::AbstractMotor::gearset::green);
 lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
@@ -49,7 +48,6 @@ lib16868C::DistanceSensor rightDist(&rightDistance, 6.375_in);
 
 lib16868C::Rotation intakeEnc(INTAKE_ENC);
 okapi::OpticalSensor ringOptical(RING_OPTICAL);
-pros::adi::LineSensor ringIR(RING_IR);
 lib16868C::Rotation armEnc(ARM_ENC);
 
 pros::adi::Potentiometer autonSelector(AUTON_SELECTOR, pros::E_ADI_POT_V2);
@@ -63,5 +61,5 @@ lib16868C::Odometry odometry(
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
 // lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
-lib16868C::Intake intake(intakeFirst, intakeSecond, intakeEnc, ringOptical, ringIR, pto);
-lib16868C::Arm arm(armMtrs, armEnc, pto, {0.05, 0, 0.0001});
+lib16868C::Intake intake(intakeMtr, intakeEnc, ringOptical);
+lib16868C::Arm arm(armMtrs, armEnc, {0.05, 0, 0.0001});

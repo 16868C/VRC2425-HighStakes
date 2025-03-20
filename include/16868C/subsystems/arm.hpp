@@ -8,14 +8,16 @@ namespace lib16868C {
 enum class ArmPosition {
 	IDLE = -1,
 	DEFAULT = 0,
-	DESECORE_STAKE = 20,
-	ALLIANCE_STAKE = 36,
-	WALL_STAKE = 54
+	LOAD = 5,
+	LOAD2 = 10,
+	WALL_STAKE = 150,
+	ALLIANCE_STAKE = 240,
+	DESECORE_STAKE = 300
 };
 
 class Arm {
 public:
-	Arm(lib16868C::MotorGroup& mtrs, lib16868C::Rotation& enc, pros::adi::Pneumatics& pto, PIDGains gains);
+	Arm(lib16868C::MotorGroup& mtrs, lib16868C::Rotation& enc, PIDGains gains);
 
 	void move(double volts);
 	void moveTo(double tgt, double volts = 12000);
@@ -34,7 +36,6 @@ public:
 private:
 	lib16868C::MotorGroup& mtrs;
 	lib16868C::Rotation& enc;
-	pros::adi::Pneumatics& pto;
 
 	double volts = 12000;
 	double tgt = 0;

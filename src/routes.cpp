@@ -7,7 +7,7 @@ using namespace lib16868C;
 void waitUntilButton(okapi::ControllerDigital btn = okapi::ControllerDigital::A) {
 	while (!master.getDigital(btn)) pros::delay(10);
 }
-
+/*
 void redSoloAWP() {
 	//initialize
 	odometry.update({81_in, 21_in, -130_deg});
@@ -26,16 +26,16 @@ void redSoloAWP() {
 	arm.defaultPos();
 	pros::delay(250);
 	pto.extend();
-	pros::Task([&] {
-		pros::delay(500);
-		arm.move(0);
-		pto.extend();
-		intake.mogo();
-		pros::delay(250);
-		intake.stop();
-		pros::delay(250);
-		intake.mogo();
-	});
+	// pros::Task([&] {
+	// 	pros::delay(500);
+	// 	arm.move(0);
+	// 	pto.extend();
+	// 	intake.mogo();
+	// 	pros::delay(250);
+	// 	intake.stop();
+	// 	pros::delay(250);
+	// 	intake.mogo();
+	// });
 
 	chassis.moveToPoint({93_in, 40_in}, 0, {.minRPM=300_rpm, .earlyExitRadius=2_in, .reverse=true});
 	chassis.moveToPoint({93_in, 52_in}, 0, {.maxRPM=400_rpm, .headingGains={0.4, 0, 0.015}, .reverse=true});
@@ -43,7 +43,7 @@ void redSoloAWP() {
 	clamp.extend();
 	pros::delay(50);
 
-	intake.mogo();
+	intake.intake();
 	chassis.turnAbsolute(-10_deg, 0, {.gains={1.2, 0.2, 0.1}});
 	chassis.moveToPoint({114_in, 50_in}, 0, {});
 
@@ -62,7 +62,7 @@ void redSoloAWP() {
 	chassis.turnAbsolute(-70_deg, 0, {.gains={1.1, 0.1, 0.085}, .turnWheel=TurnWheel::LEFT});
 	chassis.moveToPoint({47_in, 50_in}, 0, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
-	intake.mogo();
+	intake.intake();
 	pros::delay(50);
 
 	chassis.turnAbsolute(-167_deg, 0, {.gains={1.2, 0.2, 0.1}});
@@ -87,16 +87,16 @@ void blueSoloAWP() {
 	arm.defaultPos();
 	pros::delay(250);
 	pto.extend();
-	pros::Task([&] {
-		pros::delay(500);
-		arm.move(0);
-		pto.extend();
-		intake.mogo();
-		pros::delay(250);
-		intake.stop();
-		pros::delay(250);
-		intake.mogo();
-	});
+	// pros::Task([&] {
+	// 	pros::delay(500);
+	// 	arm.move(0);
+	// 	pto.extend();
+	// 	intake.mogo();
+	// 	pros::delay(250);
+	// 	intake.stop();
+	// 	pros::delay(250);
+	// 	intake.mogo();
+	// });
 
 	// chassis.moveToPoint({93_in, 40_in}, 0, {.minRPM=300_rpm, .earlyExitRadius=2_in, .reverse=true});
 	// chassis.moveToPoint({93_in, 52_in}, 0, {.maxRPM=400_rpm, .headingGains={0.4, 0, 0.015}, .reverse=true});
@@ -105,7 +105,7 @@ void blueSoloAWP() {
 	clamp.extend();
 	pros::delay(50);
 
-	intake.mogo();
+	intake.intake();
 	chassis.turnAbsolute(0_deg, 750, {.gains={1.2, 0.2, 0.1}});
 	chassis.moveToPoint({114_in, 50_in}, 1100, {});
 
@@ -124,7 +124,7 @@ void blueSoloAWP() {
 	chassis.turnAbsolute(-70_deg, 0, {.gains={1.1, 0.1, 0.085}, .turnWheel=TurnWheel::LEFT});
 	chassis.moveToPoint({47_in, 50_in}, 0, {.maxRPM=400_rpm, .reverse=true});
 	clamp.extend();
-	intake.mogo();
+	intake.intake();
 	pros::delay(50);
 
 	chassis.turnAbsolute(-167_deg, 0, {.gains={1.2, 0.2, 0.1}});
@@ -163,7 +163,7 @@ void redGoalRush() {
 	clamp.extend();
 
 	//ring intake 1
-	intake.mogo();
+	intake.intake();
 	pros::delay(600);
 	intake.intake();
 	clamp.retract();
@@ -474,7 +474,7 @@ void blueRingStake() {
 	pros::Task([&] {
 		pros::delay(700);
 		intake.hold();
-		intakeFirst.moveVoltage(-12000);
+		// intakeFirst.moveVoltage(-12000);
 	});
 	chassis.moveDistance(-13_in, 180_deg, 750, {.distGains={0.08, 0, 1.5}, .headingGains={0.45, 0, 1}});
 	chassis.moveDistance(10.5_in, 180_deg, 750, {});
@@ -654,7 +654,7 @@ void skills() {
 	
 	chassis.turnAbsolute(-130_deg, 0, {.gains={1.24, 0.1, 0.12}, .errorMargin=3_deg});
 	chassis.moveDistance(-8_in, -130_deg, 400, {});
-	intakeSecond.moveVoltage(-12000);
+	// intakeSecond.moveVoltage(-12000);
 	pros::delay(50);
 	clamp.retract();
 
@@ -680,4 +680,4 @@ void skills() {
 	intake.stop();
 	chassis.moveDistance(40_in, -135_deg, 0, {.maxRPM=300_rpm});
 	std::cout << "We did it we are worlds bound" << "\n";
-}
+}*/

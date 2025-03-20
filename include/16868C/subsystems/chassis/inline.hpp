@@ -69,9 +69,8 @@ struct MoveToPointParams {
 	PIDGains distGains = {0.09, 0, 0.011};
 	PIDGains headingGains = {0.6, 0, 0.01};
 
-	okapi::QLength exitRadius = 1_in;
 	okapi::QLength earlyExitRadius = 5_in;
-	okapi::QLength turnDeadzone = 6_in;
+	okapi::QLength settleRadius = 6_in;
 
 	bool reverse = false;
 
@@ -112,7 +111,7 @@ public:
 	void driveArcade(double forward, double turn, double deadzone = 0);
 
 	void moveDistance(okapi::QLength dist, okapi::QAngle heading, int timeout = 0, MoveDistanceParams params = {}, bool async = false);
-	void turnAbsolute(okapi::QAngle angle, int timeout = 0, TurnAbsoluteParams params = {}, bool async = false, bool debug = false);
+	void turnAbsolute(okapi::QAngle angle, int timeout = 0, TurnAbsoluteParams params = {}, bool async = false);
 
 	void turnToPoint(Pose target, int timeout = 0, TurnToPointParams params = {}, bool async = false);
 	void moveToPoint(Pose target, int timeout = 0, MoveToPointParams params = {}, bool async = false, bool debug = false);

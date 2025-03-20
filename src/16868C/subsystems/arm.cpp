@@ -9,11 +9,6 @@ void Arm::armManager(void* params) {
 	int n = 0;
 	uint32_t time = pros::millis();
 	while (true) {
-		if (arm->pto.is_extended()) {
-			pros::Task::delay_until(&time, 20);
-			continue;
-		}
-
 		if (arm->mtrs.getCurrentDraw() > 2100 && abs(arm->tgt - arm->mtrs.getPosition()) < 50) n++;
 		if (n > 5) {
 			n = 0;
@@ -33,7 +28,7 @@ void Arm::armManager(void* params) {
 	}
 }
 
-Arm::Arm(MotorGroup& mtrs, Rotation& enc, pros::adi::Pneumatics& pto, PIDGains gains) : mtrs(mtrs), enc(enc), pto(pto), pid(gains) {}
+Arm::Arm(MotorGroup& mtrs, Rotation& enc, PIDGains gains) : mtrs(mtrs), enc(enc), pid(gains) {}
 
 void Arm::move(double volts) {
 	state = ArmPosition::IDLE;
