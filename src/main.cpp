@@ -79,6 +79,8 @@ void opcontrol() {
 	okapi::ControllerButton intakeHoldTgl(okapi::ControllerDigital::left);
 	okapi::ControllerButton targetRingTgl(okapi::ControllerDigital::X);
 
+	okapi::ControllerButton redirectTgl(okapi::ControllerDigital::Y);
+
 	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
 	okapi::ControllerButton doinkerCtrl(okapi::ControllerDigital::right);
 	okapi::ControllerButton hangRelease(okapi::ControllerDigital::A);
@@ -112,6 +114,10 @@ void opcontrol() {
 				else intake.hold();
 			}
 
+			if (redirectTgl.changedToPressed()) {
+				arm.load();
+			}
+
 			if (clampTgl.changedToPressed()) clamp.toggle();
 
 			if (doinkerCtrl.changedToPressed()) {
@@ -136,7 +142,12 @@ void opcontrol() {
 				arm.defaultPos();
 			}
 			if (armWallStake.changedToPressed()) {
-				arm.wallStake();
+				pros::Task([&] {
+					intake.outtake();
+					pros::delay(50);
+					intake.stop();
+					arm.wallStake();
+				});
 			}
 			if (armAllianceStake.changedToPressed()) {
 				arm.allianceStake();
@@ -158,7 +169,7 @@ void opcontrol() {
 		std::string armLeftTemp = std::to_string((int) std::max(armLeft.getTemperature() / 5 - 7, 0.0));
 		std::string armRightTemp = std::to_string((int) std::max(armRight.getTemperature() / 5 - 7, 0.0));
 		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeTemp + " " + armLeftTemp + " " + armRightTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
-		std::cout << static_cast<int> (arm.getState()) << "\n";
+		// std::cout << static_cast<int> (arm.getState()) << "\n";
 		//std::cout << armEnc.get() << "\n";
 		pros::delay(20);
 	}

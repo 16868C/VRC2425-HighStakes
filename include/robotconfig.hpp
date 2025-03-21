@@ -27,8 +27,8 @@ const int RIGHT_REAR = 7;
 
 const int INTAKE = 13;
 
-const int ARM_LEFT = 11;
-const int ARM_RIGHT = -12;
+const int ARM_LEFT = -11;
+const int ARM_RIGHT = 12;
 
 const char MOGO_CLAMP = 'C';
 const char HANG = 'A';

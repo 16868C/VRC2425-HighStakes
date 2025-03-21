@@ -8,12 +8,12 @@ namespace lib16868C {
 enum class ArmPosition {
 	IDLE = -1,
 	DEFAULT = 0,
-	LOAD = 15,
-	LOAD2 = 10,
-	HOLD = 20,
-	WALL_STAKE = 115,
-	ALLIANCE_STAKE = 200,
-	DESECORE_STAKE = 300
+	LOAD = 24,
+	LOAD2 = 40,
+	HOLD = 50,
+	WALL_STAKE = 148,
+	ALLIANCE_STAKE = 209,
+	DESECORE_STAKE = 240
 };
 
 class Arm {
@@ -24,9 +24,12 @@ public:
 	void moveTo(double tgt, double volts = 12000);
 
 	void defaultPos(double volts = 12000);
+	void load(double volts = 12000);
+	void load2(double volts = 12000);
+	void hold(double volts = 12000);
+	void wallStake(double volts = 12000);
 	void descoreStake(double volts = 12000);
 	void allianceStake(double volts = 12000);
-	void wallStake(double volts = 12000);
 
 	double getError();
 

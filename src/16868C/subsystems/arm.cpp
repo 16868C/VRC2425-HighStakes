@@ -14,6 +14,7 @@ void Arm::armManager(void* params) {
 			n = 0;
 			arm->state = ArmPosition::IDLE;
 		}
+		// pros::lcd::print(0, "%f", arm->enc.get());
 
 		if (arm->state != ArmPosition::IDLE) {
 			arm->error = static_cast<int>(arm->getState()) - arm->enc.get();
@@ -46,6 +47,30 @@ void Arm::defaultPos(double volts) {
 	tgt = static_cast<int>(state);
 	error = static_cast<int>(state) - enc.get();
 }
+void Arm::load(double volts) {
+	this->volts = volts;
+	state = ArmPosition::LOAD;
+	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
+}
+void Arm::load2(double volts) {
+	this->volts = volts;
+	state = ArmPosition::LOAD2;
+	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
+}
+void Arm::hold(double volts) {
+	this->volts = volts;
+	state = ArmPosition::HOLD;
+	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
+}
+void Arm::wallStake(double volts) {
+	this->volts = volts;
+	state = ArmPosition::WALL_STAKE;
+	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
+}
 void Arm::descoreStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::DESECORE_STAKE;
@@ -55,12 +80,6 @@ void Arm::descoreStake(double volts) {
 void Arm::allianceStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::ALLIANCE_STAKE;
-	tgt = static_cast<int>(state);
-	error = static_cast<int>(state) - enc.get();
-}
-void Arm::wallStake(double volts) {
-	this->volts = volts;
-	state = ArmPosition::WALL_STAKE;
 	tgt = static_cast<int>(state);
 	error = static_cast<int>(state) - enc.get();
 }
