@@ -10,11 +10,12 @@ void Arm::armManager(void* params) {
 	uint32_t time = pros::millis();
 	while (true) {
 		if (arm->mtrs.getCurrentDraw() > 2100 && abs(arm->tgt - arm->mtrs.getPosition()) < 50) n++;
+		else n = 0;
 		if (n > 5) {
 			n = 0;
 			arm->state = ArmPosition::IDLE;
 		}
-		// pros::lcd::print(0, "%f", arm->enc.get());
+		pros::lcd::print(0, "%f", arm->enc.get());
 
 		if (arm->state != ArmPosition::IDLE) {
 			arm->error = static_cast<int>(arm->getState()) - arm->enc.get();
@@ -23,9 +24,10 @@ void Arm::armManager(void* params) {
 			arm->mtrs.moveVoltage(arm->volts * ctrl);
 		} else {
 			arm->error = 0;
+			arm->mtrs.moveVoltage(0);
 		}
 
-		pros::Task::delay_until(&time, 50);
+		pros::Task::delay_until(&time, 20);
 	}
 }
 

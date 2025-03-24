@@ -72,7 +72,6 @@ void opcontrol() {
 	// }
   
 	okapi::ControllerButton shift(okapi::ControllerDigital::R2);
-	okapi::ControllerButton ptoTgl(okapi::ControllerDigital::B);
 
 	okapi::ControllerButton intakeTgl(okapi::ControllerDigital::R1);
 	okapi::ControllerButton outtakeTgl(okapi::ControllerDigital::L1);
@@ -80,6 +79,7 @@ void opcontrol() {
 	okapi::ControllerButton targetRingTgl(okapi::ControllerDigital::X);
 
 	okapi::ControllerButton redirectTgl(okapi::ControllerDigital::Y);
+	okapi::ControllerButton redirect2Tgl(okapi::ControllerDigital::B);
 
 	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
 	okapi::ControllerButton doinkerCtrl(okapi::ControllerDigital::right);
@@ -115,7 +115,12 @@ void opcontrol() {
 			}
 
 			if (redirectTgl.changedToPressed()) {
+				intake.setColourFilter(false);
 				arm.load();
+			}
+			if (redirect2Tgl.changedToPressed()) {
+				intake.setColourFilter(false);
+				arm.load2();
 			}
 
 			if (clampTgl.changedToPressed()) clamp.toggle();
@@ -140,8 +145,10 @@ void opcontrol() {
 		} else {
 			if (armIdle.changedToPressed()) {
 				arm.defaultPos();
+				intake.setColourFilter(true);
 			}
 			if (armWallStake.changedToPressed()) {
+				intake.setColourFilter(true);
 				pros::Task([&] {
 					intake.outtake();
 					pros::delay(50);
@@ -150,15 +157,14 @@ void opcontrol() {
 				});
 			}
 			if (armAllianceStake.changedToPressed()) {
+				intake.setColourFilter(true);
 				arm.allianceStake();
 			}
 			if (armDescoreStake.changedToPressed()) {
+				intake.setColourFilter(true);
 				arm.descoreStake();
 			}
 		}
-		
-		if (ptoTgl.changedToPressed())
-			pto.toggle();
 
 		if (targetRingTgl.changedToPressed())
 			intake.setTargetRing(intake.getTargetRing() == RingColour::BLUE ? RingColour::RED : RingColour::BLUE);

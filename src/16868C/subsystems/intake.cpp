@@ -38,10 +38,11 @@ void Intake::intakeManager(void* param) {
 			state = intake->getState();
 		}
 
-		if (filteredRing != RingColour::NONE) {
+		if (intake->colourFilter && filteredRing != RingColour::NONE) {
 			for (int i = 0; i < intake->hookRings.size(); i++) {
 				bool inEjectPos = encPos > intake->EJECT_POS[i];
-				if (i == intake->hookRings.size() - 1) inEjectPos = inEjectPos || encPos < intake->HOOK_TICKS[1];
+				if (i == intake->hookRings.size() - 1) inEjectPos = inEjectPos || encPos < 200;
+				else inEjectPos = inEjectPos && encPos < intake->EJECT_POS[i] + 200;
 				
 				if (intake->hookRings[i] == filteredRing && inEjectPos) {
 					std::cout << "eject " << i << " " << encPos << " " << intake->EJECT_POS[i] << "\n";
@@ -65,12 +66,13 @@ void Intake::intakeManager(void* param) {
 		if (intake->isJamming()) n++;
 		else n = 0;
 		
-		// if (n >= 5) {
-		// 	intake->unjam();
-		// 	pros::delay(500);
-		// 	intake->state = state;
-		// 	intake->update();
-		// }
+		if (n >= 5) {
+			// intake->unjam();
+			// pros::delay(500);
+			// intake->state = state;
+			// intake->update();
+			intake->stop();
+		}
 
 		pros::Task::delay_until(&time, 10);
 	}
@@ -166,4 +168,11 @@ int Intake::getCurrHook() {
 		if (encPos < HOOK_TICKS[i]) return i - 1;
 	}
 	return 0;
+}
+
+void Intake::setColourFilter(bool state) {
+	colourFilter = state;
+}
+void Intake::toggleColourFilter() {
+	colourFilter = !colourFilter;
 }

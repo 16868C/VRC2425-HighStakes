@@ -40,6 +40,9 @@ class Intake {
 		int getCurrHook();
 		int getRedirectHook();
 
+		void setColourFilter(bool state);
+		void toggleColourFilter();
+
 	private:
 		void eject();
 		void unjam();
@@ -50,6 +53,8 @@ class Intake {
 		okapi::Motor& mtr;
 		lib16868C::Rotation& enc;
 		okapi::OpticalSensor& color;
+
+		bool colourFilter = true;
 
 		PIDGains gains;
 
