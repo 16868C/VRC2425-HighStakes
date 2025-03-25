@@ -11,7 +11,7 @@ enum class ArmPosition {
 	LOAD = 25,
 	LOAD2 = 30,
 	HOLD = 50,
-	WALL_STAKE = 148,
+	WALL_STAKE = 145,
 	ALLIANCE_STAKE = 209,
 	DESECORE_STAKE = 240
 };
