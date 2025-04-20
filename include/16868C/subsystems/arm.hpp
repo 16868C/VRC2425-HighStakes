@@ -8,7 +8,7 @@ namespace lib16868C {
 enum class ArmPosition {
 	IDLE = -1,
 	DEFAULT = 0,
-	LOAD = 25,
+	LOAD = 18,
 	LOAD2 = 30,
 	HOLD = 50,
 	WALL_STAKE = 145,
