@@ -15,7 +15,7 @@ void Arm::armManager(void* params) {
 			n = 0;
 			arm->state = ArmPosition::IDLE;
 		}
-		pros::lcd::print(0, "%f", arm->enc.get());
+		// pros::lcd::print(0, "%f", arm->enc.get());
 
 		if (arm->state != ArmPosition::IDLE) {
 			arm->error = static_cast<int>(arm->getState()) - arm->enc.get();

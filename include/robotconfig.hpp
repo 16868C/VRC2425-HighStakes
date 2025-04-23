@@ -31,15 +31,13 @@ const int ARM_LEFT = -11;
 const int ARM_RIGHT = 12;
 
 const char MOGO_CLAMP = 'C';
-const char HANG = 'A';
-const char DOINKER = 'D';
-const char PTO = 'G';
+const char LEFT_DOINKER = 'A';
+const char RIGHT_DOINKER = 'B';
 const char INTAKE_RAISER = 'E';
-const char CLAW = 'B';
 
-const int INERTIAL = 3;
-const int VERT_ENC = 1;
-const int HORT_ENC = 5;
+const int INERTIAL = 5;
+const int VERT_ENC = -4;
+const int HORT_ENC = -3;
 
 const int DIST_LEFT = 18;
 const int DIST_RIGHT = 9;
@@ -76,14 +74,13 @@ extern lib16868C::MotorGroup armMtrs;
 
 // Pneumatics
 extern pros::adi::Pneumatics clamp;
-extern pros::adi::Pneumatics hang;
-extern pros::adi::Pneumatics doinker;
-extern pros::adi::Pneumatics pto;
+extern pros::adi::Pneumatics leftDoinker;
+extern pros::adi::Pneumatics rightDoinker;
 extern pros::adi::Pneumatics intakeRaiser;
-extern pros::adi::Pneumatics claw;
 
 // Sensors
 extern lib16868C::Inertial inertial;
+
 extern lib16868C::Rotation vertRot;
 extern lib16868C::Rotation hortRot;
 extern lib16868C::TrackingWheel vertEnc;

@@ -26,7 +26,7 @@ void initialize() {
 
 	armEnc.resetZero();
 	intakeEnc.resetZero();
-	// odometry.calibrate();
+	odometry.calibrate();
 }
 
 void disabled() {}
@@ -47,15 +47,15 @@ void opcontrol() {
 	if (auton.getSelectedIdx() == 5)
 		intake.setTargetRing(RingColour::RED);
 
-	if (!pto.is_extended()) arm.defaultPos();
 	intakeRaiser.extend();
-	hang.retract();
 
-	// chassis.moveDistance(48_in, 0_deg, 0, {.distGains={0.09, 0, 0.011}, .headingGains={0.6, 0, 0.01}});
+	odometry.init();
+
+	// chassis.moveDistance(48_in, 0_deg, 0, {.distGains={0.064, 0, 0.004}, .headingGains={0.5, 0, 0.01}});
 
 	// chassis.moveToPoint({24_in, 24_in}, 0, {.distGains={0.09, 0, 0.011}, .headingGains={0.6, 0, 0.01}});
 
-	// chassis.turnAbsolute(180_deg, 0, {.gains={1.2, 0.2, 0.1}});
+	chassis.turnAbsolute(45_deg, 0, {.gains={1.19, 0.22, 0.1}});
 
 	// chassis.turnAbsolute(90_deg, 0, {.gains={1.25, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 
@@ -125,21 +125,19 @@ void opcontrol() {
 
 			if (clampTgl.changedToPressed()) clamp.toggle();
 
-			if (doinkerCtrl.changedToPressed()) {
-				claw.extend();
-				doinkerTgl = !doinkerTgl;
-				if (doinkerTgl) doinker.extend();
-			}
-			if (doinkerCtrl.changedToReleased()) {
-				claw.retract();
-				if (!doinkerTgl) doinker.retract();
-			}
+			// if (doinkerCtrl.changedToPressed()) {
+			// 	claw.extend();
+			// 	doinkerTgl = !doinkerTgl;
+			// 	if (doinkerTgl) doinker.extend();
+			// }
+			// if (doinkerCtrl.changedToReleased()) {
+			// 	claw.retract();
+			// 	if (!doinkerTgl) doinker.retract();
+			// }
 
-			if (hangRelease.changedToPressed()) {
-				// arm.defaultPos();
-				hang.toggle();
-				std::cout << intakeEnc.get() / 10.0 << "\n";
-			}
+			// if (hangRelease.changedToPressed()) {
+			// 	hang.toggle();
+			// }
 
 			if (intakeRaiserTgl.changedToPressed()) intakeRaiser.toggle();
 		} else {
@@ -175,8 +173,6 @@ void opcontrol() {
 		std::string armLeftTemp = std::to_string((int) std::max(armLeft.getTemperature() / 5 - 7, 0.0));
 		std::string armRightTemp = std::to_string((int) std::max(armRight.getTemperature() / 5 - 7, 0.0));
 		master.setText(0, 0, leftDriveTemp + " " + rightDriveTemp + " " + intakeTemp + " " + armLeftTemp + " " + armRightTemp + " " + (intake.getTargetRing() == RingColour::BLUE ? "B" : "R"));
-		// std::cout << static_cast<int> (arm.getState()) << "\n";
-		std::cout << armEnc.get() << "\n";
 		
 		pros::delay(20);
 	}

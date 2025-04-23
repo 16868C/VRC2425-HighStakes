@@ -24,18 +24,18 @@ lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
 lib16868C::MotorGroup armMtrs({armLeft, armRight});
 
 // Pneumatics
-pros::adi::Pneumatics clamp(MOGO_CLAMP, false);
-pros::adi::Pneumatics hang(HANG, false);
-pros::adi::Pneumatics doinker(DOINKER, false);
-pros::adi::Pneumatics pto(PTO, true, true);
+pros::adi::Pneumatics clamp(MOGO_CLAMP, false, true);
+pros::adi::Pneumatics leftDoinker(LEFT_DOINKER, false);
+pros::adi::Pneumatics rightDoinker(RIGHT_DOINKER, false);
 pros::adi::Pneumatics intakeRaiser(INTAKE_RAISER, true, true);
-pros::adi::Pneumatics claw(CLAW, false);
 
 // Sensors
 lib16868C::Inertial inertial(INERTIAL);
+
+lib16868C::Rotation vertRot(VERT_ENC);
 lib16868C::Rotation hortRot(HORT_ENC);
-lib16868C::TrackingWheel vertEnc(&leftDrive, WHEEL_DIAM, 6.15813_in, GEAR_RATIO);
-lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, 1.2449_in);
+lib16868C::TrackingWheel vertEnc(&vertRot, 2.75_in, 0.695501_in);
+lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, -3.47526_in);
 
 okapi::DistanceSensor frontDistance(DIST_FRONT);
 okapi::DistanceSensor rearDistance(DIST_REAR);
@@ -56,7 +56,7 @@ lib16868C::AutonSelector auton(autonSelector);
 // Subsystems
 lib16868C::Odometry odometry(
 	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
-	std::array<lib16868C::DistanceSensor, 4>{{frontDist, leftDist, rearDist, rightDist}},
+	std::array<lib16868C::DistanceSensor, 4>{{}}, // frontDist, leftDist, rearDist, rightDist
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
