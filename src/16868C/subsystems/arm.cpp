@@ -73,12 +73,6 @@ void Arm::wallStake(double volts) {
 	tgt = static_cast<int>(state);
 	error = static_cast<int>(state) - enc.get();
 }
-void Arm::descoreStake(double volts) {
-	this->volts = volts;
-	state = ArmPosition::DESECORE_STAKE;
-	tgt = static_cast<int>(state);
-	error = static_cast<int>(state) - enc.get();
-}
 void Arm::allianceStake(double volts) {
 	this->volts = volts;
 	state = ArmPosition::ALLIANCE_STAKE;

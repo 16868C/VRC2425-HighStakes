@@ -34,8 +34,8 @@ lib16868C::Inertial inertial(INERTIAL);
 
 lib16868C::Rotation vertRot(VERT_ENC);
 lib16868C::Rotation hortRot(HORT_ENC);
-lib16868C::TrackingWheel vertEnc(&vertRot, 2.75_in, 0.695501_in);
-lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, -3.47526_in);
+lib16868C::TrackingWheel vertEnc(&vertRot, 2.75_in, 0.354517_in);
+lib16868C::TrackingWheel hortEnc(&hortRot, 2_in, -3.63145_in);
 
 okapi::DistanceSensor frontDistance(DIST_FRONT);
 okapi::DistanceSensor rearDistance(DIST_REAR);

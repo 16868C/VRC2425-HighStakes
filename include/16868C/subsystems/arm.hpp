@@ -12,8 +12,7 @@ enum class ArmPosition {
 	LOAD2 = 30,
 	HOLD = 50,
 	WALL_STAKE = 145,
-	ALLIANCE_STAKE = 209,
-	DESECORE_STAKE = 240
+	ALLIANCE_STAKE = 198
 };
 
 class Arm {
@@ -28,7 +27,6 @@ public:
 	void load2(double volts = 12000);
 	void hold(double volts = 12000);
 	void wallStake(double volts = 12000);
-	void descoreStake(double volts = 12000);
 	void allianceStake(double volts = 12000);
 
 	double getError();

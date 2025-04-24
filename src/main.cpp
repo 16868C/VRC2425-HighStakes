@@ -53,9 +53,9 @@ void opcontrol() {
 
 	// chassis.moveDistance(48_in, 0_deg, 0, {.distGains={0.064, 0, 0.004}, .headingGains={0.5, 0, 0.01}});
 
-	// chassis.moveToPoint({24_in, 24_in}, 0, {.distGains={0.09, 0, 0.011}, .headingGains={0.6, 0, 0.01}});
+	// chassis.moveToPoint({24_in, 48_in}, 0, {.distGains={0.064, 0, 0.004}, .headingGains={0.5, 0, 0.01}});
 
-	chassis.turnAbsolute(45_deg, 0, {.gains={1.19, 0.22, 0.1}});
+	// chassis.turnAbsolute(90_deg, 0, {.gains={1.1, 0.2, 0.09}}); // 180 deg: 1.1, 0.1, 0.1
 
 	// chassis.turnAbsolute(90_deg, 0, {.gains={1.25, 0.1, 0.12}, .turnWheel=TurnWheel::RIGHT});
 
@@ -89,7 +89,6 @@ void opcontrol() {
 	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
 	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
 	okapi::ControllerButton armAllianceStake(okapi::ControllerDigital::right);
-	okapi::ControllerButton armDescoreStake(okapi::ControllerDigital::down);
 
 	bool doinkerTgl = false;
 	int i = 0;
@@ -125,19 +124,18 @@ void opcontrol() {
 
 			if (clampTgl.changedToPressed()) clamp.toggle();
 
-			// if (doinkerCtrl.changedToPressed()) {
-			// 	claw.extend();
-			// 	doinkerTgl = !doinkerTgl;
-			// 	if (doinkerTgl) doinker.extend();
-			// }
-			// if (doinkerCtrl.changedToReleased()) {
-			// 	claw.retract();
-			// 	if (!doinkerTgl) doinker.retract();
-			// }
+			if (doinkerCtrl.changedToPressed()) {
+				rightDoinker.toggle();
+			}
 
 			// if (hangRelease.changedToPressed()) {
 			// 	hang.toggle();
 			// }
+
+			if (okapi::ControllerButton(okapi::ControllerDigital::A).changedToPressed()) {
+				std::cout << vertEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << vertEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
+				std::cout << hortEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << hortEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
+			}
 
 			if (intakeRaiserTgl.changedToPressed()) intakeRaiser.toggle();
 		} else {
@@ -157,10 +155,6 @@ void opcontrol() {
 			if (armAllianceStake.changedToPressed()) {
 				intake.setColourFilter(true);
 				arm.allianceStake();
-			}
-			if (armDescoreStake.changedToPressed()) {
-				intake.setColourFilter(true);
-				arm.descoreStake();
 			}
 		}
 
