@@ -133,8 +133,9 @@ void opcontrol() {
 			// }
 
 			if (okapi::ControllerButton(okapi::ControllerDigital::A).changedToPressed()) {
-				std::cout << vertEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << vertEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
-				std::cout << hortEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << hortEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
+				std::cout << intakeEnc.get() << "\n";
+				// std::cout << vertEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << vertEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
+				// std::cout << hortEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << hortEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
 			}
 
 			if (intakeRaiserTgl.changedToPressed()) intakeRaiser.toggle();

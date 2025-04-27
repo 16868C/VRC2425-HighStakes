@@ -60,9 +60,9 @@ class Intake {
 
 		int numHook;
 
-		const double TPR = 1050.09;
-		const std::array<double, 3> HOOK_TICKS = {0, 530, 1050.09};
-		const std::array<double, 2> EJECT_POS = {500, 1030};
+		const double TPR = 1140.18;
+		const std::array<double, 3> HOOK_TICKS = {0, 570, 1140.18};
+		const std::array<double, 2> EJECT_POS = {560, 1100};
 		const std::array<double, 2> HOLD_POS = {100, 260};
 
 		IntakeState state = IntakeState::OFF;

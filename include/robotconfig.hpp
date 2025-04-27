@@ -20,7 +20,7 @@ extern okapi::Controller master;
 // Ports
 const int LEFT_FRONT = -18;
 const int LEFT_MIDDLE = 10;
-const int LEFT_REAR = -9;
+const int LEFT_REAR = -4;
 const int RIGHT_FRONT = 20;
 const int RIGHT_MIDDLE = -8;
 const int RIGHT_REAR = 7;
@@ -36,7 +36,7 @@ const char RIGHT_DOINKER = 'B';
 const char INTAKE_RAISER = 'E';
 
 const int INERTIAL = 5;
-const int VERT_ENC = -4;
+const int VERT_ENC = -9;
 const int HORT_ENC = -3;
 
 const int DIST_LEFT = 18;

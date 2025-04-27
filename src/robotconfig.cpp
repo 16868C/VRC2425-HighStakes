@@ -24,7 +24,7 @@ lib16868C::Motor armRight(ARM_RIGHT, okapi::AbstractMotor::gearset::green);
 lib16868C::MotorGroup armMtrs({armLeft, armRight});
 
 // Pneumatics
-pros::adi::Pneumatics clamp(MOGO_CLAMP, false, true);
+pros::adi::Pneumatics clamp(MOGO_CLAMP, false, false);
 pros::adi::Pneumatics leftDoinker(LEFT_DOINKER, false);
 pros::adi::Pneumatics rightDoinker(RIGHT_DOINKER, false);
 pros::adi::Pneumatics intakeRaiser(INTAKE_RAISER, true, true);
