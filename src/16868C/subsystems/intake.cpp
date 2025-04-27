@@ -23,13 +23,13 @@ void Intake::intakeManager(void* param) {
 		for (int i = 0; i < intake->hookRings.size(); i++) {
 			int ind = i + 1;
 			if (ind == intake->hookRings.size()) ind = 0;
-			if (encPos > intake->HOOK_TICKS[ind] + 100 && encPos < intake->HOOK_TICKS[ind + 1]) intake->hookRings[i] = RingColour::NONE;
+			if (encPos > intake->HOOK_TICKS[ind] + 100 && encPos < intake->HOOK_TICKS[ind + 1] - 100) intake->hookRings[i] = RingColour::NONE;
 		}
 
 		filteredRing = static_cast<RingColour>(-static_cast<int>(intake->getTargetRing()));
-		if (intake->hookRings[hookNum] != RingColour::NONE && !ring) {
+		if (hookNum != -1 && intake->hookRings[hookNum] != RingColour::NONE && !ring) {
 			ring = true;
-			std::cout << "#" << hookNum << " " << encPos << " Ring Detected: " << (intake->hookRings[hookNum] == RingColour::BLUE ? "Blue" : "Red") << " { ";
+			std::cout << "#" << hookNum << " " << encPos << " Ring Detected: " << (intake->hookRings[hookNum] == RingColour::NONE ? "None" : intake->hookRings[hookNum] == RingColour::BLUE ? "Blue" : "Red") << " { ";
 			for (int i = 0; i < intake->hookRings.size(); i++) {
 				std::cout << (intake->hookRings[i] == RingColour::NONE ? "None" : intake->hookRings[i] == RingColour::BLUE ? "Blue" : "Red") << ", ";
 			}
@@ -170,7 +170,7 @@ RingColour Intake::getColour() {
 int Intake::getCurrHook() {
 	double encPos = fmod(enc.get(), TPR);
 	for (int i = 0; i < HOOK_TICKS.size(); i++) {
-		if (encPos >= HOOK_TICKS[i] + 100 && encPos <= HOOK_TICKS[i] + 500) return i;
+		if (encPos >= HOOK_TICKS[i] + 50 && encPos <= HOOK_TICKS[i] + 500) return i;
 	}
 	return -1;
 }
