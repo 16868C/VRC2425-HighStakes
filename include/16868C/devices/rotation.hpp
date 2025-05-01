@@ -21,6 +21,8 @@ class Rotation : private pros::Rotation, public AbstractEncoder {
 		 */
 		void resetZero() override;
 
+		void setPosition(double ticks);
+
 		/**
 		 * @brief Gets the velocity of the encoder.
 		 * ? I do not know how accurate this is

@@ -76,7 +76,7 @@ void Intake::intakeManager(void* param) {
 			// pros::delay(500);
 			// intake->state = state;
 			// intake->update();
-			intake->stop();
+			// intake->stop();
 		}
 
 		pros::Task::delay_until(&time, 10);

@@ -10,16 +10,16 @@ AutonSelector::AutonSelector(pros::adi::Potentiometer& pot) : pot(pot) {}
 void AutonSelector::add(int idx, std::string name, std::function<void()> route) {
 	routes[idx - 1].name = name;
 	routes[idx - 1].route = route;
-	if (idx == 5) {
-		routes[10].name = name;
-		routes[10].route = route;
-	}
+	// if (idx == 5) {
+	// 	routes[10].name = name;
+	// 	routes[10].route = route;
+	// }
 }
 
 int AutonSelector::getSelectedIdx() {
 	for (int i = 0; i <= 10; i++) {
 		if (pot.get_value() >= routes[i].min && pot.get_value() <= routes[i].max) {
-			if (i == 10) return 5;
+			// if (i == 10) return 5;
 			return i + 1;
 		}
 	}

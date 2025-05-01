@@ -10,7 +10,4 @@ void blueGoalStake();
 void redGoalRush();
 void blueGoalRush();
 
-void redSoloAWP();
-void blueSoloAWP();
-
 void skills();

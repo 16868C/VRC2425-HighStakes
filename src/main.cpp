@@ -12,7 +12,7 @@ using namespace lib16868C;
 void initialize() {
 	pros::lcd::initialize();
 
-	// auton.add(1, "redSoloAWP", redSoloAWP);
+	auton.add(1, "redGoalStake", redGoalStake);
 	// auton.add(2, "blueSoloAWP", blueSoloAWP);
 	// auton.add(3, "redGoalRush", redGoalRush);
 	// auton.add(4, "blueGoalRush", blueGoalRush);
@@ -24,7 +24,7 @@ void initialize() {
 	// auton.add(10, "blueRingStake", blueRingStake);
 	auton.start();
 
-	armEnc.resetZero();
+	if (auton.getSelectedIdx() != 1) armEnc.resetZero();
 	intakeEnc.resetZero();
 	odometry.calibrate();
 }
@@ -36,7 +36,7 @@ void competition_initialize() {}
 void autonomous() {
 	uint st = pros::millis();
 
-	// auton.run();
+	auton.run();
 	// skills();
 	
 	printDebug("Auton took %d ms\n", pros::millis() - st);
@@ -133,7 +133,8 @@ void opcontrol() {
 			// }
 
 			if (okapi::ControllerButton(okapi::ControllerDigital::A).changedToPressed()) {
-				std::cout << intakeEnc.get() << "\n";
+				std::cout << autonSelector.get_value() << "\n";
+				// std::cout << intakeEnc.get() << "\n";
 				// std::cout << vertEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << vertEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
 				// std::cout << hortEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << hortEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
 			}

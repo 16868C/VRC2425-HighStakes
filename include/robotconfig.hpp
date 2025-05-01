@@ -33,24 +33,22 @@ const int ARM_RIGHT = 12;
 const char MOGO_CLAMP = 'C';
 const char LEFT_DOINKER = 'A';
 const char RIGHT_DOINKER = 'B';
-const char INTAKE_RAISER = 'E';
+const char INTAKE_RAISER = 'F';
 
 const int INERTIAL = 5;
 const int VERT_ENC = -9;
 const int HORT_ENC = -3;
 
-const int DIST_LEFT = 18;
-const int DIST_RIGHT = 9;
-const int DIST_FRONT = 8;
-const int DIST_REAR = 7;
-
-const int DIST_INTAKE = 10;
+const int DIST_LEFT = 14;
+const int DIST_RIGHT = 16;
+const int DIST_FRONT = 15;
+const int DIST_REAR = 19;
 
 const int INTAKE_ENC = -2;
 const int RING_OPTICAL = 6;
 const int ARM_ENC = 1;
 
-const char AUTON_SELECTOR = 'F';
+const char AUTON_SELECTOR = 'D';
 
 // Robot Constants
 const okapi::QLength WHEEL_DIAM = 3.25_in;

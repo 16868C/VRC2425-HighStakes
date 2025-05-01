@@ -56,7 +56,7 @@ lib16868C::AutonSelector auton(autonSelector);
 // Subsystems
 lib16868C::Odometry odometry(
 	std::array<lib16868C::TrackingWheel, 3>{vertEnc, {}, hortEnc},
-	std::array<lib16868C::DistanceSensor, 4>{{}}, // frontDist, leftDist, rearDist, rightDist
+	std::array<lib16868C::DistanceSensor, 4>{{frontDist, leftDist, rearDist, rightDist}},
 	&inertial);
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 

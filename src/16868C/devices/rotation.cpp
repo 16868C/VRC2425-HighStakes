@@ -16,6 +16,10 @@ void Rotation::resetZero() {
 	pros::Rotation::reset_position();
 }
 
+void Rotation::setPosition(double ticks) {
+	pros::Rotation::set_position(ticks * 100);
+}
+
 double Rotation::getVelocity() {
 	#define USE_SENSOR_VELOCITY
 	//#define USE_ENCODER_VELOCITY
