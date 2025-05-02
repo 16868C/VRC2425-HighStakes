@@ -67,7 +67,7 @@ class Intake {
 
 		IntakeState state = IntakeState::OFF;
 
-		RingColour targetRing = RingColour::BLUE;
+		RingColour targetRing = RingColour::NONE;
 		std::array<RingColour, 2> hookRings = {RingColour::NONE, RingColour::NONE};
 
 		pros::Task managerTask = pros::Task(intakeManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Ring Filter");

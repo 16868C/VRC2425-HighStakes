@@ -61,9 +61,9 @@ void Intake::intakeManager(void* param) {
 		}
 
 		if (intake->state == IntakeState::HOLDING) {
-			if (intake->hookRings[hookNum] == intake->targetRing) {
-				double holdError = encPos - intake->HOLD_POS[tgtHook];
-				intake->mtr.moveVoltage(-12000 * intakePID.calculate(holdError));
+			// std::cout << (intake->hookRings[hookNum] == RingColour::NONE ? "None" : intake->hookRings[hookNum] == RingColour::BLUE ? "Blue" : "Red") << "\n";
+			if (intake->targetRing != RingColour::NONE && hookNum != -1 && intake->hookRings[hookNum] == intake->targetRing) {
+				intake->stop();
 			} else {
 				intake->mtr.moveVoltage(12000);
 			} 
@@ -170,7 +170,7 @@ RingColour Intake::getColour() {
 int Intake::getCurrHook() {
 	double encPos = fmod(enc.get(), TPR);
 	for (int i = 0; i < HOOK_TICKS.size(); i++) {
-		if (encPos >= HOOK_TICKS[i] + 50 && encPos <= HOOK_TICKS[i] + 500) return i;
+		if (encPos >= HOOK_TICKS[i] + 20 && encPos <= HOOK_TICKS[i] + 500) return i;
 	}
 	return -1;
 }
