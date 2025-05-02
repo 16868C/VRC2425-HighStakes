@@ -53,3 +53,28 @@ void redGoalStake() {
 	chassis.moveDistance(15_in, -270_deg, 0, {});
 	chassis.moveTank(4000, 4000);
 }
+
+void redRingStake(){
+	odometry.init({60_in, 18_in, -58_deg});
+	intake.setTargetRing(RingColour::RED);
+	armEnc.setPosition(18);
+	chassis.moveDistance(4_in, -58_deg, 500, {});
+	arm.allianceStake();
+	pros::delay(500);
+
+	pros::Task([] {
+		pros::delay(300);
+		arm.defaultPos();
+		pros::delay(800);
+		clamp.extend();
+	});
+	chassis.moveToPoint({47_in, 46.5_in}, 0, {.maxRPM=300_rpm, .distGains={0.07, 0, 0.004}, .headingGains={0.8, 0, 0.02}, .reverse=true});
+	pros::delay(200);
+	chassis.turnAbsolute(110_deg, 0, {.gains={1.1, 0.2, 0.09}});
+	
+	chassis.moveDistance(10_in, 110_deg, 0, {});
+	intake.intake();
+	chassis.turnAbsolute(180_deg, 0, {.turnWheel=TurnWheel::RIGHT});
+	chassis.moveDistance(10_in, 180_deg, 0, {});
+	chassis.turnAbsolute(90_deg, 0, {.turnWheel=TurnWheel::RIGHT});
+}

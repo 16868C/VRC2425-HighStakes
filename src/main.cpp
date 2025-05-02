@@ -13,6 +13,7 @@ void initialize() {
 	pros::lcd::initialize();
 
 	auton.add(1, "redGoalStake", redGoalStake);
+	auton.add(2, "redRingStake", redRingStake);
 	// auton.add(2, "blueSoloAWP", blueSoloAWP);
 	// auton.add(3, "redGoalRush", redGoalRush);
 	// auton.add(4, "blueGoalRush", blueGoalRush);
