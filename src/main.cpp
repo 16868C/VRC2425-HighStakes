@@ -81,16 +81,16 @@ void opcontrol() {
 	okapi::ControllerButton targetRingTgl(okapi::ControllerDigital::X);
 
 	okapi::ControllerButton redirectTgl(okapi::ControllerDigital::Y);
-	okapi::ControllerButton redirect2Tgl(okapi::ControllerDigital::B);
 
 	okapi::ControllerButton clampTgl(okapi::ControllerDigital::L2);
-	okapi::ControllerButton doinkerCtrl(okapi::ControllerDigital::right);
-	okapi::ControllerButton hangRelease(okapi::ControllerDigital::A);
-	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::down);
+	okapi::ControllerButton leftDoinkerTgl(okapi::ControllerDigital::down);
+	okapi::ControllerButton rightDoinkerTgl(okapi::ControllerDigital::B);
+	okapi::ControllerButton intakeRaiserTgl(okapi::ControllerDigital::right);
 
 	okapi::ControllerButton armIdle(okapi::ControllerDigital::L2);
 	okapi::ControllerButton armWallStake(okapi::ControllerDigital::L1);
 	okapi::ControllerButton armAllianceStake(okapi::ControllerDigital::right);
+	okapi::ControllerButton armHang(okapi::ControllerDigital::A);
 
 	bool doinkerTgl = false;
 	int i = 0;
@@ -117,25 +117,30 @@ void opcontrol() {
 
 			if (redirectTgl.changedToPressed()) {
 				intake.setColourFilter(false);
-				arm.load();
-			}
-			if (redirect2Tgl.changedToPressed()) {
-				intake.setColourFilter(false);
-				arm.load2();
+				switch (arm.getState()) {
+					case ArmPosition::LOAD:
+						pros::Task([&] {
+							intake.outtake();
+							pros::delay(50);
+							intake.stop();
+							arm.load2();
+						});
+						break;
+					default:
+						arm.load();
+						break;
+				}
 			}
 
 			if (clampTgl.changedToPressed()) clamp.toggle();
 
-			if (doinkerCtrl.changedToPressed()) {
-				rightDoinker.toggle();
-			}
+			if (leftDoinkerTgl.changedToPressed()) leftDoinker.toggle();
+			if (rightDoinkerTgl.changedToPressed()) rightDoinker.toggle();
 
-			// if (hangRelease.changedToPressed()) {
-			// 	hang.toggle();
-			// }
+			if (armHang.changedToPressed()) arm.hang();
 
 			if (okapi::ControllerButton(okapi::ControllerDigital::A).changedToPressed()) {
-				std::cout << autonSelector.get_value() << "\n";
+				// std::cout << autonSelector.get_value() << "\n";
 				// std::cout << intakeEnc.get() << "\n";
 				// std::cout << vertEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << vertEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";
 				// std::cout << hortEnc.getDist() << " " << inertial.get_rotation(AngleUnit::RAD) << " " << hortEnc.getDist() / inertial.get_rotation(AngleUnit::RAD) << "\n";

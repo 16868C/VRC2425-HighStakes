@@ -43,7 +43,7 @@ void Intake::intakeManager(void* param) {
 			state = intake->getState();
 		}
 
-		if (intake->colourFilter && filteredRing != RingColour::NONE) {
+		if (intake->colourFilter && filteredRing != RingColour::NONE && *intake->armState != ArmPosition::LOAD && *intake->armState != ArmPosition::LOAD2) {
 			for (int i = 0; i < intake->hookRings.size(); i++) {
 				bool inEjectPos = encPos > intake->EJECT_POS[i];
 				if (i == intake->hookRings.size() - 1) inEjectPos = inEjectPos || encPos < 200;
@@ -72,19 +72,27 @@ void Intake::intakeManager(void* param) {
 		else n = 0;
 		
 		if (n >= 5) {
-			// intake->unjam();
-			// pros::delay(500);
-			// intake->state = state;
-			// intake->update();
-			// intake->stop();
+			switch (*intake->armState) {
+				case ArmPosition::LOAD:
+				case ArmPosition::LOAD2:
+					intake->stop();
+					break;
+				default:
+					intake->unjam();
+					pros::delay(250);
+					intake->state = state;
+					intake->update();
+					break;
+			}
+			n = 0;
 		}
 
 		pros::Task::delay_until(&time, 10);
 	}
 }
 
-Intake::Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color, PIDGains gains, int numHook)
-			: mtr(mtr), enc(enc), color(color), gains(gains), numHook(numHook) {}
+Intake::Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color, PIDGains gains, int numHook, ArmPosition* armState)
+			: mtr(mtr), enc(enc), color(color), gains(gains), numHook(numHook), armState(armState) {}
 
 void Intake::intake() {
 	state = IntakeState::INTAKING;

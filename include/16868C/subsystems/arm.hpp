@@ -8,11 +8,12 @@ namespace lib16868C {
 enum class ArmPosition {
 	IDLE = -1,
 	DEFAULT = 0,
-	LOAD = 18,
+	LOAD = 20,
 	LOAD2 = 30,
 	HOLD = 50,
 	WALL_STAKE = 145,
-	ALLIANCE_STAKE = 198
+	ALLIANCE_STAKE = 198,
+	HANG = 230
 };
 
 class Arm {
@@ -28,12 +29,14 @@ public:
 	void hold(double volts = 12000);
 	void wallStake(double volts = 12000);
 	void allianceStake(double volts = 12000);
+	void hang(double volts = 12000);
 
 	double getError();
 
 	void resetPosition();
 
 	ArmPosition getState();
+	ArmPosition* getStatePtr();
 
 private:
 	lib16868C::MotorGroup& mtrs;

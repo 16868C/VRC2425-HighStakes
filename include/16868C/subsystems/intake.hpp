@@ -1,6 +1,7 @@
 #pragma once
 #include "16868C/controllers/pidController.hpp"
 #include "16868C/devices/rotation.hpp"
+#include "16868C/subsystems/arm.hpp"
 #include "okapi/impl/device/opticalSensor.hpp"
 #include "okapi/impl/device/motor/motor.hpp"
 #include "pros/rtos.h"
@@ -22,7 +23,7 @@ enum class RingColour {
 
 class Intake {
 	public:
-		Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color, PIDGains gains, int numHook);
+		Intake(okapi::Motor& mtr, lib16868C::Rotation& enc, okapi::OpticalSensor& color, PIDGains gains, int numHook, ArmPosition* armState);
 
 		void intake();
 		void outtake();
@@ -53,6 +54,8 @@ class Intake {
 		okapi::Motor& mtr;
 		lib16868C::Rotation& enc;
 		okapi::OpticalSensor& color;
+
+		ArmPosition* armState;
 
 		bool colourFilter = true;
 

@@ -197,7 +197,12 @@ void Odometry::update(bool front, bool left, bool rear, bool right) {
 	if (dirDists[2]) x2 = {dirDists[2]->getDist() * std::abs(std::cos(theta)), dirDists[2]->getConfidence()};
 	if (dirDists[1]) y1 = {(12_ft).convert(okapi::millimeter) - dirDists[1]->getDist() * std::abs(std::cos(theta)), dirDists[1]->getConfidence()};
 	if (dirDists[3]) y2 = {dirDists[3]->getDist() * std::abs(std::cos(theta)), dirDists[3]->getConfidence()};
-	std::cout << dirDists[0]->getDist() << " " << dirDists[2]->getDist() << " " << dirDists[1]->getDist() << " " << dirDists[3]->getDist() << "\n";
+	// std::cout << dirDists[0]->getDist() << " " << dirDists[2]->getDist() << " " << dirDists[1]->getDist() << " " << dirDists[3]->getDist() << "\n";
+	for (int i = 0; i < 4; i++) {
+		if (dirDists[i]) std::cout << dirDists[i]->getDist() << " ";
+		else std::cout << "- ";
+	}
+	std::cout << "\n";
 
 	// Use the most accurate readings
 	Pose newPose(x1.first * okapi::millimeter, y1.first * okapi::millimeter, inertial->get_rotation(AngleUnit::RAD) * okapi::radian, pros::millis());

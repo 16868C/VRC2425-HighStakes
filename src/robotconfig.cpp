@@ -41,10 +41,10 @@ okapi::DistanceSensor frontDistance(DIST_FRONT);
 okapi::DistanceSensor rearDistance(DIST_REAR);
 okapi::DistanceSensor leftDistance(DIST_LEFT);
 okapi::DistanceSensor rightDistance(DIST_RIGHT);
-lib16868C::DistanceSensor frontDist(&frontDistance, 2_in);
-lib16868C::DistanceSensor rearDist(&rearDistance, 6.5_in);
-lib16868C::DistanceSensor leftDist(&leftDistance, 6.375_in);
-lib16868C::DistanceSensor rightDist(&rightDistance, 6.375_in);
+lib16868C::DistanceSensor frontDist(&frontDistance, 5_in);
+lib16868C::DistanceSensor rearDist(&rearDistance, 5.625_in);
+lib16868C::DistanceSensor leftDist(&leftDistance, 5.75_in);
+lib16868C::DistanceSensor rightDist(&rightDistance, 5.75_in);
 
 lib16868C::Rotation intakeEnc(INTAKE_ENC);
 okapi::OpticalSensor ringOptical(RING_OPTICAL);
@@ -61,6 +61,6 @@ lib16868C::Odometry odometry(
 lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIAM, GEAR_RATIO);
 
 // lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
-lib16868C::Intake intake(intakeMtr, intakeEnc, ringOptical, {0.02, 0, 0.001}, 2);
+lib16868C::Intake intake(intakeMtr, intakeEnc, ringOptical, {0.02, 0, 0.001}, 2, arm.getStatePtr());
 //lib16868C::Arm arm(armMtrs, armEnc, {0.01325, 0, 0.0008});
 lib16868C::Arm arm(armMtrs, armEnc, {0.013, 0, 0.000825});

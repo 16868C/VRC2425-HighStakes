@@ -42,7 +42,7 @@ class Odometry {
 
 		Pose getVel();
 
-		void update(bool front, bool right, bool rear, bool left);
+		void update(bool front, bool left, bool rear, bool right);
 		void update(okapi::QLength x, okapi::QLength y);
 		void update(okapi::QLength x, okapi::QLength y, okapi::QAngle theta);
 		void update(Pose pose);

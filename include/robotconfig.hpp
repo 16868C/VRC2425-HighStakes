@@ -35,7 +35,7 @@ const char LEFT_DOINKER = 'A';
 const char RIGHT_DOINKER = 'B';
 const char INTAKE_RAISER = 'F';
 
-const int INERTIAL = 5;
+const int INERTIAL = 21;
 const int VERT_ENC = -9;
 const int HORT_ENC = -3;
 

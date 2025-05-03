@@ -13,6 +13,7 @@ void Arm::armManager(void* params) {
 		else n = 0;
 		if (n > 5) {
 			n = 0;
+			arm->mtrs.moveVoltage(0);
 			arm->state = ArmPosition::IDLE;
 		}
 		// pros::lcd::print(0, "%f", arm->enc.get());
@@ -24,7 +25,6 @@ void Arm::armManager(void* params) {
 			arm->mtrs.moveVoltage(arm->volts * ctrl);
 		} else {
 			arm->error = 0;
-			arm->mtrs.moveVoltage(0);
 		}
 
 		pros::Task::delay_until(&time, 20);
@@ -79,6 +79,12 @@ void Arm::allianceStake(double volts) {
 	tgt = static_cast<int>(state);
 	error = static_cast<int>(state) - enc.get();
 }
+void Arm::hang(double volts) {
+	this->volts = volts;
+	state = ArmPosition::HANG;
+	tgt = static_cast<int>(state);
+	error = static_cast<int>(state) - enc.get();
+}
 
 double Arm::getError() {
 	return error;
@@ -102,4 +108,7 @@ void Arm::resetPosition() {
 
 ArmPosition Arm::getState() {
 	return state;
+}
+ArmPosition* Arm::getStatePtr() {
+	return &state;
 }
