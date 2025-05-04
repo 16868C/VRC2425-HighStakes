@@ -9,7 +9,7 @@ enum class ArmPosition {
 	IDLE = -1,
 	DEFAULT = 0,
 	LOAD = 20,
-	LOAD2 = 30,
+	LOAD2 = 33,
 	HOLD = 50,
 	WALL_STAKE = 145,
 	ALLIANCE_STAKE = 198,

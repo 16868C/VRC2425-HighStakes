@@ -58,27 +58,40 @@ void redGoalStake() {
 }
 
 void redRingStake(){
-	odometry.init({60_in, 18_in, -58_deg});
+	odometry.init({60_in, 15.5_in, -36_deg});
 	intake.setTargetRing(RingColour::RED);
 	armEnc.setPosition(18);
+
 	arm.allianceStake();
 	pros::delay(500);
-
+	
 	pros::Task([] {
 		pros::delay(300);
 		arm.defaultPos();
-		pros::delay(800);
-		clamp.extend();
 	});
-	chassis.moveToPoint({48_in, 46.5_in}, 0, {.maxRPM=400_rpm, .distGains={0.07, 0, 0.004}, .headingGains={0.8, 0, 0.02}, .reverse=true});
-	pros::delay(200);
-	chassis.turnAbsolute(110_deg, 0, {.gains={1.1, 0.2, 0.09}});
-	
-	chassis.moveDistance(10_in, 110_deg, 0, {});
+	chassis.moveToPoint({46_in, 47_in}, 0, {.maxRPM=300_rpm, .distGains={0.07, 0, 0.004}, .headingGains={0.8, 0, 0.02},.reverse=true});
+	pros::delay(100);
+	clamp.extend();
+	//chassis.moveToPoint({46_in, 47_in}, 0, {.maxRPM=400_rpm, .distGains={0.07, 0, 0.004}, .headingGains={0.8, 0, 0.02}, .reverse=true});
+	pros::delay(100);
+
+	chassis.turnAbsolute(120_deg, 0, {.gains={1.1, 0.1, 0.1}});
 	intake.intake();
+	chassis.moveDistance(16_in, 120_deg, 0, {.distGains={0.0725, 0, 0.004}, .exitDist = 1.55_in});
 	chassis.turnAbsolute(180_deg, 0, {.turnWheel=TurnWheel::RIGHT});
-	chassis.moveDistance(10_in, 180_deg, 0, {});
-	chassis.turnAbsolute(90_deg, 0, {.turnWheel=TurnWheel::RIGHT});
+	chassis.moveDistance(18_in, 180_deg, 0, {.distGains={0.0725, 0, 0.004}, .exitDist = 2_in});
+
+	chassis.turnAbsolute(330_deg, 0, {.turnWheel=TurnWheel::RIGHT});
+	chassis.moveDistance(15_in, 330_deg, 0, {.distGains={0.0725, 0, 0.004}, .exitDist = 2_in});
+	chassis.turnAbsolute(-45_deg, 0, {.gains={1.1, 0.1, 0.1}});
+	chassis.moveToPoint({4_in, 4_in}, 2000, {.maxRPM=350_rpm});
+	pros::delay(500);
+	pros::Task([]{
+		pros::delay(300);
+		arm.allianceStake();
+	});
+	chassis.moveToPoint({20_in, 20_in}, 0, {.maxRPM=400_rpm, .reverse=true});
+
 }
 
 void redGoalRush() {
