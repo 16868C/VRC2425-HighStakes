@@ -51,13 +51,15 @@ struct TurnToPointParams {
 	okapi::QAngularSpeed maxRPM = 600_rpm;
 	okapi::QAngularSpeed minRPM = 0_rpm;
 
-	PIDGains gains = {1, 0, 1};
+	PIDGains gains = {1.1, 0.2, 0.09};
 
-	okapi::QAngle errorMargin = 2_deg;
-	okapi::QAngle angularVelThreshold = 30_deg; // per second
+	okapi::QAngle errorMargin = 1_deg;
+	okapi::QAngle angularVelThreshold = 5_deg; // per second
 
 	TurnWheel turnWheel = TurnWheel::BOTH;
 	TurnDirection dir = TurnDirection::SHORTEST;
+
+	bool reverse = false;
 
 	double slewRate = 0;
 };

@@ -13,20 +13,14 @@ void initialize() {
 	pros::lcd::initialize();
 
 	auton.add(1, "redGoalStake", redGoalStake);
-	auton.add(2, "redRingStake", redRingStake);
-	auton.add(3, "redGoalRush", redGoalRush);
-	// auton.add(2, "blueSoloAWP", blueSoloAWP);
-	// auton.add(3, "redGoalRush", redGoalRush);
-	// auton.add(4, "blueGoalRush", blueGoalRush);
-	// auton.add(5, "redGoalStake", redGoalStake);
-	// auton.add(6, "blueGoalStake", blueGoalStake);
-	// auton.add(7, "redRingRush", redRingRush);
-	// auton.add(8, "blueRingRush", blueRingRush);
-	// auton.add(9, "redRingStake", redRingStake);
-	// auton.add(10, "blueRingStake", blueRingStake);
+	auton.add(2, "blueGoalStake", blueGoalStake);
+	auton.add(3, "redRingStake", redRingStake);
+	auton.add(4, "blueRingStake", blueRingStake);
+	auton.add(5, "redGoalRush", redGoalRush);
+	auton.add(6, "blueGoalRush", blueGoalRush);
 	auton.start();
 
-	if (auton.getSelectedIdx() != 1) armEnc.resetZero();
+	armEnc.resetZero();
 	intakeEnc.resetZero();
 	odometry.calibrate();
 }
@@ -50,8 +44,9 @@ void opcontrol() {
 		intake.setTargetRing(RingColour::RED);
 
 	intakeRaiser.extend();
+	arm.defaultPos();
 
-	odometry.init();
+	// odometry.init();
 
 	// chassis.moveDistance(48_in, 0_deg, 0, {.distGains={0.064, 0, 0.004}, .headingGains={0.5, 0, 0.01}});
 

@@ -197,6 +197,7 @@ void Inline::turnToPoint(Pose target, int timeout, TurnToPointParams params, boo
 	}
 
 	double tgtHeading = odom->getPose().angleTo(target);
+	if (params.reverse) tgtHeading = target.angleTo(odom->getPose());
 	tgtHeading = getTargetHeading(tgtHeading, inertial->get_rotation(AngleUnit::RAD));
 	TurnAbsoluteParams turnAbsoluteParams = {params.maxRPM,
 											params.minRPM, 
