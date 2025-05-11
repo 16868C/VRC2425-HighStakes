@@ -63,4 +63,4 @@ lib16868C::Inline chassis(leftDrive, rightDrive, &inertial, &odometry, WHEEL_DIA
 // lib16868C::Intake intake(intakeMtr, ringDetect, hookDist);
 lib16868C::Intake intake(intakeMtr, intakeEnc, ringOptical, {0.02, 0, 0.001}, 2, arm.getStatePtr());
 //lib16868C::Arm arm(armMtrs, armEnc, {0.01325, 0, 0.0008});
-lib16868C::Arm arm(armMtrs, armEnc, {0.013, 0, 0.000825});
+lib16868C::Arm arm(armMtrs, armEnc, {0.013, 0, 0.000825}, {0.01, 0, 0.0001});

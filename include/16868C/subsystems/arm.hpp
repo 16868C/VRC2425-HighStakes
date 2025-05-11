@@ -8,17 +8,17 @@ namespace lib16868C {
 enum class ArmPosition {
 	IDLE = -1,
 	DEFAULT = 0,
-	LOAD = 20,
-	LOAD2 = 33,
+	LOAD = 22,
+	LOAD2 = 37,
 	HOLD = 50,
 	WALL_STAKE = 145,
-	ALLIANCE_STAKE = 198,
+	ALLIANCE_STAKE = 210,
 	HANG = 230
 };
 
 class Arm {
 public:
-	Arm(lib16868C::MotorGroup& mtrs, lib16868C::Rotation& enc, PIDGains gains);
+	Arm(lib16868C::MotorGroup& mtrs, lib16868C::Rotation& enc, PIDGains largeErrorGains, PIDGains smallErrorGains);
 
 	void move(double volts);
 	void moveTo(double tgt, double volts = 12000);
@@ -46,7 +46,8 @@ private:
 	double tgt = 0;
 	double error = 1e5;
 	ArmPosition state = ArmPosition::IDLE;
-	PIDGains pid;
+	PIDGains largeErrorGains;
+	PIDGains smallErrorGains;
 
 	pros::Task armTask = pros::Task(armManager, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Arm Manager");
 	static void armManager(void* params);

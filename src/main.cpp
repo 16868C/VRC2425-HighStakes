@@ -123,6 +123,7 @@ void opcontrol() {
 						break;
 					default:
 						arm.load();
+						intake.intake();
 						break;
 				}
 			}
@@ -132,7 +133,10 @@ void opcontrol() {
 			if (leftDoinkerTgl.changedToPressed()) leftDoinker.toggle();
 			if (rightDoinkerTgl.changedToPressed()) rightDoinker.toggle();
 
-			if (armHang.changedToPressed()) arm.hang();
+			if (armHang.changedToPressed()) {
+				arm.hang();
+				intake.stop();
+			}
 
 			if (okapi::ControllerButton(okapi::ControllerDigital::A).changedToPressed()) {
 				// std::cout << autonSelector.get_value() << "\n";

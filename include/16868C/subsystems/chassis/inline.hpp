@@ -72,7 +72,7 @@ struct MoveToPointParams {
 	PIDGains headingGains = {0.5, 0, 0.01};
 
 	okapi::QLength earlyExitRadius = 5_in;
-	okapi::QLength settleRadius = 6_in;
+	okapi::QLength settleRadius = 8_in;
 
 	bool reverse = false;
 

@@ -4,7 +4,7 @@ using namespace lib16868C;
 
 void Arm::armManager(void* params) {
 	Arm* arm = (Arm*) params;
-	PIDController armPID(arm->pid);
+	PIDController armPID(arm->largeErrorGains);
 
 	int n = 0;
 	uint32_t time = pros::millis();
@@ -16,10 +16,12 @@ void Arm::armManager(void* params) {
 			arm->mtrs.moveVoltage(0);
 			arm->state = ArmPosition::IDLE;
 		}
-		// pros::lcd::print(0, "%f", arm->enc.get());
+		pros::lcd::print(0, "%f", arm->enc.get());
 
 		if (arm->state != ArmPosition::IDLE) {
 			arm->error = static_cast<int>(arm->getState()) - arm->enc.get();
+			if (std::abs(arm->error) > 50) armPID.setGains(arm->largeErrorGains);
+			else armPID.setGains(arm->smallErrorGains);
 			double ctrl = armPID.calculate(arm->error);
 			// std::cout << ctrl << " " << static_cast<int>(arm->getState()) << " " << arm->enc.get() << "\n";
 			arm->mtrs.moveVoltage(arm->volts * ctrl);
@@ -31,7 +33,7 @@ void Arm::armManager(void* params) {
 	}
 }
 
-Arm::Arm(MotorGroup& mtrs, Rotation& enc, PIDGains gains) : mtrs(mtrs), enc(enc), pid(gains) {}
+Arm::Arm(MotorGroup& mtrs, Rotation& enc, PIDGains largeErrorGains, PIDGains smallErrorGains) : mtrs(mtrs), enc(enc), largeErrorGains(largeErrorGains), smallErrorGains(smallErrorGains) {}
 
 void Arm::move(double volts) {
 	state = ArmPosition::IDLE;
